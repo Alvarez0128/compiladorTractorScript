@@ -1,0 +1,14 @@
+.ant-tabs {
+  background-color: #1f1f1f; /* Fondo del contenido los tabs */
+}
+
+.ant-tabs-nav {
+  background-color: #2e2e2e; /* Fondo de la barra de navegación de los tabs */
+  
+}
+
+/*
+::-webkit-scrollbar {
+  display: none;
+}
+*/
