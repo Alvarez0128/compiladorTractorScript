@@ -1,26 +1,67 @@
 import React from 'react';
-import { Dropdown, message, Space,ConfigProvider } from 'antd';
+import { Dropdown, message, Space, ConfigProvider } from 'antd';
 
 const onClick = ({ key }) => {
   message.info(`Click on item ${key}`);
 };
 
-const items = [
+const itemsArchivo = [
   {
-    label: '1st menu item',
+    label: 'Nuevo archivo',
     key: '1',
   },
   {
-    label: '2nd menu item',
+    label: 'Abrir',
     key: '2',
   },
   {
-    label: '3rd menu item',
+    label: 'Guardar',
+    key: '3',
+  },
+  {
+    label: 'Guardar como',
+    key: '4',
+  },
+];
+
+const itemsEditar = [
+  {
+    label: 'Copiar',
+    key: '1',
+  },
+  {
+    label: 'Cortar',
+    key: '2',
+  },
+  {
+    label: 'Pegar',
     key: '3',
   },
 ];
 
-const MenuDropdown = ({ label }) => (
+const itemsVer = [
+  {
+    label: 'Vista previa',
+    key: '1',
+  },
+  {
+    label: 'Opciones de visualización',
+    key: '2',
+  },
+];
+
+const itemsAyuda = [
+  {
+    label: 'Documentación',
+    key: '1',
+  },
+  {
+    label: 'Soporte',
+    key: '2',
+  },
+];
+
+const MenuDropdown = ({ label, items }) => (
   <Dropdown menu={{ items, onClick }} trigger={['click']}>
     <a onClick={(e) => e.preventDefault()} className="cursor-default">
       <Space className='hover:bg-green-600 px-3 py-0.5'>
@@ -40,10 +81,10 @@ const BarraMenu = () => (
       }
     }
   }}>
-    <MenuDropdown label="Archivo" />
-    <MenuDropdown label="Editar" />
-    <MenuDropdown label="Ver" />
-    <MenuDropdown label="Ayuda" />
+    <MenuDropdown label="Archivo" items={itemsArchivo} />
+    <MenuDropdown label="Editar" items={itemsEditar} />
+    <MenuDropdown label="Ver" items={itemsVer} />
+    <MenuDropdown label="Ayuda" items={itemsAyuda} />
   </ConfigProvider>
 );
 

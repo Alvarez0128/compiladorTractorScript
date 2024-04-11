@@ -19,9 +19,9 @@ const CardComponent = () => (
         
       }}
     >
-      <p>Card content</p>
-      <p>Card content</p>
-      <p>Card content</p>
+      <p>Error 1</p>
+      <p>Error 2</p>
+      <p>Error 3</p>
     </Card>
   </ConfigProvider>
 );
