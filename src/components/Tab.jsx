@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Tabs, ConfigProvider, Button, Tooltip } from 'antd';
 import { CaretRightOutlined, FileOutlined } from '@ant-design/icons';
-import EditorCodigo from './EditorCodigo.jsx';
+import Editor from '@monaco-editor/react';
 import './Tab.css';
 
 const operations = <Tooltip title="Compilar"><Button type="primary" shape="circle" icon={<CaretRightOutlined />} className='mr-12' /></Tooltip>
@@ -9,7 +9,13 @@ const operations = <Tooltip title="Compilar"><Button type="primary" shape="circl
 const initialItems = [
   {
     label: 'Sin-Título',
-    children: <EditorCodigo />,
+    children: <Editor
+      theme='vs-dark'
+      height='93vh'
+      options={{
+        fontSize: '18',
+      }}
+    />,
     key: '1',
     closable: false,
     icon: <FileOutlined />
@@ -20,21 +26,46 @@ const Tab = () => {
   const [activeKey, setActiveKey] = useState(initialItems[0].key);
   const [items, setItems] = useState(initialItems);
   const newTabIndex = useRef(0);
+
+  const compileCode = () => {
+    
+    const newHeight = '75vh'  //`${window.innerHeight * 0.8}px`; 
+    const newItems = items.map(item => ({
+      ...item,
+      children: <Editor
+        theme='vs-dark'
+        height={newHeight}
+        options={{
+          fontSize: '18',
+        }}
+      />
+    }));
+    setItems(newItems);
+  };
+
   const onChange = (newActiveKey) => {
     setActiveKey(newActiveKey);
   };
+
   const add = () => {
     const newActiveKey = `newTab${newTabIndex.current++}`;
     const newPanes = [...items];
     newPanes.push({
       label: 'Nueva pestaña',
-      children: <EditorCodigo />,
+      children: <Editor
+        theme='vs-dark'
+        height='100vh'
+        options={{
+          fontSize: '18',
+        }}
+      />,
       key: newActiveKey,
       icon: <FileOutlined />
     });
     setItems(newPanes);
     setActiveKey(newActiveKey);
   };
+
   const remove = (targetKey) => {
     let newActiveKey = activeKey;
     let lastIndex = -1;
@@ -54,6 +85,7 @@ const Tab = () => {
     setItems(newPanes);
     setActiveKey(newActiveKey);
   };
+
   const onEdit = (targetKey, action) => {
     if (action === 'add') {
       add();
@@ -89,18 +121,20 @@ const Tab = () => {
       }}
 
     >
-      <div className="border border-green-900" >
+      <div className="border-b-0 border border-green-900" >
         <Tabs
           type="editable-card"
           onChange={onChange}
           activeKey={activeKey}
           onEdit={onEdit}
           items={items}
-          tabBarExtraContent={operations}
+          tabBarExtraContent={<div onClick={compileCode}>{operations}</div>}
         ></Tabs>
       </div>
+      <div className='bg-current h-1 w-full cursor-s-resize border-b border-l border-r border-green-900'></div>
 
     </ConfigProvider>
   );
 };
+
 export default Tab;

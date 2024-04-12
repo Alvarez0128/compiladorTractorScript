@@ -64,7 +64,7 @@ const itemsAyuda = [
 const MenuDropdown = ({ label, items }) => (
   <Dropdown menu={{ items, onClick }} trigger={['click']}>
     <a onClick={(e) => e.preventDefault()} className="cursor-default">
-      <Space className='hover:bg-green-600 px-3 py-0.5'>
+      <Space className=' text-white hover:bg-green-600 px-3 py-0.5 hover:text-white'>
         {label}
       </Space>
     </a>
