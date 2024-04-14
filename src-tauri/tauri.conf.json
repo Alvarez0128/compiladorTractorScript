@@ -11,6 +11,26 @@
   },
   "tauri": {
     "allowlist": {
+      "fs": {
+        "all": true, 
+        "readFile": true,
+        "writeFile": true,
+        "readDir": true,
+        "copyFile": true,
+        "createDir": true,
+        "removeDir": true,
+        "removeFile": true,
+        "renameFile": true,
+        "exists": true
+      },
+      "dialog": {
+        "all": true, 
+        "ask": true, 
+        "confirm": true, 
+        "message": true, 
+        "open": true, 
+        "save": true 
+      },
       "all": false,
       "shell": {
         "all": false,
@@ -20,11 +40,11 @@
     "windows": [
       {
         "title": "TractorScript Compiler",
-        "width": 800,
-        "height": 600,
+        "width": 1000,
+        "height": 800,
         "center": true,
-        "minWidth": 600,
-        "minHeight": 400
+        "minWidth": 900,
+        "minHeight": 700
       }
     ],
     "security": {

@@ -1,51 +1,345 @@
-import Tab from './components/Tab.jsx';
-import BarraMenu from './components/BarraMenu.jsx';
-import { Layout, Card, ConfigProvider } from 'antd';
+import React, { useRef, useState } from 'react';
+import { Layout, Card, ConfigProvider, Button, Tooltip, Tabs, Table, message, Dropdown, Space } from 'antd';
+import Editor from '@monaco-editor/react';
+import { writeFile, readTextFile } from '@tauri-apps/api/fs';
+import { open, save } from '@tauri-apps/api/dialog';
 import './App.css'
+
+
+
 const { Header, Content, Footer } = Layout;
 
+
+const columns = [
+  {
+    title: 'Token',
+    dataIndex: 'type',
+    key: 'type',
+  },
+  {
+    title: 'Lexema',
+    dataIndex: 'value',
+    key: 'value',
+    render: (text) => <a>{text}</a>,
+  },
+  {
+    title: 'Linea',
+    dataIndex: 'line',
+    key: 'line',
+  },
+  {
+    title: 'Columna',
+    key: 'column',
+    dataIndex: 'column',
+  },
+];
+
 function App() {
+  const [tokens, setTokens] = useState([]);
+  const [errors, setErrors] = useState([]);
+  const [compilationMessage, setCompilationMessage] = useState('');
+  const [codigo, setCodigo] = useState('');
+
+  let table = <ConfigProvider theme={{
+    components: {
+      Table: {
+        colorBgContainer: '#303030',
+        algorithm: true,
+        borderColor: '#282828',
+        colorText: '#dcdcdc',
+        rowHoverBg: '#353535',
+        colorTextHeading: '#fff'
+      }
+    }
+  }}>
+    <Table pagination={false} columns={columns} dataSource={tokens} />
+  </ConfigProvider>
+
+  const itemsTabs = [
+    {
+      key: '1',
+      label: 'Componentes Léxicos',
+      children: table,
+    },
+    {
+      key: '2',
+      label: 'Análisis Semántico',
+      children: 'Content of Tab Pane 2',
+    },
+    {
+      key: '3',
+      label: 'Codigo Intermedio',
+      children: 'Content of Tab Pane 3',
+    },
+    {
+      key: '4',
+      label: 'Codigo Optimizado',
+      children: 'Content of Tab Pane 4',
+    },
+    {
+      key: '5',
+      label: 'Codigo Objeto',
+      children: 'Content of Tab Pane 5',
+    },
+  ];
+
+  const editorRef = useRef(null);
+
+  function handleEditorDidMount(editor, monaco) {
+    editorRef.current = editor;
+  }
+
+  const compileCode = () => {
+    fetch('http://localhost:5000/compile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code: editorRef.current.getValue() }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.tokens) {
+          setTokens(data.tokens);
+          setErrors([]);
+        }
+        if (data.errors) {
+          setErrors(data.errors);
+          setCompilationMessage('Compilación exitosa');
+        }
+        editorRef.current.setPosition({ lineNumber: 1, column: 1 });
+      })
+      .catch(error => console.error('Error:', error));
+  };
+
+  const guardarArchivo = async () => {
+    const codigo = editorRef.current.getValue();
+    try {
+      const result = await save({
+        defaultPath: 'code.tsp',
+        filters: [{
+          name: 'TractorScript',
+          extensions: ['tsp']
+        }]
+      });
+      if (result) {
+        await writeFile(result, codigo);
+        message.success('Archivo guardado correctamente');
+      } else {
+        message.info('Guardado cancelado por el usuario');
+      }
+    } catch (error) {
+      console.error('Error al guardar el archivo:', error);
+      message.error('Error al guardar el archivo');
+    }
+  };
+
+  const nuevoArchivo = () =>{
+    setCodigo('');
+  }
+  const abrirArchivo = async () => {
+    try {
+      const result = await open({
+        
+        filters: [{
+          name: 'TractorScript',
+          extensions: ['tsp']
+        }]
+      });
+      if (result) {
+        const codigo = await readTextFile(result);
+        setCodigo(codigo);
+        message.success('Abierto');
+      } else {
+        message.info('No abierto');
+      }
+    } catch (error) {
+      console.error('Error al abrir el archivo:', error);
+      message.error('Error al abrir el archivo');
+    }
+  };
+  const onClick = ({ key }) => { };
+
+  const itemsArchivo = [
+    {
+      label: 'Nuevo archivo',
+      key: 'nuevo',
+      onClick: () => {
+        nuevoArchivo();
+      },
+    },
+    {
+      label: 'Abrir',
+      key: 'abrir',
+      onClick: () => {
+        abrirArchivo();
+      },
+    },
+    {
+      label: 'Guardar',
+      key: 'guardar',
+      
+    },
+    {
+      label: 'Guardar como',
+      key: 'guardarc',
+      onClick: () => {
+        guardarArchivo();
+      },
+    },
+  ];
+
+  const itemsEditar = [
+    {
+      label: 'Copiar',
+      key: 'copiar',
+    },
+    {
+      label: 'Cortar',
+      key: 'cortar',
+    },
+    {
+      label: 'Pegar',
+      key: 'pegar',
+    },
+  ];
+
+  const itemsVer = [
+    {
+      label: 'Panel derecho',
+      key: 'pander',
+    },
+    {
+      label: 'Salida',
+      key: 'salida',
+    },
+  ];
+
+  const itemsAyuda = [
+    {
+      label: 'Documentación',
+      key: 'documentacion',
+    },
+    {
+      label: 'Soporte',
+      key: 'soporte',
+    },
+  ];
+
+
+  const MenuDropdown = ({ label, items }) => (
+    <Dropdown menu={{ items, onClick }} trigger={['click']}>
+      <a onClick={(e) => e.preventDefault()} className="cursor-default">
+        <Space className=' text-white hover:bg-green-600 px-3 py-0.5 hover:text-white'>
+          {label}
+        </Space>
+      </a>
+    </Dropdown>
+  );
+
   return (
     <Layout>
-      <Header className='bg-zinc-900 text-sm space-x-0.5 text-white h-fit pl-0'>
-        <BarraMenu />
+      <Header className='bg-zinc-900 text-sm text-white h-fit pl-0'>
+        <ConfigProvider theme={{
+          components: {
+            Dropdown: {
+              colorBgElevated: '#C9FFB6',
+              borderRadiusLG: 2,
+              colorText: '#000'
+            }
+          }
+        }}>
+          <MenuDropdown label="Archivo" items={itemsArchivo} />
+          <MenuDropdown label="Editar" items={itemsEditar} />
+          <MenuDropdown label="Ver" items={itemsVer} />
+          <MenuDropdown label="Ayuda" items={itemsAyuda} />
+        </ConfigProvider>
+
+        <ConfigProvider theme={{
+          components: {
+            Button: {
+              textHoverBg: 'rgba(22, 163, 74, 0)',
+              colorText: '#fff',
+              colorBgTextActive: 'rgba(22, 163, 74, 0.28)'
+            }
+          }
+        }}>
+          <Tooltip title="Compilar">
+            <Button type='text' onClick={guardarArchivo}>▶</Button>
+          </Tooltip>
+        </ConfigProvider>
+
       </Header>
 
-      <Content>
-        <Tab />
+      <Content id='content' className='border border-green-900 grid grid-cols-2'>
+        <div>
+          <Editor
+            theme='vs-dark'
+            height='100%'
+            width='100%'
+            options={{
+              fontSize: '18',
+            }}
+            value={`${codigo}`??""}
+            onChange={(value) => setCodigo(value)}
+            onMount={handleEditorDidMount}
+            className='border-e border-green-900 pt-3'
+          />
+        </div>
+        <div className='px-6 '>
+          <ConfigProvider
+            theme={{
+              components: {
+                Tabs: {
+                  itemSelectedColor: '#43BC4C',
+                  algorithm: true,
+                  inkBarColor: '#43BC4C',
+                  itemColor: '#fff',
+                  itemHoverColor: '#47AB4E',
+                  colorText: '#fff',
+                  colorBorderSecondary: '#8b8b8b',
+                  colorBgContainer: '#282828'
+                }
+              }
+            }}
+          >
+            <Tabs defaultActiveKey="1" items={itemsTabs} />
+          </ConfigProvider>
+        </div>
       </Content>
 
       <Footer className='bg-slate-800 h-60 m-0 p-0'>
         <ConfigProvider theme={{
-          components:{
-            Card:{
-              headerHeight:0,
-              colorText:'#CCCCCC',
-              colorBorderSecondary:'#14532D',
-              algorithm:true,
-              paddingLG:10
+          components: {
+            Card: {
+              headerHeight: 0,
+              colorText: '#CCCCCC',
+              colorBorderSecondary: '#14532D',
+              paddingLG: 10,
+              algorithm: true
             }
           }
         }}>
           <Card
-            title="Salida"
+            title="Salida ↴"
             bordered={false}
             style={{
               width: '100%',
-              height: '100%',
+              height: '35vh',
               borderRadius: 0,
+              overflow: 'auto',
               backgroundColor: '#2e2e2e',
             }}
           >
-            <p>Error...</p>
-            <p>Error...</p>
-            <p>Error...</p>
+            {errors.length === 0 && <p>{compilationMessage}</p>}
+            {errors.map((error, index) => (
+              <p key={index}>{error.type} en la línea {error.line}, columna {error.column} lexema: {error.value}</p>
+            ))}
           </Card>
         </ConfigProvider>
       </Footer>
     </Layout>
-  )
-
+  );
 }
 
 export default App;
