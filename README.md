@@ -34,5 +34,5 @@ Dirígete a la carpeta raíz del proyecto y ejecuta:
 npm run compilador
 ```
 
-##Paso 4: ¡Listo para Empezar!
+## Paso 4: ¡Listo para Empezar!
 ¡Felicidades! Has inicializado con éxito el proyecto [TractorScript]. Ahora puedes comenzar a explorar o editar el código si lo requieres.
