@@ -39,6 +39,7 @@ function App() {
   const [errors, setErrors] = useState([]);
   const [compilationMessage, setCompilationMessage] = useState('');
   const [codigo, setCodigo] = useState('');
+  const [arbol, setArbol] = useState('');
 
   let table = <ConfigProvider theme={{
     components: {
@@ -52,8 +53,13 @@ function App() {
       }
     }
   }}>
-    <Table pagination={false} columns={columns} dataSource={tokens} id='tabla'/>
+    <Table pagination={false} columns={columns} dataSource={tokens} id='tabla' />
   </ConfigProvider>
+
+  let tree = <pre className='font-mono font-bold bg-neutral-700 rounded-lg p-5 text-lg overflow-auto'>
+    Gramatica generada:<br /><pre className='text-lg font-normal'>{arbol}</pre>
+  </pre>
+
 
   const itemsTabs = [
     {
@@ -64,7 +70,7 @@ function App() {
     {
       key: '2',
       label: 'Análisis Sintáctico',
-      children: 'Content of Tab Pane 2',
+      children: tree,
     },
     {
       key: '3',
@@ -106,6 +112,7 @@ function App() {
       .then(data => {
         if (data.tokens) {
           setTokens(data.tokens);
+          setArbol(data.tree)
           setErrors([]);
         }
         if (data.errors) {
@@ -139,13 +146,13 @@ function App() {
     }
   };
 
-  const nuevoArchivo = () =>{
+  const nuevoArchivo = () => {
     setCodigo('');
   }
   const abrirArchivo = async () => {
     try {
       const result = await open({
-        
+
         filters: [{
           name: 'TractorScript',
           extensions: ['tsp']
@@ -280,7 +287,7 @@ function App() {
             options={{
               fontSize: '18',
             }}
-            value={`${codigo}`??""}
+            value={`${codigo}` ?? ""}
             onChange={(value) => setCodigo(value)}
             onMount={handleEditorDidMount}
             className='border-e border-green-900 pt-3 relative'

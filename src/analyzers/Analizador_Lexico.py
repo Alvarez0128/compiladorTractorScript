@@ -1,15 +1,12 @@
-from flask import Flask, request, jsonify
 import ply.lex as lex
-from flask_cors import CORS  # Importa la extensión Flask-CORS
 
-app = Flask(__name__)
-CORS(app)
-
-#Para reiniciar los contadores de linea y columna
-def reiniciar_analizador():
+# Función para reiniciar la lista de errores y los contadores del analizador
+def reiniciar_analizador_lexico(lexer):
+    # global errors
+    # errors = []
     lexer.lineno = 1
     lexer.lexpos = 0
-
+    
 # Función para encontrar la columna del token en la línea
 def find_column(input, token):
     last_cr = input.rfind('\n', 0, token.lexpos)
@@ -20,15 +17,13 @@ def find_column(input, token):
         return 1 
     return column
 
-
 # Lista de errores
 errors = []
 
-#USO DE AUTOMATAS FINITOS PARA EL MANEJO DE ERRORES
+# USO DE AUTOMATAS FINITOS PARA EL MANEJO DE ERRORES
 
 # Manejo de errores para identificadores mal formados
 def t_error_IDENTIFICADOR(t):
-    
     r'\d+[a-zA-Z_ñÑ][a-zA-Z0-9_ñÑ]*'
     errors.append({
         'type': 'Error: Identificador inválido',
@@ -36,7 +31,7 @@ def t_error_IDENTIFICADOR(t):
         'line': t.lineno,
         'column': find_column(t.lexer.lexdata, t)
     })
-    #t.lexer.skip(1)
+    # t.lexer.skip(1)
 
 # Manejo de errores para números enteros invalidos
 def t_error_NUMERO_ENTERO(t):
@@ -47,11 +42,11 @@ def t_error_NUMERO_ENTERO(t):
         'line': t.lineno,
         'column': find_column(t.lexer.lexdata, t)
     })
-    #t.lexer.skip(1)
+    # t.lexer.skip(1)
 
 # Manejo de errores para números decimales invalidos
 def t_error_NUMERO_DECIMAL(t):
-    r'\d+([\.]{2,}[a-zA-Z0-9_ñÑ]+[\.|[a-zA-Z0-9_ñÑ]]*)+ | \d+\.[a-zA-Z0-9_ñÑ]+(\.+[a-zA-Z0-9_ñÑ]+)+ | \.+[a-zA-Z0-9_ñÑ]+(\.|[a-zA-Z0-9_ñÑ])* ' 
+    r'\d+([\.]{2,}[a-zA-Z0-9_ñÑ]+[\.|[a-zA-Z0-9_ñÑ]]*)+ | \d+\.[a-zA-Z0-9_ñÑ]+(\.+[a-zA-Z0-9_ñÑ]+)+ | \.+[a-zA-Z0-9_ñÑ]+(\.|[a-zA-Z0-9_ñÑ])* '
     errors.append({
         'type': 'Error: Formato de número decimal inválido',
         'value': t.value,
@@ -59,7 +54,7 @@ def t_error_NUMERO_DECIMAL(t):
         'column': find_column(t.lexer.lexdata, t)
     })
 
-# Manejo de errores para simbolos no reconocidos
+# Manejo de errores para símbolos no reconocidos
 def t_error(t):
     errors.append({
         'type': 'Error: Símbolo no reconocido',
@@ -222,34 +217,14 @@ def t_NUEVA_LINEA(t):
 
 # Ignorar espacios en blanco y tabulaciones
 t_ignore = ' \t'
-
-# Construcción del analizador léxico
 lexer = lex.lex()
+# Construcción del analizador léxico
+def construir_analizador_lexico():
+    return lex.lex()
 
-@app.route('/compile', methods=['POST'])
-def compile_code():
+# Función para obtener los errores y limpiar la lista de errores
+def obtener_errores_lexico():
     global errors
-    errors = []  
-    
-    # Reiniciamos la lista de errores en cada solicitud
-    reiniciar_analizador()
-    # Obtener el código fuente de la solicitud POST
-    code = request.json['code']
-    # Reemplazar los saltos de línea por '\n' explícitamente
-    code = code.replace('\r\n', '\n')
-    # Pasar el código al analizador léxico
-    lexer.input(code)
-    tokens = []
-    for tok in lexer:
-        tokens.append({
-            'type': tok.type,
-            'value': tok.value,
-            'line': tok.lineno,
-            'column': tok.lexpos - code.rfind('\n', 0, tok.lexpos)
-        })
-
-    # Devolver los resultados y errores
-    return jsonify({'tokens': tokens, 'errors': errors})
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    errores = list(errors)
+    errors.clear()
+    return errores

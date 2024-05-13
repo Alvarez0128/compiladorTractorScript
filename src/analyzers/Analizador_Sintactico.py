@@ -1,5 +1,6 @@
 import ply.yacc as yacc
-from Analizador_Lexico import tokens  # Importa tokens desde tu archivo léxico
+from Analizador_Lexico import tokens, find_column # Importa tokens desde tu archivo léxico
+
 
 # Clase para representar el nodo PARA en el árbol sintáctico
 class NodoPara:
@@ -50,6 +51,7 @@ def p_declaracion(p):
                 | si
                 | para
                 | mientras
+                | mostrar_en_pantalla
     """
     if len(p) == 6:
         p[0] = ('declaracion', p[1], p[2], p[4])
@@ -168,49 +170,100 @@ def p_mientras(p):
     """
     p[0] = ('mientras', p[3], p[5])
 
+# Estructura expresion MOSTRAR_EN_PANTALLA
+def p_mostrar_en_pantalla(p):
+    """
+    mostrar_en_pantalla : MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
+    """
+    p[0] = ('mostrar_en_pantalla', p[3])
+    
 # Manejo de Errores
+
+errors=[]
 def p_error(p):
+    global errors
     if p:
-        print(f"Error de sintaxis en '{p.value}', línea {p.lineno}")
+        errors.append({
+            'type': 'Error de sintaxis en ',
+            'value': p.value,
+            'line': p.lineno,
+            'column': find_column(p.lexer.lexdata, p)
+        })
+        #print(f"Error de sintaxis en '{p.value}', línea {p.lineno}")
     else:
-        print("Error de sintaxis: expresión incompleta")
+        errors.append({
+            'type': 'Error de sintaxis: expresión incompleta',
+            'value': '',
+            'line': '',
+            'column': ''
+        })
+        #print("Error de sintaxis: expresión incompleta")
 
 # Construir el analizador
-parser = yacc.yacc()
+# parser = yacc.yacc()
+def construir_analizador_sintactico():
+    return yacc.yacc()
 
+# Función para obtener los errores y limpiar la lista de errores
+def obtener_errores_sintactico():
+    global errors
+    errores = list(errors)
+    errors.clear()
+    return errores
+
+def tree_to_string(node, depth=0):
+    result = ""
+    if isinstance(node, tuple):
+        result += "  " * depth + node[0] + "\n"
+        for child in node[1:]:
+            result += tree_to_string(child, depth + 1)
+    elif isinstance(node, NodoPara):
+        result += "  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}\n"
+        result += tree_to_string(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+    elif isinstance(node, list):
+        for item in node:
+            result += tree_to_string(item, depth)
+    else:
+        result += "  " * depth + str(node) + "\n"
+    return result
+
+
+
+
+######################################################
 # Función de prueba
-def test_parser(input_string):
-    result = parser.parse(input_string)
-    print_tree(result)
+# def test_parser(input_string):
+#     result = parser.parse(input_string)
+#     #print_tree(result)
 
 # Función para imprimir el árbol sintáctico
-def print_tree(node, depth=0):
-    if isinstance(node, tuple):
-        print("  " * depth + node[0])
-        for child in node[1:]:
-            print_tree(child, depth + 1)
-    elif isinstance(node, NodoPara):
-        print("  " * depth + "PARA")
-        print_tree(node.variable, depth + 1)
-        print_tree(node.inicio, depth + 1)
-        print_tree(node.condicion, depth + 1)
-        print_tree(node.actualizacion, depth + 1)
-        print_tree(node.cuerpo, depth + 1)
-    else:
-        print("  " * depth + str(node))
+# def print_tree(node, depth=0):
+#     if isinstance(node, tuple):
+#         print("  " * depth + node[0])
+#         for child in node[1:]:
+#             print_tree(child, depth + 1)
+#     elif isinstance(node, NodoPara):
+#         print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+#         print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+#     elif isinstance(node, list):
+#         for item in node:
+#             print_tree(item, depth)
+#     else:
+#         print("  " * depth + str(node))
 
-# Código de prueba
-test_code = """
-COMENZAR{
-    ENTERO contador = 0;
-    ENTERO s = 0;
-PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
-    //MOSTRAR_EN_PANTALLA(contador);
-    ENTERO s = 0;
-}
 
-}
-TERMINAR
-"""
+# # Código de prueba
+# test_code = """
+# COMENZAR{
+#     ENTERO contador = 0;
+#     ENTERO s = 0;
+# PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
+#     MOSTRAR_EN_PANTALLA(contador);
+#     ENTERO s = 0;
+# }
 
-test_parser(test_code)
+# }
+# TERMINAR
+# """
+
+# test_parser(test_code)

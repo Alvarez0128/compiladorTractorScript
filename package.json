@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "start": "tauri dev",
-    "analizar": "python src/analyzers/Analizador_Lexico.py",
+    "analizar": "python src/analyzers/MainServer.py",
     "compilador": "npm-run-all --parallel analizar start"
   },
   "dependencies": {
