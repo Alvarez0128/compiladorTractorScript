@@ -52,7 +52,7 @@ function App() {
       }
     }
   }}>
-    <Table pagination={false} columns={columns} dataSource={tokens} />
+    <Table pagination={false} columns={columns} dataSource={tokens} id='tabla'/>
   </ConfigProvider>
 
   const itemsTabs = [
@@ -63,21 +63,26 @@ function App() {
     },
     {
       key: '2',
-      label: 'Análisis Semántico',
+      label: 'Análisis Sintáctico',
       children: 'Content of Tab Pane 2',
     },
     {
       key: '3',
+      label: 'Análisis Semántico',
+      children: 'Content of Tab Pane 2',
+    },
+    {
+      key: '4',
       label: 'Codigo Intermedio',
       children: 'Content of Tab Pane 3',
     },
     {
-      key: '4',
+      key: '5',
       label: 'Codigo Optimizado',
       children: 'Content of Tab Pane 4',
     },
     {
-      key: '5',
+      key: '6',
       label: 'Codigo Objeto',
       children: 'Content of Tab Pane 5',
     },
@@ -177,11 +182,6 @@ function App() {
     },
     {
       label: 'Guardar',
-      key: 'guardar',
-      
-    },
-    {
-      label: 'Guardar como',
       key: 'guardarc',
       onClick: () => {
         guardarArchivo();
@@ -265,7 +265,7 @@ function App() {
           }
         }}>
           <Tooltip title="Compilar">
-            <Button type='text' onClick={guardarArchivo}>▶</Button>
+            <Button type='text' onClick={compileCode}>▶</Button>
           </Tooltip>
         </ConfigProvider>
 
@@ -283,7 +283,7 @@ function App() {
             value={`${codigo}`??""}
             onChange={(value) => setCodigo(value)}
             onMount={handleEditorDidMount}
-            className='border-e border-green-900 pt-3'
+            className='border-e border-green-900 pt-3 relative'
           />
         </div>
         <div className='px-6 '>

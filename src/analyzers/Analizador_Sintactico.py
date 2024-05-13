@@ -1,0 +1,216 @@
+import ply.yacc as yacc
+from Analizador_Lexico import tokens  # Importa tokens desde tu archivo léxico
+
+# Clase para representar el nodo PARA en el árbol sintáctico
+class NodoPara:
+    def __init__(self, tipo, identificador, inicio, condicion, incremento, bloque):
+        self.tipo = tipo
+        self.identificador = identificador
+        self.inicio = inicio
+        self.condicion = condicion
+        self.incremento = incremento
+        self.bloque = bloque
+
+    def __str__(self):
+        return f"PARA {self.tipo} {self.identificador} = {self.inicio}; {self.condicion}; {self.incremento} {{\n{self.bloque}\n}}"
+
+# Evitar la impresión de advertencias sobre tokens no utilizados
+yacc.errorlog = yacc.NullLogger()
+
+# Programa principal
+def p_programa(p):
+    """
+    programa : COMENZAR bloque_codigo TERMINAR
+    """
+    p[0] = ('programa', p[2])
+
+# Bloque de código
+def p_bloque_codigo(p):
+    """
+    bloque_codigo : LLAVE_IZQ lista_declaraciones LLAVE_DER
+    """
+    p[0] = ('bloque_codigo', p[2])
+
+# Lista de declaraciones
+def p_lista_declaraciones(p):
+    """
+    lista_declaraciones : lista_declaraciones declaracion 
+                        | declaracion
+    """
+    if len(p) == 3:
+        p[0] = p[1] + [p[2]]
+    else:
+        p[0] = [p[1]]
+
+# Declaración
+def p_declaracion(p):
+    """
+    declaracion : tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA
+                | expresion PUNTO_COMA
+                | si
+                | para
+                | mientras
+    """
+    if len(p) == 6:
+        p[0] = ('declaracion', p[1], p[2], p[4])
+    else:
+        p[0] = ('declaracion', p[1])
+
+# Tipos de datos
+def p_tipo(p):
+    """
+    tipo : ENTERO
+         | DECIMAL
+         | BOOL
+         | LISTA
+         | DICCIONARIO
+    """
+    p[0] = p[1]
+
+# Expresiones
+def p_expresion(p):
+    """
+    expresion : expresion operador expresion
+              | PARENTESIS_IZQ expresion PARENTESIS_DER
+              | IDENTIFICADOR
+              | ENTERO
+              | DECIMAL
+              | BOOL
+              | CADENA
+              | lista
+    """
+    if len(p) == 4:
+        if p[1] == '(':
+            p[0] = ('grupo', p[2])
+        else:
+            p[0] = ('expresion', p[1], p[2], p[3])
+    else:
+        p[0] = p[1]
+
+# Operadores
+def p_operador(p):
+    """
+    operador : MAS
+             | MENOS
+             | POR
+             | DIVIDIDO
+             | IGUAL
+             | DIFERENTE
+             | MENOR
+             | MAYOR
+             | MENOR_IGUAL
+             | MAYOR_IGUAL
+             | Y
+             | O
+             | NO
+    """
+    p[0] = p[1]
+
+# Lista
+def p_lista(p):
+    """
+    lista : LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
+    """
+    p[0] = ('lista', p[2], p[4])
+
+def p_menor_tipo(p):
+    """
+    menor_tipo : MENOR IDENTIFICADOR MAYOR
+    """
+    p[0] = p[2]
+
+def p_valores_lista(p):
+    """
+    valores_lista : valores_lista COMA valor_lista
+                  | valor_lista
+    """
+    if len(p) == 4:
+        p[0] = p[1] + [p[3]]
+    else:
+        p[0] = [p[1]]
+
+def p_valor_lista(p):
+    """
+    valor_lista : ENTERO
+                | DECIMAL
+                | BOOL
+    """
+    p[0] = p[1]
+
+# Estructuras de Control de Flujo
+def p_si(p):
+    """
+    si : SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
+                  | SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo
+                  | SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo
+                  | SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo
+    """
+    if len(p) == 6:
+        p[0] = ('si', p[3], p[5])
+    elif p[4] == 'Y':
+        p[0] = ('si_y', p[3], p[5], p[7])
+    elif p[4] == 'O':
+        p[0] = ('si_o', p[3], p[5], p[7])
+    else:
+        p[0] = ('si_no', p[4], p[5])
+
+# Estructura de control de flujo PARA
+def p_para(p):
+    """
+    para : PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+    """
+    p[0] = NodoPara(p[3], p[4], p[6], p[8], p[10], p[12])
+
+# Estructura de control de flujo MIENTRAS
+def p_mientras(p):
+    """
+    mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
+    """
+    p[0] = ('mientras', p[3], p[5])
+
+# Manejo de Errores
+def p_error(p):
+    if p:
+        print(f"Error de sintaxis en '{p.value}', línea {p.lineno}")
+    else:
+        print("Error de sintaxis: expresión incompleta")
+
+# Construir el analizador
+parser = yacc.yacc()
+
+# Función de prueba
+def test_parser(input_string):
+    result = parser.parse(input_string)
+    print_tree(result)
+
+# Función para imprimir el árbol sintáctico
+def print_tree(node, depth=0):
+    if isinstance(node, tuple):
+        print("  " * depth + node[0])
+        for child in node[1:]:
+            print_tree(child, depth + 1)
+    elif isinstance(node, NodoPara):
+        print("  " * depth + "PARA")
+        print_tree(node.variable, depth + 1)
+        print_tree(node.inicio, depth + 1)
+        print_tree(node.condicion, depth + 1)
+        print_tree(node.actualizacion, depth + 1)
+        print_tree(node.cuerpo, depth + 1)
+    else:
+        print("  " * depth + str(node))
+
+# Código de prueba
+test_code = """
+COMENZAR{
+    ENTERO contador = 0;
+    ENTERO s = 0;
+PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
+    //MOSTRAR_EN_PANTALLA(contador);
+    ENTERO s = 0;
+}
+
+}
+TERMINAR
+"""
+
+test_parser(test_code)

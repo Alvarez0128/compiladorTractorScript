@@ -11,9 +11,13 @@ body {
 #content{
   background-color: #1e1e1e;
   height: 65vh;
+  overflow: auto;
 }
 
 ::-webkit-scrollbar {
   display: none;
 }
-
+#tabla{
+  overflow: auto;
+  height: 55vh;
+}
