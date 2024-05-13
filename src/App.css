@@ -14,10 +14,31 @@ body {
   overflow: auto;
 }
 
-::-webkit-scrollbar {
+body::-webkit-scrollbar {
   display: none;
+}
+::-webkit-scrollbar {
+  background-color: inherit;
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-corner {
+  background-color: inherit;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #365d34;
+  border-radius: 20px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #2ea52e; /* Cambiar el color del pulgar al pasar el mouse sobre él */
 }
 #tabla{
   overflow: auto;
   height: 55vh;
 }
+#arbol{
+  overflow: auto;
+  height: 55vh;
+}
+
+

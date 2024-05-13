@@ -49,16 +49,19 @@ function App() {
         borderColor: '#282828',
         colorText: '#dcdcdc',
         rowHoverBg: '#353535',
-        colorTextHeading: '#fff'
+        colorTextHeading: '#fff',
+        stickyScrollBarBg: '#365d34',
       }
     }
   }}>
-    <Table pagination={false} columns={columns} dataSource={tokens} id='tabla' />
+    <Table pagination={false} columns={columns} dataSource={tokens} id='tabla'/>
   </ConfigProvider>
 
-  let tree = <pre className='font-mono font-bold bg-neutral-700 rounded-lg p-5 text-lg overflow-auto'>
-    Gramatica generada:<br /><pre className='text-lg font-normal'>{arbol}</pre>
-  </pre>
+  let tree = <div className='font-mono font-bold bg-neutral-700 rounded-lg p-5 text-lg overflow-auto m-1' id='arbol'>
+    <pre className='font-mono font-bold text-lg p-2'>
+      Gramatica generada:<br /><pre className='text-lg font-normal'>{arbol}</pre>
+    </pre>
+  </div>
 
 
   const itemsTabs = [
@@ -338,10 +341,12 @@ function App() {
               backgroundColor: '#2e2e2e',
             }}
           >
-            {errors.length === 0 && <p>{compilationMessage}</p>}
-            {errors.map((error, index) => (
-              <p key={index}>{error.type} en la línea {error.line}, columna {error.column} lexema: {error.value}</p>
-            ))}
+            <div className='px-5 '>
+              {errors.length === 0 && <p>{compilationMessage}</p>}
+              {errors.map((error, index) => (
+                <p key={index}>{error.type} en la línea {error.line}, columna {error.column} lexema: {error.value}</p>
+              ))}
+            </div>
           </Card>
         </ConfigProvider>
       </Footer>
