@@ -16,7 +16,6 @@ def compile_code():
 
     # Obtener el código fuente de la solicitud POST
     code = request.json['code']
-    # Reemplazar los saltos de línea por '\n' explícitamente
     code = code.replace('\r\n', '\n')
     # Pasar el código al analizador léxico
     lexer.input(code)
@@ -30,7 +29,7 @@ def compile_code():
             'column': tok.lexpos - code.rfind('\n', 0, tok.lexpos)
         })
 
-    result = tree_to_string(parser.parse(code))
+    arbol = tree_to_string(parser.parse(code))
     
     # Obtener errores después de analizar el código
     errores_lexico = obtener_errores_lexico()
@@ -38,10 +37,11 @@ def compile_code():
 
     # Fusionar las listas de errores en una sola lista
     errores = errores_lexico + errores_sintactico
+    
     all_errors = remove_duplicates(errores)
     
     # Devolver los resultados y errores
-    return jsonify({'tokens': tokens, 'errors': all_errors, 'tree':result})
+    return jsonify({'tokens': tokens, 'errors': all_errors},arbol) 
 
 def remove_duplicates(error_list):
     

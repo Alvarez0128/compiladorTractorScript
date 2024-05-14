@@ -1,3 +1,4 @@
+from flask import jsonify
 import ply.yacc as yacc
 from Analizador_Lexico import tokens, find_column # Importa tokens desde tu archivo léxico
 
@@ -190,14 +191,13 @@ def p_error(p):
             'column': find_column(p.lexer.lexdata, p)
         })
         #print(f"Error de sintaxis en '{p.value}', línea {p.lineno}")
-    else:
-        errors.append({
-            'type': 'Error de sintaxis: expresión incompleta',
-            'value': '',
-            'line': '',
-            'column': ''
-        })
-        #print("Error de sintaxis: expresión incompleta")
+    # else:
+    #     errors.append({
+    #         'type': 'Error de sintaxis: expresión incompleta',
+    #         'value': '',
+    #         'line': '',
+    #         'column': ''
+    #     })
 
 # Construir el analizador
 # parser = yacc.yacc()
@@ -227,6 +227,30 @@ def tree_to_string(node, depth=0):
         result += "  " * depth + str(node) + "\n"
     return result
 
+def tree_to_json(node):
+    if isinstance(node, tuple):
+        result = {'title': node[0], 'children': []}
+        for child in node[1:]:
+            child_json = tree_to_json(child)
+            if child_json.get('title'):  # Si el hijo tiene un título válido
+                result['children'].append(child_json)
+            else:  # Si no tiene título, añadir sus hijos directamente
+                result['children'].extend(child_json.get('children', []))
+        return result
+    elif isinstance(node, NodoPara):
+        result = {'title': f'PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}', 'children': []}
+        result['children'].append(tree_to_json(node.bloque))
+        return result
+    elif isinstance(node, list):
+        result = {'children': []}
+        for item in node:
+            result['children'].append(tree_to_json(item))
+        return result
+    else:
+        return {'title': str(node)}
+
+def tree_to_json_string(node):
+    return jsonify(tree_to_json(node))
 
 
 

@@ -2,8 +2,8 @@ import ply.lex as lex
 
 # Función para reiniciar la lista de errores y los contadores del analizador
 def reiniciar_analizador_lexico(lexer):
-    # global errors
-    # errors = []
+    global errors
+    errors = []
     lexer.lineno = 1
     lexer.lexpos = 0
     
@@ -46,7 +46,7 @@ def t_error_NUMERO_ENTERO(t):
 
 # Manejo de errores para números decimales invalidos
 def t_error_NUMERO_DECIMAL(t):
-    r'\d+([\.]{2,}[a-zA-Z0-9_ñÑ]+[\.|[a-zA-Z0-9_ñÑ]]*)+ | \d+\.[a-zA-Z0-9_ñÑ]+(\.+[a-zA-Z0-9_ñÑ]+)+ | \.+[a-zA-Z0-9_ñÑ]+(\.|[a-zA-Z0-9_ñÑ])* '
+    r'\d+([\.]{2,}[a-zA-Z0-9_ñÑ]+[\.|[a-zA-Z0-9_ñÑ]]*)+ | \d+\.[a-zA-Z0-9_ñÑ]+(\.+[a-zA-Z0-9_ñÑ]+)+ | \.+[a-zA-Z0-9_ñÑ]+(\.|[a-zA-Z0-9_ñÑ])* | \d\.\.\d'
     errors.append({
         'type': 'Error: Formato de número decimal inválido',
         'value': t.value,
@@ -54,16 +54,15 @@ def t_error_NUMERO_DECIMAL(t):
         'column': find_column(t.lexer.lexdata, t)
     })
 
-# Manejo de errores para símbolos no reconocidos
+# Manejo de errores para cualquier carácter no reconocido
 def t_error(t):
     errors.append({
-        'type': 'Error: Símbolo no reconocido',
+        'type': 'Error: Carácter no reconocido',
         'value': t.value[0],
         'line': t.lineno,
         'column': find_column(t.lexer.lexdata, t)
     })
     t.lexer.skip(1)
-
 
 # Definición de tokens
 tokens = [
@@ -217,7 +216,7 @@ def t_NUEVA_LINEA(t):
 
 # Ignorar espacios en blanco y tabulaciones
 t_ignore = ' \t'
-lexer = lex.lex()
+#lexer = lex.lex()
 # Construcción del analizador léxico
 def construir_analizador_lexico():
     return lex.lex()

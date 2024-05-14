@@ -1,14 +1,12 @@
 import React, { useRef, useState } from 'react';
-import { Layout, Card, ConfigProvider, Button, Tooltip, Tabs, Table, message, Dropdown, Space } from 'antd';
+import { Layout, Card, ConfigProvider, Button, Tooltip, Tabs, Table, message, Dropdown, Space, Tree } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
 import { writeFile, readTextFile } from '@tauri-apps/api/fs';
 import { open, save } from '@tauri-apps/api/dialog';
 import './App.css'
 
-
-
 const { Header, Content, Footer } = Layout;
-
 
 const columns = [
   {
@@ -39,7 +37,7 @@ function App() {
   const [errors, setErrors] = useState([]);
   const [compilationMessage, setCompilationMessage] = useState('');
   const [codigo, setCodigo] = useState('');
-  const [arbol, setArbol] = useState('');
+  const [arbol, setArbol] = useState([]);
 
   let table = <ConfigProvider theme={{
     components: {
@@ -54,15 +52,35 @@ function App() {
       }
     }
   }}>
-    <Table pagination={false} columns={columns} dataSource={tokens} id='tabla'/>
+    <Table pagination={false} columns={columns} dataSource={tokens} id='tabla' />
   </ConfigProvider>
 
-  let tree = <div className='font-mono font-bold bg-neutral-700 rounded-lg p-5 text-lg overflow-auto m-1' id='arbol'>
+  let tree = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='arbol'>
     <pre className='font-mono font-bold text-lg p-2'>
-      Gramatica generada:<br /><pre className='text-lg font-normal'>{arbol}</pre>
+      Gramatica generada:<br />
+      <ConfigProvider theme={{
+        components: {
+          Tree: {
+            colorBgContainer: '#404040',
+            algorithm: true,
+            colorText: '#dcdcdc',
+            nodeSelectedBg: '#606060',
+            nodeHoverBg: '#505050'
+          }
+        }
+      }}
+      >
+        <Tree
+        showLine
+        switcherIcon={<DownOutlined />}
+        defaultExpandedKeys={['0-0-0']}
+        // onSelect={onSelect}
+        treeData={arbol}
+        style={{overflow:"auto",padding:"10px"}}
+      />
+      </ConfigProvider>
     </pre>
   </div>
-
 
   const itemsTabs = [
     {
@@ -104,6 +122,7 @@ function App() {
   }
 
   const compileCode = () => {
+    console.log(JSON.stringify({ code: editorRef.current.getValue() }));
     fetch('http://localhost:5000/compile', {
       method: 'POST',
       headers: {
@@ -113,16 +132,17 @@ function App() {
     })
       .then(response => response.json())
       .then(data => {
-        if (data.tokens) {
-          setTokens(data.tokens);
-          setArbol(data.tree)
+        if (data[0].tokens) {
+          setTokens(data[0].tokens);
+          setArbol([data[1]])
           setErrors([]);
         }
-        if (data.errors) {
-          setErrors(data.errors);
+        if (data[0].errors) {
+          setErrors(data[0].errors);
           setCompilationMessage('Compilación exitosa');
         }
         editorRef.current.setPosition({ lineNumber: 1, column: 1 });
+        
       })
       .catch(error => console.error('Error:', error));
   };
