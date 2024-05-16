@@ -6,7 +6,6 @@ from Error import Error
 
 errores=obtener_errores_lexico()
 def agregar_error_sintactico(error_type,error_description, value, line, column):
-    global errores
     errores.append(Error(error_type,error_description, value, line, column))
 
 
@@ -197,7 +196,8 @@ def p_error_tipo(p):
 
 
 def p_error(p):
-    print("Error: Se esperaba otra cadena antes de",p)
+    pass
+    #print("Error: Se esperaba otra cadena antes de",p)
 
 
 # Construir el analizador
@@ -232,17 +232,21 @@ def tree_to_json(node):
 
 ######################################################
 lexer = construir_analizador_lexico()
+tokens=[]
 # Función de prueba
 def test_parser(input_string):
     #global errores
     lexer.input(input_string)
     
     for token in lexer:
-        print(token)
+        tokens.append(token)
+        #print(token)
+    result = parser.parse(input_string)
+    reiniciar_analizador_lexico(lexer)
     for error in errores:
         print(error)
-    reiniciar_analizador_lexico(lexer)
-    result = parser.parse(input_string)
+    for t in tokens:
+        print(t)
     print_tree(result)
 
 # Función para imprimir el árbol sintáctico
