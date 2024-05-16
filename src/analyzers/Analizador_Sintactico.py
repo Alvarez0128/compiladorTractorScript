@@ -1,7 +1,15 @@
 from flask import jsonify
 import ply.yacc as yacc
-from Analizador_Lexico import tokens, find_column # Importa tokens desde tu archivo léxico
+from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens, find_column 
 
+from Error import Error
+
+def agregar_error_sintactico(error_type,error_description, value, line, column):
+    errors.append(Error(error_type,error_description, value, line, column))
+
+def obtener_errores_sintactico():
+    global errors
+    return errors.copy()
 
 # Clase para representar el nodo PARA en el árbol sintáctico
 class NodoPara:
@@ -76,8 +84,8 @@ def p_expresion(p):
     expresion : expresion operador expresion
               | PARENTESIS_IZQ expresion PARENTESIS_DER
               | IDENTIFICADOR
-              | ENTERO
-              | DECIMAL
+              | NUMENTERO
+              | NUMDECIMAL
               | BOOL
               | CADENA
               | lista
@@ -134,8 +142,8 @@ def p_valores_lista(p):
 
 def p_valor_lista(p):
     """
-    valor_lista : ENTERO
-                | DECIMAL
+    valor_lista : NUMENTERO
+                | NUMDECIMAL
                 | BOOL
     """
     p[0] = p[1]
@@ -179,53 +187,24 @@ def p_mostrar_en_pantalla(p):
     p[0] = ('mostrar_en_pantalla', p[3])
     
 # Manejo de Errores
+def p_error_tipo(p):
+    """
+    declaracion : error IDENTIFICADOR IGUAL expresion PUNTO_COMA
+                | tipo error IGUAL expresion PUNTO_COMA
+                | error PUNTO_COMA
+    """
+    print("Error: Declaracion invalida",p.lineno(2))
 
-errors=[]
+
 def p_error(p):
-    global errors
-    if p:
-        errors.append({
-            'type': 'Error de sintaxis en ',
-            'value': p.value,
-            'line': p.lineno,
-            'column': find_column(p.lexer.lexdata, p)
-        })
-        #print(f"Error de sintaxis en '{p.value}', línea {p.lineno}")
-    # else:
-    #     errors.append({
-    #         'type': 'Error de sintaxis: expresión incompleta',
-    #         'value': '',
-    #         'line': '',
-    #         'column': ''
-    #     })
+    print("Error: Se esperaba otra cadena antes de",p.value,"Linea:",p.lineno,"Columna:",find_column(p.lexer.lexdata, p))
+
 
 # Construir el analizador
-# parser = yacc.yacc()
-def construir_analizador_sintactico():
-    return yacc.yacc()
+parser = yacc.yacc()
+# def construir_analizador_sintactico():
+#     return yacc.yacc()
 
-# Función para obtener los errores y limpiar la lista de errores
-def obtener_errores_sintactico():
-    global errors
-    errores = list(errors)
-    errors.clear()
-    return errores
-
-def tree_to_string(node, depth=0):
-    result = ""
-    if isinstance(node, tuple):
-        result += "  " * depth + node[0] + "\n"
-        for child in node[1:]:
-            result += tree_to_string(child, depth + 1)
-    elif isinstance(node, NodoPara):
-        result += "  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}\n"
-        result += tree_to_string(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-    elif isinstance(node, list):
-        for item in node:
-            result += tree_to_string(item, depth)
-    else:
-        result += "  " * depth + str(node) + "\n"
-    return result
 
 def tree_to_json(node):
     if isinstance(node, tuple):
@@ -249,45 +228,50 @@ def tree_to_json(node):
     else:
         return {'title': str(node)}
 
-def tree_to_json_string(node):
-    return jsonify(tree_to_json(node))
-
 
 
 ######################################################
+lexer = construir_analizador_lexico()
 # Función de prueba
-# def test_parser(input_string):
-#     result = parser.parse(input_string)
-#     #print_tree(result)
+def test_parser(input_string):
+    lexer.input(input_string)
+    errores=obtener_errores_lexico()
+    for token in lexer:
+        print(token)
+    for error in errores:
+        print(error)
+    reiniciar_analizador_lexico(lexer)
+    result = parser.parse(input_string)
+    print_tree(result)
 
 # Función para imprimir el árbol sintáctico
-# def print_tree(node, depth=0):
-#     if isinstance(node, tuple):
-#         print("  " * depth + node[0])
-#         for child in node[1:]:
-#             print_tree(child, depth + 1)
-#     elif isinstance(node, NodoPara):
-#         print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-#         print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-#     elif isinstance(node, list):
-#         for item in node:
-#             print_tree(item, depth)
-#     else:
-#         print("  " * depth + str(node))
+def print_tree(node, depth=0):
+    if isinstance(node, tuple):
+        print("  " * depth + node[0])
+        for child in node[1:]:
+            print_tree(child, depth + 1)
+    elif isinstance(node, NodoPara):
+        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+    elif isinstance(node, list):
+        for item in node:
+            print_tree(item, depth)
+    else:
+        print("  " * depth + str(node))
 
 
 # # Código de prueba
-# test_code = """
-# COMENZAR{
-#     ENTERO contador = 0;
-#     ENTERO s = 0;
-# PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
-#     MOSTRAR_EN_PANTALLA(contador);
-#     ENTERO s = 0;
-# }
+test_code = """
+COMENZAR{
+    ;
+    ENTERO = 0;
+PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
+    MOSTRAR_EN_PANTALLA(contador);
+    ENTERO s = 0;
+}
 
-# }
-# TERMINAR
-# """
+}
+TERMINAR
+"""
 
-# test_parser(test_code)
+test_parser(test_code)

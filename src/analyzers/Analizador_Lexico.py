@@ -1,11 +1,23 @@
 import ply.lex as lex
+from Error import Error
+
+
+errors = []
 
 # Función para reiniciar la lista de errores y los contadores del analizador
 def reiniciar_analizador_lexico(lexer):
-    global errors
-    errors = []
+    # global errors
+    # errors = []
     lexer.lineno = 1
     lexer.lexpos = 0
+
+# Función para obtener los errores
+def obtener_errores_lexico():
+    global errors
+    return errors
+
+def agregar_error_lexico(error_type,error_description, value, line, column):
+    errors.append(Error(error_type,error_description, value, line, column))
     
 # Función para encontrar la columna del token en la línea
 def find_column(input, token):
@@ -17,51 +29,27 @@ def find_column(input, token):
         return 1 
     return column
 
-# Lista de errores
-errors = []
 
 # USO DE AUTOMATAS FINITOS PARA EL MANEJO DE ERRORES
 
 # Manejo de errores para identificadores mal formados
 def t_error_IDENTIFICADOR(t):
     r'\d+[a-zA-Z_ñÑ][a-zA-Z0-9_ñÑ]*'
-    errors.append({
-        'type': 'Error: Identificador inválido',
-        'value': t.value,
-        'line': t.lineno,
-        'column': find_column(t.lexer.lexdata, t)
-    })
-    # t.lexer.skip(1)
+    agregar_error_lexico('Léxico','Identificador inválido',t.value,t.lineno,find_column(t.lexer.lexdata, t))
 
 # Manejo de errores para números enteros invalidos
 def t_error_NUMERO_ENTERO(t):
     r'[+-]{2,}\d+'
-    errors.append({
-        'type': 'Error: Formato de número entero inválido',
-        'value': t.value,
-        'line': t.lineno,
-        'column': find_column(t.lexer.lexdata, t)
-    })
-    # t.lexer.skip(1)
+    agregar_error_lexico('Léxico','Formato de número entero inválido',t.value,t.lineno,find_column(t.lexer.lexdata, t))
 
 # Manejo de errores para números decimales invalidos
 def t_error_NUMERO_DECIMAL(t):
     r'\d+([\.]{2,}[a-zA-Z0-9_ñÑ]+[\.|[a-zA-Z0-9_ñÑ]]*)+ | \d+\.[a-zA-Z0-9_ñÑ]+(\.+[a-zA-Z0-9_ñÑ]+)+ | \.+[a-zA-Z0-9_ñÑ]+(\.|[a-zA-Z0-9_ñÑ])* | \d\.\.\d'
-    errors.append({
-        'type': 'Error: Formato de número decimal inválido',
-        'value': t.value,
-        'line': t.lineno,
-        'column': find_column(t.lexer.lexdata, t)
-    })
+    agregar_error_lexico('Léxico','Formato de número decimal inválido',t.value,t.lineno,find_column(t.lexer.lexdata, t))
 
 # Manejo de errores para cualquier carácter no reconocido
 def t_error(t):
-    errors.append({
-        'type': 'Error: Carácter no reconocido',
-        'value': t.value[0],
-        'line': t.lineno,
-        'column': find_column(t.lexer.lexdata, t)
-    })
+    agregar_error_lexico('Léxico','Carácter no reconocido',t.value[0],t.lineno,find_column(t.lexer.lexdata, t))
     t.lexer.skip(1)
 
 # Definición de tokens
@@ -71,7 +59,9 @@ tokens = [
     'PARA',
     'MIENTRAS',
     'ENTERO',
+    'NUMENTERO',
     'DECIMAL',
+    'NUMDECIMAL',
     'BOOL',
     'IDENTIFICADOR',
     'LISTA',
@@ -143,13 +133,13 @@ t_O = r'[Oo]'
 t_NO = r'[Nn][Oo]'
 
 # Expresión regular para números decimales
-def t_DECIMAL(t):
+def t_NUMDECIMAL(t):
     r'\d+\.\d+'
     t.value = float(t.value)
     return t
 
 # Expresión regular para números enteros
-def t_ENTERO(t):
+def t_NUMENTERO(t):
     r'\d+'
     t.value = int(t.value)
     return t
@@ -195,12 +185,7 @@ def t_CADENA(t):
 # Manejo de errores para cadenas no cerradas
 def t_error_CADENA(t):
     r'"(?:\\.|[^\n\"])*[^"]?'
-    errors.append({
-        'type': 'Error: Cadena no cerrada',
-        'value': t.value,
-        'line': t.lineno,
-        'column': find_column(t.lexer.lexdata, t)
-    })
+    agregar_error_lexico('Léxico','Cadena no cerrada',t.value,t.lineno,find_column(t.lexer.lexdata, t))
     t.lexer.skip(1)
 
 # Expresión regular para comentarios
@@ -216,14 +201,32 @@ def t_NUEVA_LINEA(t):
 
 # Ignorar espacios en blanco y tabulaciones
 t_ignore = ' \t'
-#lexer = lex.lex()
+
 # Construcción del analizador léxico
 def construir_analizador_lexico():
     return lex.lex()
 
-# Función para obtener los errores y limpiar la lista de errores
-def obtener_errores_lexico():
-    global errors
-    errores = list(errors)
-    errors.clear()
-    return errores
+
+
+
+# code = """
+# COMENZAR{
+#     ENTERO contador = 0.2;
+#     ENTERO = 0;
+# PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
+#     MOSTRAR_EN_PANTALLA(contador);
+#     ENTERO s = 0;
+# }
+
+# }
+# TERMINAR
+# """
+# lexer = construir_analizador_lexico()
+
+# lexer.input(code)
+
+# for token in lexer:
+#     print(token)
+# for error in errors:
+#     print(error)
+
