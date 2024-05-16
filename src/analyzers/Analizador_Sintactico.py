@@ -4,12 +4,11 @@ from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexic
 
 from Error import Error
 
+errores=obtener_errores_lexico()
 def agregar_error_sintactico(error_type,error_description, value, line, column):
-    errors.append(Error(error_type,error_description, value, line, column))
+    global errores
+    errores.append(Error(error_type,error_description, value, line, column))
 
-def obtener_errores_sintactico():
-    global errors
-    return errors.copy()
 
 # Clase para representar el nodo PARA en el árbol sintáctico
 class NodoPara:
@@ -193,11 +192,12 @@ def p_error_tipo(p):
                 | tipo error IGUAL expresion PUNTO_COMA
                 | error PUNTO_COMA
     """
-    print("Error: Declaracion invalida",p.lineno(2))
+    agregar_error_sintactico('Sintactico','Declaración inválida',p[2],p.lineno(2),p.lexpos(2))
+    #print("Error: Declaración inválida en la linea",p.lineno(2), ", columna:",p.lexpos(2))
 
 
 def p_error(p):
-    print("Error: Se esperaba otra cadena antes de",p.value,"Linea:",p.lineno,"Columna:",find_column(p.lexer.lexdata, p))
+    print("Error: Se esperaba otra cadena antes de",p)
 
 
 # Construir el analizador
@@ -234,8 +234,9 @@ def tree_to_json(node):
 lexer = construir_analizador_lexico()
 # Función de prueba
 def test_parser(input_string):
+    #global errores
     lexer.input(input_string)
-    errores=obtener_errores_lexico()
+    
     for token in lexer:
         print(token)
     for error in errores:
@@ -263,7 +264,9 @@ def print_tree(node, depth=0):
 # # Código de prueba
 test_code = """
 COMENZAR{
-    ;
+    0..0;
+    @
+    0..2;
     ENTERO = 0;
 PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
     MOSTRAR_EN_PANTALLA(contador);

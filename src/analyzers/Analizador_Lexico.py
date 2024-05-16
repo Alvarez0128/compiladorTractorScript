@@ -13,7 +13,7 @@ def reiniciar_analizador_lexico(lexer):
 
 # Función para obtener los errores
 def obtener_errores_lexico():
-    global errors
+    #global errors
     return errors
 
 def agregar_error_lexico(error_type,error_description, value, line, column):
@@ -211,7 +211,7 @@ def construir_analizador_lexico():
 
 # code = """
 # COMENZAR{
-#     ENTERO contador = 0.2;
+#     ENTERO contador = 0..2;
 #     ENTERO = 0;
 # PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
 #     MOSTRAR_EN_PANTALLA(contador);
