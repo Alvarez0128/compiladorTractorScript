@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Layout, Card, ConfigProvider, Button, Tooltip, Tabs, Table, message, Dropdown, Space, Tree } from 'antd';
+import { Layout, Card, ConfigProvider, Button, Tooltip, Tabs, Table, message, Dropdown, Space, Tree, Modal, Image } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
 import { writeFile, readTextFile } from '@tauri-apps/api/fs';
@@ -38,6 +38,7 @@ function App() {
   const [compilationMessage, setCompilationMessage] = useState('');
   const [codigo, setCodigo] = useState('');
   const [arbol, setArbol] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   let table = <ConfigProvider theme={{
     components: {
@@ -71,13 +72,13 @@ function App() {
       }}
       >
         <Tree
-        showLine
-        switcherIcon={<DownOutlined />}
-        defaultExpandedKeys={['0-0-0']}
-        // onSelect={onSelect}
-        treeData={arbol}
-        style={{overflow:"auto",padding:"10px"}}
-      />
+          showLine
+          switcherIcon={<DownOutlined />}
+          defaultExpandedKeys={['0-0-0']}
+          // onSelect={onSelect}
+          treeData={arbol}
+          style={{ overflow: "auto", padding: "10px" }}
+        />
       </ConfigProvider>
     </pre>
   </div>
@@ -169,9 +170,9 @@ function App() {
         console.log(data[1].title);
         if (data[0].tokens) {
           setTokens(data[0].tokens);
-          if(data[1].title==="Error encontrado"){
-            setArbol([{title: "No se logró generar el árbol debido a un error inesperado"}])
-          }else{
+          if (data[1].title === "Error encontrado") {
+            setArbol([{ title: "Árbol no generado" }])
+          } else {
             setArbol([data[1]])
           }
           setErrors([]);
@@ -181,7 +182,7 @@ function App() {
           setCompilationMessage('Compilación exitosa');
         }
         editorRef.current.setPosition({ lineNumber: 1, column: 1 });
-        
+
       })
       .catch(error => console.error('Error:', error));
   };
@@ -232,7 +233,17 @@ function App() {
       message.error('Error al abrir el archivo');
     }
   };
-  const onClick = ({ key }) => { };
+  const onClick = ({ key }) => { }
+
+  // Función para mostrar el modal
+  const showModalInfoErrores = () => {
+    setModalVisible(true);
+  };
+
+  // Función para ocultar el modal
+  const handleCancel = () => {
+    setModalVisible(false);
+  };
 
   const itemsArchivo = [
     {
@@ -403,8 +414,23 @@ function App() {
             <div className='px-5 '>
               {errors.length === 0 && <p>{compilationMessage}</p>}
               {errors.map((error, index) => (
-                <p key={index}>Error {error.type} - {error.description} en la <a onClick={() => goToLineAndColumn(error.line, error.column, error.value)}className="font-bold hover:underline">línea {error.line}, columna {error.column}</a> lexema: {error.value}</p>
+                <li key={index} onClick={showModalInfoErrores} className='hover:text-green-600 cursor-pointer transition'>
+                  Error {error.type} - {error.description} en la <a onClick={(e) => { e.stopPropagation(); goToLineAndColumn(error.line, error.column, error.value); }} className="font-bold hover:underline"> línea {error.line}, columna {error.column}</a> lexema: {error.value}
+                </li>
               ))}
+
+              <Modal
+                title="Gramatica de validación para el error"
+                open={modalVisible}
+                onCancel={handleCancel}
+                footer={null}
+              >
+                foto de ejemplo de las gramaticas que quiere el fic
+                <Image
+                  width="90%"
+                  src="https://i.ibb.co/BgbnGf1/example.jpg"
+                />
+              </Modal>
             </div>
           </Card>
         </ConfigProvider>

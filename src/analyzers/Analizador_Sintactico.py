@@ -239,7 +239,7 @@ def p_error_declaracion_4(p):
     """
     declaracion : tipo IDENTIFICADOR error expresion PUNTO_COMA
     """
-    agregar_error_sintactico('Sintactico','Se esperaba un signo (=) para la declaración',p[3],p.lineno(3),find_column(p.lexer.lexdata,p,3))
+    agregar_error_sintactico('Sintactico','Se esperaba un signo (=) para la declaración',p[4],p.lineno(3),find_column(p.lexer.lexdata,p,3))
 def p_error_declaracion_5(p):
     """
     declaracion : tipo IDENTIFICADOR IGUAL expresion error
@@ -285,6 +285,8 @@ def tree_to_json(node):
 
 
 ######################################################ZONA PARA PRUEBAS
+#DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
+
 # parser = yacc.yacc()
 # lexer = construir_analizador_lexico()
 # tokens_analisis=[]
@@ -323,7 +325,7 @@ def tree_to_json(node):
 # # # Código de prueba
 # test_code = """
 # COMENZAR{
-#     x  0;
+#     ENTERO x 0;
 # PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
 #     MOSTRAR_EN_PANTALLA(contador);
 #     ENTERO s = 0;
