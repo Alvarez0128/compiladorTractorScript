@@ -122,7 +122,6 @@ function App() {
   }
 
   const compileCode = () => {
-    console.log(JSON.stringify({ code: editorRef.current.getValue() }));
     fetch('http://localhost:5000/compile', {
       method: 'POST',
       headers: {
@@ -132,6 +131,7 @@ function App() {
     })
       .then(response => response.json())
       .then(data => {
+        console.log(data[0].errors);
         if (data[0].tokens) {
           setTokens(data[0].tokens);
           setArbol([data[1]])
@@ -364,7 +364,7 @@ function App() {
             <div className='px-5 '>
               {errors.length === 0 && <p>{compilationMessage}</p>}
               {errors.map((error, index) => (
-                <p key={index}>{error.type} en la línea {error.line}, columna {error.column} lexema: {error.value}</p>
+                <p key={index}>Error {error.type} - {error.description} en la línea {error.line}, columna {error.column} lexema: {error.value}</p>
               ))}
             </div>
           </Card>

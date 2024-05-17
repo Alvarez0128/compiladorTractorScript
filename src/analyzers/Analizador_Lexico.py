@@ -1,23 +1,27 @@
 import ply.lex as lex
-from Error import Error
 
-
-errors = []
+tabla_errores = []
 
 # Función para reiniciar la lista de errores y los contadores del analizador
 def reiniciar_analizador_lexico(lexer):
-    # global errors
-    # errors = []
+    global tabla_errores
+    tabla_errores = []
     lexer.lineno = 1
     lexer.lexpos = 0
 
 # Función para obtener los errores
 def obtener_errores_lexico():
-    #global errors
-    return errors
+    global tabla_errores
+    return tabla_errores
 
 def agregar_error_lexico(error_type,error_description, value, line, column):
-    errors.append(Error(error_type,error_description, value, line, column))
+    tabla_errores.append({
+        'type': error_type,
+        'description': error_description,
+        'value': value,
+        'line': line,
+        'column': column
+    })
     
 # Función para encontrar la columna del token en la línea
 def find_column(input, token):
@@ -37,6 +41,10 @@ def t_error_IDENTIFICADOR(t):
     r'\d+[a-zA-Z_ñÑ][a-zA-Z0-9_ñÑ]*'
     agregar_error_lexico('Léxico','Identificador inválido',t.value,t.lineno,find_column(t.lexer.lexdata, t))
 
+def t_error_PUNTO(t):
+    r'\.'
+    agregar_error_lexico('Léxico','No se esperaba ese caracter en esa posicion',t.value,t.lineno,find_column(t.lexer.lexdata, t))
+
 # Manejo de errores para números enteros invalidos
 def t_error_NUMERO_ENTERO(t):
     r'[+-]{2,}\d+'
@@ -44,7 +52,7 @@ def t_error_NUMERO_ENTERO(t):
 
 # Manejo de errores para números decimales invalidos
 def t_error_NUMERO_DECIMAL(t):
-    r'\d+([\.]{2,}[a-zA-Z0-9_ñÑ]+[\.|[a-zA-Z0-9_ñÑ]]*)+ | \d+\.[a-zA-Z0-9_ñÑ]+(\.+[a-zA-Z0-9_ñÑ]+)+ | \.+[a-zA-Z0-9_ñÑ]+(\.|[a-zA-Z0-9_ñÑ])* | \d\.\.\d'
+    r'\d+([\.]{2,}\d+[\.|\d]*)+ | \d+\.\d+(\.+\d+)+ | \.+\d+(\.|\d)* | (\d?\.\.\d)+ | \d+\.(?!\d)'
     agregar_error_lexico('Léxico','Formato de número decimal inválido',t.value,t.lineno,find_column(t.lexer.lexdata, t))
 
 # Manejo de errores para cualquier carácter no reconocido
@@ -211,7 +219,7 @@ def construir_analizador_lexico():
 
 # code = """
 # COMENZAR{
-#     ENTERO contador = 0..2;
+#     ENTERO contador = 22.;
 #     ENTERO = 0;
 # PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
 #     MOSTRAR_EN_PANTALLA(contador);
@@ -227,6 +235,6 @@ def construir_analizador_lexico():
 
 # for token in lexer:
 #     print(token)
-# for error in errors:
+# for error in tabla_errores:
 #     print(error)
 

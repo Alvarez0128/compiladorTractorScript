@@ -73,13 +73,28 @@ Rule 50    mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion P
 Rule 51    declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA
 Rule 52    declaracion -> tipo error IGUAL expresion PUNTO_COMA
 Rule 53    declaracion -> error PUNTO_COMA
+Rule 54    declaracion -> error expresion PUNTO_COMA
+Rule 55    declaracion -> NUMENTERO PUNTO_COMA
+Rule 56    declaracion -> NUMDECIMAL PUNTO_COMA
+Rule 57    declaracion -> BOOL PUNTO_COMA
+Rule 58    declaracion -> IDENTIFICADOR PUNTO_COMA
+Rule 59    declaracion -> CADENA PUNTO_COMA
+Rule 60    declaracion -> lista PUNTO_COMA
+Rule 61    declaracion -> NUMENTERO
+Rule 62    declaracion -> NUMDECIMAL
+Rule 63    declaracion -> BOOL
+Rule 64    declaracion -> IDENTIFICADOR
+Rule 65    declaracion -> CADENA
+Rule 66    declaracion -> lista
+Rule 67    declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA
+Rule 68    declaracion -> tipo IDENTIFICADOR IGUAL expresion error
 
 Terminals, with rules where they appear
 
 ASIGNAR              : 
 A_CADENA             : 
-BOOL                 : 13 21 43
-CADENA               : 22
+BOOL                 : 13 21 43 57 63
+CADENA               : 22 59 65
 CAPTURAR             : 
 CODIGO               : 
 COMA                 : 39
@@ -95,8 +110,8 @@ DOS_PUNTOS           :
 ENTERO               : 11
 EXCEPCION            : 
 FUNCION              : 
-IDENTIFICADOR        : 5 18 38 48 51
-IGUAL                : 5 28 48 51 52
+IDENTIFICADOR        : 5 18 38 48 51 58 64 67 68
+IGUAL                : 5 28 48 51 52 68
 INTENTAR             : 
 LISTA                : 14 37
 LLAVE_DER            : 2 37
@@ -111,27 +126,27 @@ MIENTRAS             : 49
 MOSTRAR_EN_PANTALLA  : 50
 NO                   : 36 47
 NUEVA_LINEA          : 
-NUMDECIMAL           : 20 42
-NUMENTERO            : 19 41
+NUMDECIMAL           : 20 42 56 62
+NUMENTERO            : 19 41 55 61
 O                    : 35 46
 PARA                 : 48
 PARENTESIS_DER       : 17 44 45 46 47 48 49 50
 PARENTESIS_IZQ       : 17 44 45 46 47 48 49 50
 POR                  : 26
-PUNTO_COMA           : 5 6 48 48 50 51 52 53
+PUNTO_COMA           : 5 6 48 48 50 51 52 53 54 55 56 57 58 59 60 67
 RETORNA              : 
 SI                   : 44 45 46 47
 SINO                 : 
 TERMINAR             : 1
 Y                    : 34 45
-error                : 51 52 53
+error                : 51 52 53 54 67 68
 
 Nonterminals, with rules where they appear
 
 bloque_codigo        : 1 44 45 46 47 48 49
 declaracion          : 3 4
-expresion            : 5 6 16 16 17 44 45 45 46 46 47 48 48 48 49 50 51 52
-lista                : 23
+expresion            : 5 6 16 16 17 44 45 45 46 46 47 48 48 48 49 50 51 52 54 67 68
+lista                : 23 60 66
 lista_declaraciones  : 2 3
 menor_tipo           : 37
 mientras             : 9
@@ -140,7 +155,7 @@ operador             : 16
 para                 : 8
 programa             : 0
 si                   : 7
-tipo                 : 5 48 52
+tipo                 : 5 48 52 67 68
 valor_lista          : 39 40
 valores_lista        : 37 39
 
@@ -191,6 +206,21 @@ state 4
     (51) declaracion -> . error IDENTIFICADOR IGUAL expresion PUNTO_COMA
     (52) declaracion -> . tipo error IGUAL expresion PUNTO_COMA
     (53) declaracion -> . error PUNTO_COMA
+    (54) declaracion -> . error expresion PUNTO_COMA
+    (55) declaracion -> . NUMENTERO PUNTO_COMA
+    (56) declaracion -> . NUMDECIMAL PUNTO_COMA
+    (57) declaracion -> . BOOL PUNTO_COMA
+    (58) declaracion -> . IDENTIFICADOR PUNTO_COMA
+    (59) declaracion -> . CADENA PUNTO_COMA
+    (60) declaracion -> . lista PUNTO_COMA
+    (61) declaracion -> . NUMENTERO
+    (62) declaracion -> . NUMDECIMAL
+    (63) declaracion -> . BOOL
+    (64) declaracion -> . IDENTIFICADOR
+    (65) declaracion -> . CADENA
+    (66) declaracion -> . lista
+    (67) declaracion -> . tipo IDENTIFICADOR error expresion PUNTO_COMA
+    (68) declaracion -> . tipo IDENTIFICADOR IGUAL expresion error
     (11) tipo -> . ENTERO
     (12) tipo -> . DECIMAL
     (13) tipo -> . BOOL
@@ -214,16 +244,16 @@ state 4
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
     error           shift and go to state 15
-    ENTERO          shift and go to state 16
-    DECIMAL         shift and go to state 17
+    NUMENTERO       shift and go to state 16
+    NUMDECIMAL      shift and go to state 17
     BOOL            shift and go to state 18
-    LISTA           shift and go to state 19
-    DICCIONARIO     shift and go to state 20
-    PARENTESIS_IZQ  shift and go to state 21
     IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    CADENA          shift and go to state 24
+    CADENA          shift and go to state 19
+    ENTERO          shift and go to state 21
+    DECIMAL         shift and go to state 22
+    LISTA           shift and go to state 23
+    DICCIONARIO     shift and go to state 24
+    PARENTESIS_IZQ  shift and go to state 25
     SI              shift and go to state 26
     PARA            shift and go to state 27
     MIENTRAS        shift and go to state 28
@@ -237,7 +267,7 @@ state 4
     para                           shift and go to state 12
     mientras                       shift and go to state 13
     mostrar_en_pantalla            shift and go to state 14
-    lista                          shift and go to state 25
+    lista                          shift and go to state 20
 
 state 5
 
@@ -259,6 +289,21 @@ state 6
     (51) declaracion -> . error IDENTIFICADOR IGUAL expresion PUNTO_COMA
     (52) declaracion -> . tipo error IGUAL expresion PUNTO_COMA
     (53) declaracion -> . error PUNTO_COMA
+    (54) declaracion -> . error expresion PUNTO_COMA
+    (55) declaracion -> . NUMENTERO PUNTO_COMA
+    (56) declaracion -> . NUMDECIMAL PUNTO_COMA
+    (57) declaracion -> . BOOL PUNTO_COMA
+    (58) declaracion -> . IDENTIFICADOR PUNTO_COMA
+    (59) declaracion -> . CADENA PUNTO_COMA
+    (60) declaracion -> . lista PUNTO_COMA
+    (61) declaracion -> . NUMENTERO
+    (62) declaracion -> . NUMDECIMAL
+    (63) declaracion -> . BOOL
+    (64) declaracion -> . IDENTIFICADOR
+    (65) declaracion -> . CADENA
+    (66) declaracion -> . lista
+    (67) declaracion -> . tipo IDENTIFICADOR error expresion PUNTO_COMA
+    (68) declaracion -> . tipo IDENTIFICADOR IGUAL expresion error
     (11) tipo -> . ENTERO
     (12) tipo -> . DECIMAL
     (13) tipo -> . BOOL
@@ -283,16 +328,16 @@ state 6
 
     LLAVE_DER       shift and go to state 30
     error           shift and go to state 15
-    ENTERO          shift and go to state 16
-    DECIMAL         shift and go to state 17
+    NUMENTERO       shift and go to state 16
+    NUMDECIMAL      shift and go to state 17
     BOOL            shift and go to state 18
-    LISTA           shift and go to state 19
-    DICCIONARIO     shift and go to state 20
-    PARENTESIS_IZQ  shift and go to state 21
     IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    CADENA          shift and go to state 24
+    CADENA          shift and go to state 19
+    ENTERO          shift and go to state 21
+    DECIMAL         shift and go to state 22
+    LISTA           shift and go to state 23
+    DICCIONARIO     shift and go to state 24
+    PARENTESIS_IZQ  shift and go to state 25
     SI              shift and go to state 26
     PARA            shift and go to state 27
     MIENTRAS        shift and go to state 28
@@ -305,7 +350,7 @@ state 6
     para                           shift and go to state 12
     mientras                       shift and go to state 13
     mostrar_en_pantalla            shift and go to state 14
-    lista                          shift and go to state 25
+    lista                          shift and go to state 20
 
 state 7
 
@@ -313,16 +358,16 @@ state 7
 
     LLAVE_DER       reduce using rule 4 (lista_declaraciones -> declaracion .)
     error           reduce using rule 4 (lista_declaraciones -> declaracion .)
+    NUMENTERO       reduce using rule 4 (lista_declaraciones -> declaracion .)
+    NUMDECIMAL      reduce using rule 4 (lista_declaraciones -> declaracion .)
+    BOOL            reduce using rule 4 (lista_declaraciones -> declaracion .)
+    IDENTIFICADOR   reduce using rule 4 (lista_declaraciones -> declaracion .)
+    CADENA          reduce using rule 4 (lista_declaraciones -> declaracion .)
     ENTERO          reduce using rule 4 (lista_declaraciones -> declaracion .)
     DECIMAL         reduce using rule 4 (lista_declaraciones -> declaracion .)
-    BOOL            reduce using rule 4 (lista_declaraciones -> declaracion .)
     LISTA           reduce using rule 4 (lista_declaraciones -> declaracion .)
     DICCIONARIO     reduce using rule 4 (lista_declaraciones -> declaracion .)
     PARENTESIS_IZQ  reduce using rule 4 (lista_declaraciones -> declaracion .)
-    IDENTIFICADOR   reduce using rule 4 (lista_declaraciones -> declaracion .)
-    NUMENTERO       reduce using rule 4 (lista_declaraciones -> declaracion .)
-    NUMDECIMAL      reduce using rule 4 (lista_declaraciones -> declaracion .)
-    CADENA          reduce using rule 4 (lista_declaraciones -> declaracion .)
     SI              reduce using rule 4 (lista_declaraciones -> declaracion .)
     PARA            reduce using rule 4 (lista_declaraciones -> declaracion .)
     MIENTRAS        reduce using rule 4 (lista_declaraciones -> declaracion .)
@@ -333,6 +378,8 @@ state 8
 
     (5) declaracion -> tipo . IDENTIFICADOR IGUAL expresion PUNTO_COMA
     (52) declaracion -> tipo . error IGUAL expresion PUNTO_COMA
+    (67) declaracion -> tipo . IDENTIFICADOR error expresion PUNTO_COMA
+    (68) declaracion -> tipo . IDENTIFICADOR IGUAL expresion error
 
     IDENTIFICADOR   shift and go to state 32
     error           shift and go to state 33
@@ -340,9 +387,28 @@ state 8
 
 state 9
 
+    (58) declaracion -> IDENTIFICADOR . PUNTO_COMA
+    (64) declaracion -> IDENTIFICADOR .
     (18) expresion -> IDENTIFICADOR .
 
-    PUNTO_COMA      reduce using rule 18 (expresion -> IDENTIFICADOR .)
+  ! shift/reduce conflict for PUNTO_COMA resolved as shift
+    PUNTO_COMA      shift and go to state 34
+    LLAVE_DER       reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    error           reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    NUMENTERO       reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    NUMDECIMAL      reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    BOOL            reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    IDENTIFICADOR   reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    CADENA          reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    ENTERO          reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    DECIMAL         reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    LISTA           reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    DICCIONARIO     reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    PARENTESIS_IZQ  reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    SI              reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    PARA            reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    MIENTRAS        reduce using rule 64 (declaracion -> IDENTIFICADOR .)
+    MOSTRAR_EN_PANTALLA reduce using rule 64 (declaracion -> IDENTIFICADOR .)
     MAS             reduce using rule 18 (expresion -> IDENTIFICADOR .)
     MENOS           reduce using rule 18 (expresion -> IDENTIFICADOR .)
     POR             reduce using rule 18 (expresion -> IDENTIFICADOR .)
@@ -356,7 +422,8 @@ state 9
     Y               reduce using rule 18 (expresion -> IDENTIFICADOR .)
     O               reduce using rule 18 (expresion -> IDENTIFICADOR .)
     NO              reduce using rule 18 (expresion -> IDENTIFICADOR .)
-    PARENTESIS_DER  reduce using rule 18 (expresion -> IDENTIFICADOR .)
+
+  ! PUNTO_COMA      [ reduce using rule 18 (expresion -> IDENTIFICADOR .) ]
 
 
 state 10
@@ -377,22 +444,22 @@ state 10
     (35) operador -> . O
     (36) operador -> . NO
 
-    PUNTO_COMA      shift and go to state 34
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PUNTO_COMA      shift and go to state 35
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
 state 11
 
@@ -400,16 +467,16 @@ state 11
 
     LLAVE_DER       reduce using rule 7 (declaracion -> si .)
     error           reduce using rule 7 (declaracion -> si .)
+    NUMENTERO       reduce using rule 7 (declaracion -> si .)
+    NUMDECIMAL      reduce using rule 7 (declaracion -> si .)
+    BOOL            reduce using rule 7 (declaracion -> si .)
+    IDENTIFICADOR   reduce using rule 7 (declaracion -> si .)
+    CADENA          reduce using rule 7 (declaracion -> si .)
     ENTERO          reduce using rule 7 (declaracion -> si .)
     DECIMAL         reduce using rule 7 (declaracion -> si .)
-    BOOL            reduce using rule 7 (declaracion -> si .)
     LISTA           reduce using rule 7 (declaracion -> si .)
     DICCIONARIO     reduce using rule 7 (declaracion -> si .)
     PARENTESIS_IZQ  reduce using rule 7 (declaracion -> si .)
-    IDENTIFICADOR   reduce using rule 7 (declaracion -> si .)
-    NUMENTERO       reduce using rule 7 (declaracion -> si .)
-    NUMDECIMAL      reduce using rule 7 (declaracion -> si .)
-    CADENA          reduce using rule 7 (declaracion -> si .)
     SI              reduce using rule 7 (declaracion -> si .)
     PARA            reduce using rule 7 (declaracion -> si .)
     MIENTRAS        reduce using rule 7 (declaracion -> si .)
@@ -422,16 +489,16 @@ state 12
 
     LLAVE_DER       reduce using rule 8 (declaracion -> para .)
     error           reduce using rule 8 (declaracion -> para .)
+    NUMENTERO       reduce using rule 8 (declaracion -> para .)
+    NUMDECIMAL      reduce using rule 8 (declaracion -> para .)
+    BOOL            reduce using rule 8 (declaracion -> para .)
+    IDENTIFICADOR   reduce using rule 8 (declaracion -> para .)
+    CADENA          reduce using rule 8 (declaracion -> para .)
     ENTERO          reduce using rule 8 (declaracion -> para .)
     DECIMAL         reduce using rule 8 (declaracion -> para .)
-    BOOL            reduce using rule 8 (declaracion -> para .)
     LISTA           reduce using rule 8 (declaracion -> para .)
     DICCIONARIO     reduce using rule 8 (declaracion -> para .)
     PARENTESIS_IZQ  reduce using rule 8 (declaracion -> para .)
-    IDENTIFICADOR   reduce using rule 8 (declaracion -> para .)
-    NUMENTERO       reduce using rule 8 (declaracion -> para .)
-    NUMDECIMAL      reduce using rule 8 (declaracion -> para .)
-    CADENA          reduce using rule 8 (declaracion -> para .)
     SI              reduce using rule 8 (declaracion -> para .)
     PARA            reduce using rule 8 (declaracion -> para .)
     MIENTRAS        reduce using rule 8 (declaracion -> para .)
@@ -444,16 +511,16 @@ state 13
 
     LLAVE_DER       reduce using rule 9 (declaracion -> mientras .)
     error           reduce using rule 9 (declaracion -> mientras .)
+    NUMENTERO       reduce using rule 9 (declaracion -> mientras .)
+    NUMDECIMAL      reduce using rule 9 (declaracion -> mientras .)
+    BOOL            reduce using rule 9 (declaracion -> mientras .)
+    IDENTIFICADOR   reduce using rule 9 (declaracion -> mientras .)
+    CADENA          reduce using rule 9 (declaracion -> mientras .)
     ENTERO          reduce using rule 9 (declaracion -> mientras .)
     DECIMAL         reduce using rule 9 (declaracion -> mientras .)
-    BOOL            reduce using rule 9 (declaracion -> mientras .)
     LISTA           reduce using rule 9 (declaracion -> mientras .)
     DICCIONARIO     reduce using rule 9 (declaracion -> mientras .)
     PARENTESIS_IZQ  reduce using rule 9 (declaracion -> mientras .)
-    IDENTIFICADOR   reduce using rule 9 (declaracion -> mientras .)
-    NUMENTERO       reduce using rule 9 (declaracion -> mientras .)
-    NUMDECIMAL      reduce using rule 9 (declaracion -> mientras .)
-    CADENA          reduce using rule 9 (declaracion -> mientras .)
     SI              reduce using rule 9 (declaracion -> mientras .)
     PARA            reduce using rule 9 (declaracion -> mientras .)
     MIENTRAS        reduce using rule 9 (declaracion -> mientras .)
@@ -466,16 +533,16 @@ state 14
 
     LLAVE_DER       reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
     error           reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
+    NUMENTERO       reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
+    NUMDECIMAL      reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
+    BOOL            reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
+    IDENTIFICADOR   reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
+    CADENA          reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
     ENTERO          reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
     DECIMAL         reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
-    BOOL            reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
     LISTA           reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
     DICCIONARIO     reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
     PARENTESIS_IZQ  reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
-    IDENTIFICADOR   reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
-    NUMENTERO       reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
-    NUMDECIMAL      reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
-    CADENA          reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
     SI              reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
     PARA            reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
     MIENTRAS        reduce using rule 10 (declaracion -> mostrar_en_pantalla .)
@@ -486,35 +553,138 @@ state 15
 
     (51) declaracion -> error . IDENTIFICADOR IGUAL expresion PUNTO_COMA
     (53) declaracion -> error . PUNTO_COMA
+    (54) declaracion -> error . expresion PUNTO_COMA
+    (16) expresion -> . expresion operador expresion
+    (17) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
+    (18) expresion -> . IDENTIFICADOR
+    (19) expresion -> . NUMENTERO
+    (20) expresion -> . NUMDECIMAL
+    (21) expresion -> . BOOL
+    (22) expresion -> . CADENA
+    (23) expresion -> . lista
+    (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    IDENTIFICADOR   shift and go to state 49
-    PUNTO_COMA      shift and go to state 50
+    IDENTIFICADOR   shift and go to state 50
+    PUNTO_COMA      shift and go to state 52
+    PARENTESIS_IZQ  shift and go to state 25
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
+    expresion                      shift and go to state 51
+    lista                          shift and go to state 57
 
 state 16
 
-    (11) tipo -> ENTERO .
+    (55) declaracion -> NUMENTERO . PUNTO_COMA
+    (61) declaracion -> NUMENTERO .
+    (19) expresion -> NUMENTERO .
 
-    IDENTIFICADOR   reduce using rule 11 (tipo -> ENTERO .)
-    error           reduce using rule 11 (tipo -> ENTERO .)
+  ! shift/reduce conflict for PUNTO_COMA resolved as shift
+    PUNTO_COMA      shift and go to state 59
+    LLAVE_DER       reduce using rule 61 (declaracion -> NUMENTERO .)
+    error           reduce using rule 61 (declaracion -> NUMENTERO .)
+    NUMENTERO       reduce using rule 61 (declaracion -> NUMENTERO .)
+    NUMDECIMAL      reduce using rule 61 (declaracion -> NUMENTERO .)
+    BOOL            reduce using rule 61 (declaracion -> NUMENTERO .)
+    IDENTIFICADOR   reduce using rule 61 (declaracion -> NUMENTERO .)
+    CADENA          reduce using rule 61 (declaracion -> NUMENTERO .)
+    ENTERO          reduce using rule 61 (declaracion -> NUMENTERO .)
+    DECIMAL         reduce using rule 61 (declaracion -> NUMENTERO .)
+    LISTA           reduce using rule 61 (declaracion -> NUMENTERO .)
+    DICCIONARIO     reduce using rule 61 (declaracion -> NUMENTERO .)
+    PARENTESIS_IZQ  reduce using rule 61 (declaracion -> NUMENTERO .)
+    SI              reduce using rule 61 (declaracion -> NUMENTERO .)
+    PARA            reduce using rule 61 (declaracion -> NUMENTERO .)
+    MIENTRAS        reduce using rule 61 (declaracion -> NUMENTERO .)
+    MOSTRAR_EN_PANTALLA reduce using rule 61 (declaracion -> NUMENTERO .)
+    MAS             reduce using rule 19 (expresion -> NUMENTERO .)
+    MENOS           reduce using rule 19 (expresion -> NUMENTERO .)
+    POR             reduce using rule 19 (expresion -> NUMENTERO .)
+    DIVIDIDO        reduce using rule 19 (expresion -> NUMENTERO .)
+    IGUAL           reduce using rule 19 (expresion -> NUMENTERO .)
+    DIFERENTE       reduce using rule 19 (expresion -> NUMENTERO .)
+    MENOR           reduce using rule 19 (expresion -> NUMENTERO .)
+    MAYOR           reduce using rule 19 (expresion -> NUMENTERO .)
+    MENOR_IGUAL     reduce using rule 19 (expresion -> NUMENTERO .)
+    MAYOR_IGUAL     reduce using rule 19 (expresion -> NUMENTERO .)
+    Y               reduce using rule 19 (expresion -> NUMENTERO .)
+    O               reduce using rule 19 (expresion -> NUMENTERO .)
+    NO              reduce using rule 19 (expresion -> NUMENTERO .)
+
+  ! PUNTO_COMA      [ reduce using rule 19 (expresion -> NUMENTERO .) ]
 
 
 state 17
 
-    (12) tipo -> DECIMAL .
+    (56) declaracion -> NUMDECIMAL . PUNTO_COMA
+    (62) declaracion -> NUMDECIMAL .
+    (20) expresion -> NUMDECIMAL .
 
-    IDENTIFICADOR   reduce using rule 12 (tipo -> DECIMAL .)
-    error           reduce using rule 12 (tipo -> DECIMAL .)
+  ! shift/reduce conflict for PUNTO_COMA resolved as shift
+    PUNTO_COMA      shift and go to state 60
+    LLAVE_DER       reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    error           reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    NUMENTERO       reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    NUMDECIMAL      reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    BOOL            reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    IDENTIFICADOR   reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    CADENA          reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    ENTERO          reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    DECIMAL         reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    LISTA           reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    DICCIONARIO     reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    PARENTESIS_IZQ  reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    SI              reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    PARA            reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    MIENTRAS        reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    MOSTRAR_EN_PANTALLA reduce using rule 62 (declaracion -> NUMDECIMAL .)
+    MAS             reduce using rule 20 (expresion -> NUMDECIMAL .)
+    MENOS           reduce using rule 20 (expresion -> NUMDECIMAL .)
+    POR             reduce using rule 20 (expresion -> NUMDECIMAL .)
+    DIVIDIDO        reduce using rule 20 (expresion -> NUMDECIMAL .)
+    IGUAL           reduce using rule 20 (expresion -> NUMDECIMAL .)
+    DIFERENTE       reduce using rule 20 (expresion -> NUMDECIMAL .)
+    MENOR           reduce using rule 20 (expresion -> NUMDECIMAL .)
+    MAYOR           reduce using rule 20 (expresion -> NUMDECIMAL .)
+    MENOR_IGUAL     reduce using rule 20 (expresion -> NUMDECIMAL .)
+    MAYOR_IGUAL     reduce using rule 20 (expresion -> NUMDECIMAL .)
+    Y               reduce using rule 20 (expresion -> NUMDECIMAL .)
+    O               reduce using rule 20 (expresion -> NUMDECIMAL .)
+    NO              reduce using rule 20 (expresion -> NUMDECIMAL .)
+
+  ! PUNTO_COMA      [ reduce using rule 20 (expresion -> NUMDECIMAL .) ]
 
 
 state 18
 
+    (57) declaracion -> BOOL . PUNTO_COMA
+    (63) declaracion -> BOOL .
     (13) tipo -> BOOL .
     (21) expresion -> BOOL .
 
+  ! reduce/reduce conflict for IDENTIFICADOR resolved using rule 13 (tipo -> BOOL .)
+  ! reduce/reduce conflict for error resolved using rule 13 (tipo -> BOOL .)
+  ! shift/reduce conflict for PUNTO_COMA resolved as shift
+    PUNTO_COMA      shift and go to state 61
+    LLAVE_DER       reduce using rule 63 (declaracion -> BOOL .)
+    NUMENTERO       reduce using rule 63 (declaracion -> BOOL .)
+    NUMDECIMAL      reduce using rule 63 (declaracion -> BOOL .)
+    BOOL            reduce using rule 63 (declaracion -> BOOL .)
+    CADENA          reduce using rule 63 (declaracion -> BOOL .)
+    ENTERO          reduce using rule 63 (declaracion -> BOOL .)
+    DECIMAL         reduce using rule 63 (declaracion -> BOOL .)
+    LISTA           reduce using rule 63 (declaracion -> BOOL .)
+    DICCIONARIO     reduce using rule 63 (declaracion -> BOOL .)
+    PARENTESIS_IZQ  reduce using rule 63 (declaracion -> BOOL .)
+    SI              reduce using rule 63 (declaracion -> BOOL .)
+    PARA            reduce using rule 63 (declaracion -> BOOL .)
+    MIENTRAS        reduce using rule 63 (declaracion -> BOOL .)
+    MOSTRAR_EN_PANTALLA reduce using rule 63 (declaracion -> BOOL .)
     IDENTIFICADOR   reduce using rule 13 (tipo -> BOOL .)
     error           reduce using rule 13 (tipo -> BOOL .)
-    PUNTO_COMA      reduce using rule 21 (expresion -> BOOL .)
     MAS             reduce using rule 21 (expresion -> BOOL .)
     MENOS           reduce using rule 21 (expresion -> BOOL .)
     POR             reduce using rule 21 (expresion -> BOOL .)
@@ -529,8 +699,110 @@ state 18
     O               reduce using rule 21 (expresion -> BOOL .)
     NO              reduce using rule 21 (expresion -> BOOL .)
 
+  ! error           [ reduce using rule 63 (declaracion -> BOOL .) ]
+  ! IDENTIFICADOR   [ reduce using rule 63 (declaracion -> BOOL .) ]
+  ! PUNTO_COMA      [ reduce using rule 21 (expresion -> BOOL .) ]
+
 
 state 19
+
+    (59) declaracion -> CADENA . PUNTO_COMA
+    (65) declaracion -> CADENA .
+    (22) expresion -> CADENA .
+
+  ! shift/reduce conflict for PUNTO_COMA resolved as shift
+    PUNTO_COMA      shift and go to state 62
+    LLAVE_DER       reduce using rule 65 (declaracion -> CADENA .)
+    error           reduce using rule 65 (declaracion -> CADENA .)
+    NUMENTERO       reduce using rule 65 (declaracion -> CADENA .)
+    NUMDECIMAL      reduce using rule 65 (declaracion -> CADENA .)
+    BOOL            reduce using rule 65 (declaracion -> CADENA .)
+    IDENTIFICADOR   reduce using rule 65 (declaracion -> CADENA .)
+    CADENA          reduce using rule 65 (declaracion -> CADENA .)
+    ENTERO          reduce using rule 65 (declaracion -> CADENA .)
+    DECIMAL         reduce using rule 65 (declaracion -> CADENA .)
+    LISTA           reduce using rule 65 (declaracion -> CADENA .)
+    DICCIONARIO     reduce using rule 65 (declaracion -> CADENA .)
+    PARENTESIS_IZQ  reduce using rule 65 (declaracion -> CADENA .)
+    SI              reduce using rule 65 (declaracion -> CADENA .)
+    PARA            reduce using rule 65 (declaracion -> CADENA .)
+    MIENTRAS        reduce using rule 65 (declaracion -> CADENA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 65 (declaracion -> CADENA .)
+    MAS             reduce using rule 22 (expresion -> CADENA .)
+    MENOS           reduce using rule 22 (expresion -> CADENA .)
+    POR             reduce using rule 22 (expresion -> CADENA .)
+    DIVIDIDO        reduce using rule 22 (expresion -> CADENA .)
+    IGUAL           reduce using rule 22 (expresion -> CADENA .)
+    DIFERENTE       reduce using rule 22 (expresion -> CADENA .)
+    MENOR           reduce using rule 22 (expresion -> CADENA .)
+    MAYOR           reduce using rule 22 (expresion -> CADENA .)
+    MENOR_IGUAL     reduce using rule 22 (expresion -> CADENA .)
+    MAYOR_IGUAL     reduce using rule 22 (expresion -> CADENA .)
+    Y               reduce using rule 22 (expresion -> CADENA .)
+    O               reduce using rule 22 (expresion -> CADENA .)
+    NO              reduce using rule 22 (expresion -> CADENA .)
+
+  ! PUNTO_COMA      [ reduce using rule 22 (expresion -> CADENA .) ]
+
+
+state 20
+
+    (60) declaracion -> lista . PUNTO_COMA
+    (66) declaracion -> lista .
+    (23) expresion -> lista .
+
+  ! shift/reduce conflict for PUNTO_COMA resolved as shift
+    PUNTO_COMA      shift and go to state 63
+    LLAVE_DER       reduce using rule 66 (declaracion -> lista .)
+    error           reduce using rule 66 (declaracion -> lista .)
+    NUMENTERO       reduce using rule 66 (declaracion -> lista .)
+    NUMDECIMAL      reduce using rule 66 (declaracion -> lista .)
+    BOOL            reduce using rule 66 (declaracion -> lista .)
+    IDENTIFICADOR   reduce using rule 66 (declaracion -> lista .)
+    CADENA          reduce using rule 66 (declaracion -> lista .)
+    ENTERO          reduce using rule 66 (declaracion -> lista .)
+    DECIMAL         reduce using rule 66 (declaracion -> lista .)
+    LISTA           reduce using rule 66 (declaracion -> lista .)
+    DICCIONARIO     reduce using rule 66 (declaracion -> lista .)
+    PARENTESIS_IZQ  reduce using rule 66 (declaracion -> lista .)
+    SI              reduce using rule 66 (declaracion -> lista .)
+    PARA            reduce using rule 66 (declaracion -> lista .)
+    MIENTRAS        reduce using rule 66 (declaracion -> lista .)
+    MOSTRAR_EN_PANTALLA reduce using rule 66 (declaracion -> lista .)
+    MAS             reduce using rule 23 (expresion -> lista .)
+    MENOS           reduce using rule 23 (expresion -> lista .)
+    POR             reduce using rule 23 (expresion -> lista .)
+    DIVIDIDO        reduce using rule 23 (expresion -> lista .)
+    IGUAL           reduce using rule 23 (expresion -> lista .)
+    DIFERENTE       reduce using rule 23 (expresion -> lista .)
+    MENOR           reduce using rule 23 (expresion -> lista .)
+    MAYOR           reduce using rule 23 (expresion -> lista .)
+    MENOR_IGUAL     reduce using rule 23 (expresion -> lista .)
+    MAYOR_IGUAL     reduce using rule 23 (expresion -> lista .)
+    Y               reduce using rule 23 (expresion -> lista .)
+    O               reduce using rule 23 (expresion -> lista .)
+    NO              reduce using rule 23 (expresion -> lista .)
+
+  ! PUNTO_COMA      [ reduce using rule 23 (expresion -> lista .) ]
+
+
+state 21
+
+    (11) tipo -> ENTERO .
+
+    IDENTIFICADOR   reduce using rule 11 (tipo -> ENTERO .)
+    error           reduce using rule 11 (tipo -> ENTERO .)
+
+
+state 22
+
+    (12) tipo -> DECIMAL .
+
+    IDENTIFICADOR   reduce using rule 12 (tipo -> DECIMAL .)
+    error           reduce using rule 12 (tipo -> DECIMAL .)
+
+
+state 23
 
     (14) tipo -> LISTA .
     (37) lista -> LISTA . menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
@@ -538,11 +810,11 @@ state 19
 
     IDENTIFICADOR   reduce using rule 14 (tipo -> LISTA .)
     error           reduce using rule 14 (tipo -> LISTA .)
-    MENOR           shift and go to state 52
+    MENOR           shift and go to state 65
 
-    menor_tipo                     shift and go to state 51
+    menor_tipo                     shift and go to state 64
 
-state 20
+state 24
 
     (15) tipo -> DICCIONARIO .
 
@@ -550,7 +822,7 @@ state 20
     error           reduce using rule 15 (tipo -> DICCIONARIO .)
 
 
-state 21
+state 25
 
     (17) expresion -> PARENTESIS_IZQ . expresion PARENTESIS_DER
     (16) expresion -> . expresion operador expresion
@@ -563,18 +835,429 @@ state 21
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 53
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 66
+    lista                          shift and go to state 57
 
-state 22
+state 26
+
+    (44) si -> SI . PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
+    (45) si -> SI . PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo
+    (46) si -> SI . PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo
+    (47) si -> SI . PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo
+
+    PARENTESIS_IZQ  shift and go to state 68
+
+
+state 27
+
+    (48) para -> PARA . PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+
+    PARENTESIS_IZQ  shift and go to state 69
+
+
+state 28
+
+    (49) mientras -> MIENTRAS . PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
+
+    PARENTESIS_IZQ  shift and go to state 70
+
+
+state 29
+
+    (50) mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA . PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
+
+    PARENTESIS_IZQ  shift and go to state 71
+
+
+state 30
+
+    (2) bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .
+
+    TERMINAR        reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    LLAVE_DER       reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    error           reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    NUMENTERO       reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    NUMDECIMAL      reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    BOOL            reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    IDENTIFICADOR   reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    CADENA          reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    ENTERO          reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    DECIMAL         reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    LISTA           reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    DICCIONARIO     reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    PARENTESIS_IZQ  reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    SI              reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    PARA            reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    MIENTRAS        reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+    MOSTRAR_EN_PANTALLA reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
+
+
+state 31
+
+    (3) lista_declaraciones -> lista_declaraciones declaracion .
+
+    LLAVE_DER       reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    error           reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    NUMENTERO       reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    NUMDECIMAL      reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    BOOL            reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    IDENTIFICADOR   reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    CADENA          reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    ENTERO          reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    DECIMAL         reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    LISTA           reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    DICCIONARIO     reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    PARENTESIS_IZQ  reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    SI              reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    PARA            reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    MIENTRAS        reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+    MOSTRAR_EN_PANTALLA reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
+
+
+state 32
+
+    (5) declaracion -> tipo IDENTIFICADOR . IGUAL expresion PUNTO_COMA
+    (67) declaracion -> tipo IDENTIFICADOR . error expresion PUNTO_COMA
+    (68) declaracion -> tipo IDENTIFICADOR . IGUAL expresion error
+
+    IGUAL           shift and go to state 72
+    error           shift and go to state 73
+
+
+state 33
+
+    (52) declaracion -> tipo error . IGUAL expresion PUNTO_COMA
+
+    IGUAL           shift and go to state 74
+
+
+state 34
+
+    (58) declaracion -> IDENTIFICADOR PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    error           reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    NUMENTERO       reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    BOOL            reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    CADENA          reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    ENTERO          reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    DECIMAL         reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    LISTA           reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    SI              reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    PARA            reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    MIENTRAS        reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 58 (declaracion -> IDENTIFICADOR PUNTO_COMA .)
+
+
+state 35
+
+    (6) declaracion -> expresion PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    error           reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    NUMENTERO       reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    BOOL            reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    CADENA          reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    ENTERO          reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    DECIMAL         reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    LISTA           reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    SI              reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    PARA            reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    MIENTRAS        reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
+
+
+state 36
+
+    (16) expresion -> expresion operador . expresion
+    (16) expresion -> . expresion operador expresion
+    (17) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
+    (18) expresion -> . IDENTIFICADOR
+    (19) expresion -> . NUMENTERO
+    (20) expresion -> . NUMDECIMAL
+    (21) expresion -> . BOOL
+    (22) expresion -> . CADENA
+    (23) expresion -> . lista
+    (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
+
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
+
+    expresion                      shift and go to state 75
+    lista                          shift and go to state 57
+
+state 37
+
+    (24) operador -> MAS .
+
+    PARENTESIS_IZQ  reduce using rule 24 (operador -> MAS .)
+    IDENTIFICADOR   reduce using rule 24 (operador -> MAS .)
+    NUMENTERO       reduce using rule 24 (operador -> MAS .)
+    NUMDECIMAL      reduce using rule 24 (operador -> MAS .)
+    BOOL            reduce using rule 24 (operador -> MAS .)
+    CADENA          reduce using rule 24 (operador -> MAS .)
+    LISTA           reduce using rule 24 (operador -> MAS .)
+
+
+state 38
+
+    (25) operador -> MENOS .
+
+    PARENTESIS_IZQ  reduce using rule 25 (operador -> MENOS .)
+    IDENTIFICADOR   reduce using rule 25 (operador -> MENOS .)
+    NUMENTERO       reduce using rule 25 (operador -> MENOS .)
+    NUMDECIMAL      reduce using rule 25 (operador -> MENOS .)
+    BOOL            reduce using rule 25 (operador -> MENOS .)
+    CADENA          reduce using rule 25 (operador -> MENOS .)
+    LISTA           reduce using rule 25 (operador -> MENOS .)
+
+
+state 39
+
+    (26) operador -> POR .
+
+    PARENTESIS_IZQ  reduce using rule 26 (operador -> POR .)
+    IDENTIFICADOR   reduce using rule 26 (operador -> POR .)
+    NUMENTERO       reduce using rule 26 (operador -> POR .)
+    NUMDECIMAL      reduce using rule 26 (operador -> POR .)
+    BOOL            reduce using rule 26 (operador -> POR .)
+    CADENA          reduce using rule 26 (operador -> POR .)
+    LISTA           reduce using rule 26 (operador -> POR .)
+
+
+state 40
+
+    (27) operador -> DIVIDIDO .
+
+    PARENTESIS_IZQ  reduce using rule 27 (operador -> DIVIDIDO .)
+    IDENTIFICADOR   reduce using rule 27 (operador -> DIVIDIDO .)
+    NUMENTERO       reduce using rule 27 (operador -> DIVIDIDO .)
+    NUMDECIMAL      reduce using rule 27 (operador -> DIVIDIDO .)
+    BOOL            reduce using rule 27 (operador -> DIVIDIDO .)
+    CADENA          reduce using rule 27 (operador -> DIVIDIDO .)
+    LISTA           reduce using rule 27 (operador -> DIVIDIDO .)
+
+
+state 41
+
+    (28) operador -> IGUAL .
+
+    PARENTESIS_IZQ  reduce using rule 28 (operador -> IGUAL .)
+    IDENTIFICADOR   reduce using rule 28 (operador -> IGUAL .)
+    NUMENTERO       reduce using rule 28 (operador -> IGUAL .)
+    NUMDECIMAL      reduce using rule 28 (operador -> IGUAL .)
+    BOOL            reduce using rule 28 (operador -> IGUAL .)
+    CADENA          reduce using rule 28 (operador -> IGUAL .)
+    LISTA           reduce using rule 28 (operador -> IGUAL .)
+
+
+state 42
+
+    (29) operador -> DIFERENTE .
+
+    PARENTESIS_IZQ  reduce using rule 29 (operador -> DIFERENTE .)
+    IDENTIFICADOR   reduce using rule 29 (operador -> DIFERENTE .)
+    NUMENTERO       reduce using rule 29 (operador -> DIFERENTE .)
+    NUMDECIMAL      reduce using rule 29 (operador -> DIFERENTE .)
+    BOOL            reduce using rule 29 (operador -> DIFERENTE .)
+    CADENA          reduce using rule 29 (operador -> DIFERENTE .)
+    LISTA           reduce using rule 29 (operador -> DIFERENTE .)
+
+
+state 43
+
+    (30) operador -> MENOR .
+
+    PARENTESIS_IZQ  reduce using rule 30 (operador -> MENOR .)
+    IDENTIFICADOR   reduce using rule 30 (operador -> MENOR .)
+    NUMENTERO       reduce using rule 30 (operador -> MENOR .)
+    NUMDECIMAL      reduce using rule 30 (operador -> MENOR .)
+    BOOL            reduce using rule 30 (operador -> MENOR .)
+    CADENA          reduce using rule 30 (operador -> MENOR .)
+    LISTA           reduce using rule 30 (operador -> MENOR .)
+
+
+state 44
+
+    (31) operador -> MAYOR .
+
+    PARENTESIS_IZQ  reduce using rule 31 (operador -> MAYOR .)
+    IDENTIFICADOR   reduce using rule 31 (operador -> MAYOR .)
+    NUMENTERO       reduce using rule 31 (operador -> MAYOR .)
+    NUMDECIMAL      reduce using rule 31 (operador -> MAYOR .)
+    BOOL            reduce using rule 31 (operador -> MAYOR .)
+    CADENA          reduce using rule 31 (operador -> MAYOR .)
+    LISTA           reduce using rule 31 (operador -> MAYOR .)
+
+
+state 45
+
+    (32) operador -> MENOR_IGUAL .
+
+    PARENTESIS_IZQ  reduce using rule 32 (operador -> MENOR_IGUAL .)
+    IDENTIFICADOR   reduce using rule 32 (operador -> MENOR_IGUAL .)
+    NUMENTERO       reduce using rule 32 (operador -> MENOR_IGUAL .)
+    NUMDECIMAL      reduce using rule 32 (operador -> MENOR_IGUAL .)
+    BOOL            reduce using rule 32 (operador -> MENOR_IGUAL .)
+    CADENA          reduce using rule 32 (operador -> MENOR_IGUAL .)
+    LISTA           reduce using rule 32 (operador -> MENOR_IGUAL .)
+
+
+state 46
+
+    (33) operador -> MAYOR_IGUAL .
+
+    PARENTESIS_IZQ  reduce using rule 33 (operador -> MAYOR_IGUAL .)
+    IDENTIFICADOR   reduce using rule 33 (operador -> MAYOR_IGUAL .)
+    NUMENTERO       reduce using rule 33 (operador -> MAYOR_IGUAL .)
+    NUMDECIMAL      reduce using rule 33 (operador -> MAYOR_IGUAL .)
+    BOOL            reduce using rule 33 (operador -> MAYOR_IGUAL .)
+    CADENA          reduce using rule 33 (operador -> MAYOR_IGUAL .)
+    LISTA           reduce using rule 33 (operador -> MAYOR_IGUAL .)
+
+
+state 47
+
+    (34) operador -> Y .
+
+    PARENTESIS_IZQ  reduce using rule 34 (operador -> Y .)
+    IDENTIFICADOR   reduce using rule 34 (operador -> Y .)
+    NUMENTERO       reduce using rule 34 (operador -> Y .)
+    NUMDECIMAL      reduce using rule 34 (operador -> Y .)
+    BOOL            reduce using rule 34 (operador -> Y .)
+    CADENA          reduce using rule 34 (operador -> Y .)
+    LISTA           reduce using rule 34 (operador -> Y .)
+
+
+state 48
+
+    (35) operador -> O .
+
+    PARENTESIS_IZQ  reduce using rule 35 (operador -> O .)
+    IDENTIFICADOR   reduce using rule 35 (operador -> O .)
+    NUMENTERO       reduce using rule 35 (operador -> O .)
+    NUMDECIMAL      reduce using rule 35 (operador -> O .)
+    BOOL            reduce using rule 35 (operador -> O .)
+    CADENA          reduce using rule 35 (operador -> O .)
+    LISTA           reduce using rule 35 (operador -> O .)
+
+
+state 49
+
+    (36) operador -> NO .
+
+    PARENTESIS_IZQ  reduce using rule 36 (operador -> NO .)
+    IDENTIFICADOR   reduce using rule 36 (operador -> NO .)
+    NUMENTERO       reduce using rule 36 (operador -> NO .)
+    NUMDECIMAL      reduce using rule 36 (operador -> NO .)
+    BOOL            reduce using rule 36 (operador -> NO .)
+    CADENA          reduce using rule 36 (operador -> NO .)
+    LISTA           reduce using rule 36 (operador -> NO .)
+
+
+state 50
+
+    (51) declaracion -> error IDENTIFICADOR . IGUAL expresion PUNTO_COMA
+    (18) expresion -> IDENTIFICADOR .
+
+  ! shift/reduce conflict for IGUAL resolved as shift
+    IGUAL           shift and go to state 76
+    PUNTO_COMA      reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MAS             reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MENOS           reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    POR             reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    DIVIDIDO        reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    DIFERENTE       reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MENOR           reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MAYOR           reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MENOR_IGUAL     reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MAYOR_IGUAL     reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    Y               reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    O               reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    NO              reduce using rule 18 (expresion -> IDENTIFICADOR .)
+
+  ! IGUAL           [ reduce using rule 18 (expresion -> IDENTIFICADOR .) ]
+
+
+state 51
+
+    (54) declaracion -> error expresion . PUNTO_COMA
+    (16) expresion -> expresion . operador expresion
+    (24) operador -> . MAS
+    (25) operador -> . MENOS
+    (26) operador -> . POR
+    (27) operador -> . DIVIDIDO
+    (28) operador -> . IGUAL
+    (29) operador -> . DIFERENTE
+    (30) operador -> . MENOR
+    (31) operador -> . MAYOR
+    (32) operador -> . MENOR_IGUAL
+    (33) operador -> . MAYOR_IGUAL
+    (34) operador -> . Y
+    (35) operador -> . O
+    (36) operador -> . NO
+
+    PUNTO_COMA      shift and go to state 77
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
+
+    operador                       shift and go to state 36
+
+state 52
+
+    (53) declaracion -> error PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    error           reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    NUMENTERO       reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    BOOL            reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    CADENA          reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    ENTERO          reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    DECIMAL         reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    LISTA           reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    SI              reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    PARA            reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    MIENTRAS        reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 53 (declaracion -> error PUNTO_COMA .)
+
+
+state 53
 
     (19) expresion -> NUMENTERO .
 
@@ -593,9 +1276,10 @@ state 22
     O               reduce using rule 19 (expresion -> NUMENTERO .)
     NO              reduce using rule 19 (expresion -> NUMENTERO .)
     PARENTESIS_DER  reduce using rule 19 (expresion -> NUMENTERO .)
+    error           reduce using rule 19 (expresion -> NUMENTERO .)
 
 
-state 23
+state 54
 
     (20) expresion -> NUMDECIMAL .
 
@@ -614,9 +1298,32 @@ state 23
     O               reduce using rule 20 (expresion -> NUMDECIMAL .)
     NO              reduce using rule 20 (expresion -> NUMDECIMAL .)
     PARENTESIS_DER  reduce using rule 20 (expresion -> NUMDECIMAL .)
+    error           reduce using rule 20 (expresion -> NUMDECIMAL .)
 
 
-state 24
+state 55
+
+    (21) expresion -> BOOL .
+
+    PUNTO_COMA      reduce using rule 21 (expresion -> BOOL .)
+    MAS             reduce using rule 21 (expresion -> BOOL .)
+    MENOS           reduce using rule 21 (expresion -> BOOL .)
+    POR             reduce using rule 21 (expresion -> BOOL .)
+    DIVIDIDO        reduce using rule 21 (expresion -> BOOL .)
+    IGUAL           reduce using rule 21 (expresion -> BOOL .)
+    DIFERENTE       reduce using rule 21 (expresion -> BOOL .)
+    MENOR           reduce using rule 21 (expresion -> BOOL .)
+    MAYOR           reduce using rule 21 (expresion -> BOOL .)
+    MENOR_IGUAL     reduce using rule 21 (expresion -> BOOL .)
+    MAYOR_IGUAL     reduce using rule 21 (expresion -> BOOL .)
+    Y               reduce using rule 21 (expresion -> BOOL .)
+    O               reduce using rule 21 (expresion -> BOOL .)
+    NO              reduce using rule 21 (expresion -> BOOL .)
+    PARENTESIS_DER  reduce using rule 21 (expresion -> BOOL .)
+    error           reduce using rule 21 (expresion -> BOOL .)
+
+
+state 56
 
     (22) expresion -> CADENA .
 
@@ -635,9 +1342,10 @@ state 24
     O               reduce using rule 22 (expresion -> CADENA .)
     NO              reduce using rule 22 (expresion -> CADENA .)
     PARENTESIS_DER  reduce using rule 22 (expresion -> CADENA .)
+    error           reduce using rule 22 (expresion -> CADENA .)
 
 
-state 25
+state 57
 
     (23) expresion -> lista .
 
@@ -656,357 +1364,143 @@ state 25
     O               reduce using rule 23 (expresion -> lista .)
     NO              reduce using rule 23 (expresion -> lista .)
     PARENTESIS_DER  reduce using rule 23 (expresion -> lista .)
-
-
-state 26
-
-    (44) si -> SI . PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
-    (45) si -> SI . PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo
-    (46) si -> SI . PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo
-    (47) si -> SI . PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo
-
-    PARENTESIS_IZQ  shift and go to state 56
-
-
-state 27
-
-    (48) para -> PARA . PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
-
-    PARENTESIS_IZQ  shift and go to state 57
-
-
-state 28
-
-    (49) mientras -> MIENTRAS . PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
-
-    PARENTESIS_IZQ  shift and go to state 58
-
-
-state 29
-
-    (50) mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA . PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
-
-    PARENTESIS_IZQ  shift and go to state 59
-
-
-state 30
-
-    (2) bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .
-
-    TERMINAR        reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    LLAVE_DER       reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    error           reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    ENTERO          reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    DECIMAL         reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    BOOL            reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    LISTA           reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    DICCIONARIO     reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    PARENTESIS_IZQ  reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    IDENTIFICADOR   reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    NUMENTERO       reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    NUMDECIMAL      reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    CADENA          reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    SI              reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    PARA            reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    MIENTRAS        reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-    MOSTRAR_EN_PANTALLA reduce using rule 2 (bloque_codigo -> LLAVE_IZQ lista_declaraciones LLAVE_DER .)
-
-
-state 31
-
-    (3) lista_declaraciones -> lista_declaraciones declaracion .
-
-    LLAVE_DER       reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    error           reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    ENTERO          reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    DECIMAL         reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    BOOL            reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    LISTA           reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    DICCIONARIO     reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    PARENTESIS_IZQ  reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    IDENTIFICADOR   reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    NUMENTERO       reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    NUMDECIMAL      reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    CADENA          reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    SI              reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    PARA            reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    MIENTRAS        reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-    MOSTRAR_EN_PANTALLA reduce using rule 3 (lista_declaraciones -> lista_declaraciones declaracion .)
-
-
-state 32
-
-    (5) declaracion -> tipo IDENTIFICADOR . IGUAL expresion PUNTO_COMA
-
-    IGUAL           shift and go to state 60
-
-
-state 33
-
-    (52) declaracion -> tipo error . IGUAL expresion PUNTO_COMA
-
-    IGUAL           shift and go to state 61
-
-
-state 34
-
-    (6) declaracion -> expresion PUNTO_COMA .
-
-    LLAVE_DER       reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    error           reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    ENTERO          reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    DECIMAL         reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    BOOL            reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    LISTA           reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    DICCIONARIO     reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    PARENTESIS_IZQ  reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    NUMENTERO       reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    NUMDECIMAL      reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    CADENA          reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    SI              reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    PARA            reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    MIENTRAS        reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-    MOSTRAR_EN_PANTALLA reduce using rule 6 (declaracion -> expresion PUNTO_COMA .)
-
-
-state 35
-
-    (16) expresion -> expresion operador . expresion
-    (16) expresion -> . expresion operador expresion
-    (17) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
-    (18) expresion -> . IDENTIFICADOR
-    (19) expresion -> . NUMENTERO
-    (20) expresion -> . NUMDECIMAL
-    (21) expresion -> . BOOL
-    (22) expresion -> . CADENA
-    (23) expresion -> . lista
-    (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
-
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
-
-    expresion                      shift and go to state 62
-    lista                          shift and go to state 25
-
-state 36
-
-    (24) operador -> MAS .
-
-    PARENTESIS_IZQ  reduce using rule 24 (operador -> MAS .)
-    IDENTIFICADOR   reduce using rule 24 (operador -> MAS .)
-    NUMENTERO       reduce using rule 24 (operador -> MAS .)
-    NUMDECIMAL      reduce using rule 24 (operador -> MAS .)
-    BOOL            reduce using rule 24 (operador -> MAS .)
-    CADENA          reduce using rule 24 (operador -> MAS .)
-    LISTA           reduce using rule 24 (operador -> MAS .)
-
-
-state 37
-
-    (25) operador -> MENOS .
-
-    PARENTESIS_IZQ  reduce using rule 25 (operador -> MENOS .)
-    IDENTIFICADOR   reduce using rule 25 (operador -> MENOS .)
-    NUMENTERO       reduce using rule 25 (operador -> MENOS .)
-    NUMDECIMAL      reduce using rule 25 (operador -> MENOS .)
-    BOOL            reduce using rule 25 (operador -> MENOS .)
-    CADENA          reduce using rule 25 (operador -> MENOS .)
-    LISTA           reduce using rule 25 (operador -> MENOS .)
-
-
-state 38
-
-    (26) operador -> POR .
-
-    PARENTESIS_IZQ  reduce using rule 26 (operador -> POR .)
-    IDENTIFICADOR   reduce using rule 26 (operador -> POR .)
-    NUMENTERO       reduce using rule 26 (operador -> POR .)
-    NUMDECIMAL      reduce using rule 26 (operador -> POR .)
-    BOOL            reduce using rule 26 (operador -> POR .)
-    CADENA          reduce using rule 26 (operador -> POR .)
-    LISTA           reduce using rule 26 (operador -> POR .)
-
-
-state 39
-
-    (27) operador -> DIVIDIDO .
-
-    PARENTESIS_IZQ  reduce using rule 27 (operador -> DIVIDIDO .)
-    IDENTIFICADOR   reduce using rule 27 (operador -> DIVIDIDO .)
-    NUMENTERO       reduce using rule 27 (operador -> DIVIDIDO .)
-    NUMDECIMAL      reduce using rule 27 (operador -> DIVIDIDO .)
-    BOOL            reduce using rule 27 (operador -> DIVIDIDO .)
-    CADENA          reduce using rule 27 (operador -> DIVIDIDO .)
-    LISTA           reduce using rule 27 (operador -> DIVIDIDO .)
-
-
-state 40
-
-    (28) operador -> IGUAL .
-
-    PARENTESIS_IZQ  reduce using rule 28 (operador -> IGUAL .)
-    IDENTIFICADOR   reduce using rule 28 (operador -> IGUAL .)
-    NUMENTERO       reduce using rule 28 (operador -> IGUAL .)
-    NUMDECIMAL      reduce using rule 28 (operador -> IGUAL .)
-    BOOL            reduce using rule 28 (operador -> IGUAL .)
-    CADENA          reduce using rule 28 (operador -> IGUAL .)
-    LISTA           reduce using rule 28 (operador -> IGUAL .)
-
-
-state 41
-
-    (29) operador -> DIFERENTE .
-
-    PARENTESIS_IZQ  reduce using rule 29 (operador -> DIFERENTE .)
-    IDENTIFICADOR   reduce using rule 29 (operador -> DIFERENTE .)
-    NUMENTERO       reduce using rule 29 (operador -> DIFERENTE .)
-    NUMDECIMAL      reduce using rule 29 (operador -> DIFERENTE .)
-    BOOL            reduce using rule 29 (operador -> DIFERENTE .)
-    CADENA          reduce using rule 29 (operador -> DIFERENTE .)
-    LISTA           reduce using rule 29 (operador -> DIFERENTE .)
-
-
-state 42
-
-    (30) operador -> MENOR .
-
-    PARENTESIS_IZQ  reduce using rule 30 (operador -> MENOR .)
-    IDENTIFICADOR   reduce using rule 30 (operador -> MENOR .)
-    NUMENTERO       reduce using rule 30 (operador -> MENOR .)
-    NUMDECIMAL      reduce using rule 30 (operador -> MENOR .)
-    BOOL            reduce using rule 30 (operador -> MENOR .)
-    CADENA          reduce using rule 30 (operador -> MENOR .)
-    LISTA           reduce using rule 30 (operador -> MENOR .)
-
-
-state 43
-
-    (31) operador -> MAYOR .
-
-    PARENTESIS_IZQ  reduce using rule 31 (operador -> MAYOR .)
-    IDENTIFICADOR   reduce using rule 31 (operador -> MAYOR .)
-    NUMENTERO       reduce using rule 31 (operador -> MAYOR .)
-    NUMDECIMAL      reduce using rule 31 (operador -> MAYOR .)
-    BOOL            reduce using rule 31 (operador -> MAYOR .)
-    CADENA          reduce using rule 31 (operador -> MAYOR .)
-    LISTA           reduce using rule 31 (operador -> MAYOR .)
-
-
-state 44
-
-    (32) operador -> MENOR_IGUAL .
-
-    PARENTESIS_IZQ  reduce using rule 32 (operador -> MENOR_IGUAL .)
-    IDENTIFICADOR   reduce using rule 32 (operador -> MENOR_IGUAL .)
-    NUMENTERO       reduce using rule 32 (operador -> MENOR_IGUAL .)
-    NUMDECIMAL      reduce using rule 32 (operador -> MENOR_IGUAL .)
-    BOOL            reduce using rule 32 (operador -> MENOR_IGUAL .)
-    CADENA          reduce using rule 32 (operador -> MENOR_IGUAL .)
-    LISTA           reduce using rule 32 (operador -> MENOR_IGUAL .)
-
-
-state 45
-
-    (33) operador -> MAYOR_IGUAL .
-
-    PARENTESIS_IZQ  reduce using rule 33 (operador -> MAYOR_IGUAL .)
-    IDENTIFICADOR   reduce using rule 33 (operador -> MAYOR_IGUAL .)
-    NUMENTERO       reduce using rule 33 (operador -> MAYOR_IGUAL .)
-    NUMDECIMAL      reduce using rule 33 (operador -> MAYOR_IGUAL .)
-    BOOL            reduce using rule 33 (operador -> MAYOR_IGUAL .)
-    CADENA          reduce using rule 33 (operador -> MAYOR_IGUAL .)
-    LISTA           reduce using rule 33 (operador -> MAYOR_IGUAL .)
-
-
-state 46
-
-    (34) operador -> Y .
-
-    PARENTESIS_IZQ  reduce using rule 34 (operador -> Y .)
-    IDENTIFICADOR   reduce using rule 34 (operador -> Y .)
-    NUMENTERO       reduce using rule 34 (operador -> Y .)
-    NUMDECIMAL      reduce using rule 34 (operador -> Y .)
-    BOOL            reduce using rule 34 (operador -> Y .)
-    CADENA          reduce using rule 34 (operador -> Y .)
-    LISTA           reduce using rule 34 (operador -> Y .)
-
-
-state 47
-
-    (35) operador -> O .
-
-    PARENTESIS_IZQ  reduce using rule 35 (operador -> O .)
-    IDENTIFICADOR   reduce using rule 35 (operador -> O .)
-    NUMENTERO       reduce using rule 35 (operador -> O .)
-    NUMDECIMAL      reduce using rule 35 (operador -> O .)
-    BOOL            reduce using rule 35 (operador -> O .)
-    CADENA          reduce using rule 35 (operador -> O .)
-    LISTA           reduce using rule 35 (operador -> O .)
-
-
-state 48
-
-    (36) operador -> NO .
-
-    PARENTESIS_IZQ  reduce using rule 36 (operador -> NO .)
-    IDENTIFICADOR   reduce using rule 36 (operador -> NO .)
-    NUMENTERO       reduce using rule 36 (operador -> NO .)
-    NUMDECIMAL      reduce using rule 36 (operador -> NO .)
-    BOOL            reduce using rule 36 (operador -> NO .)
-    CADENA          reduce using rule 36 (operador -> NO .)
-    LISTA           reduce using rule 36 (operador -> NO .)
-
-
-state 49
-
-    (51) declaracion -> error IDENTIFICADOR . IGUAL expresion PUNTO_COMA
-
-    IGUAL           shift and go to state 63
-
-
-state 50
-
-    (53) declaracion -> error PUNTO_COMA .
-
-    LLAVE_DER       reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    error           reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    ENTERO          reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    DECIMAL         reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    BOOL            reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    LISTA           reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    DICCIONARIO     reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    PARENTESIS_IZQ  reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    NUMENTERO       reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    NUMDECIMAL      reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    CADENA          reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    SI              reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    PARA            reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    MIENTRAS        reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-    MOSTRAR_EN_PANTALLA reduce using rule 53 (declaracion -> error PUNTO_COMA .)
-
-
-state 51
+    error           reduce using rule 23 (expresion -> lista .)
+
+
+state 58
+
+    (37) lista -> LISTA . menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
+    (38) menor_tipo -> . MENOR IDENTIFICADOR MAYOR
+
+    MENOR           shift and go to state 65
+
+    menor_tipo                     shift and go to state 64
+
+state 59
+
+    (55) declaracion -> NUMENTERO PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    error           reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    NUMENTERO       reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    BOOL            reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    CADENA          reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    ENTERO          reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    DECIMAL         reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    LISTA           reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    SI              reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    PARA            reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    MIENTRAS        reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 55 (declaracion -> NUMENTERO PUNTO_COMA .)
+
+
+state 60
+
+    (56) declaracion -> NUMDECIMAL PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    error           reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    NUMENTERO       reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    BOOL            reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    CADENA          reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    ENTERO          reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    DECIMAL         reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    LISTA           reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    SI              reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    PARA            reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    MIENTRAS        reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 56 (declaracion -> NUMDECIMAL PUNTO_COMA .)
+
+
+state 61
+
+    (57) declaracion -> BOOL PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    error           reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    NUMENTERO       reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    BOOL            reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    CADENA          reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    ENTERO          reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    DECIMAL         reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    LISTA           reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    SI              reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    PARA            reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    MIENTRAS        reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 57 (declaracion -> BOOL PUNTO_COMA .)
+
+
+state 62
+
+    (59) declaracion -> CADENA PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    error           reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    NUMENTERO       reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    BOOL            reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    CADENA          reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    ENTERO          reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    DECIMAL         reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    LISTA           reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    SI              reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    PARA            reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    MIENTRAS        reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 59 (declaracion -> CADENA PUNTO_COMA .)
+
+
+state 63
+
+    (60) declaracion -> lista PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    error           reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    NUMENTERO       reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    BOOL            reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    CADENA          reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    ENTERO          reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    DECIMAL         reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    LISTA           reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    SI              reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    PARA            reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    MIENTRAS        reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 60 (declaracion -> lista PUNTO_COMA .)
+
+
+state 64
 
     (37) lista -> LISTA menor_tipo . LLAVE_IZQ valores_lista LLAVE_DER
 
-    LLAVE_IZQ       shift and go to state 64
+    LLAVE_IZQ       shift and go to state 78
 
 
-state 52
+state 65
 
     (38) menor_tipo -> MENOR . IDENTIFICADOR MAYOR
 
-    IDENTIFICADOR   shift and go to state 65
+    IDENTIFICADOR   shift and go to state 79
 
 
-state 53
+state 66
 
     (17) expresion -> PARENTESIS_IZQ expresion . PARENTESIS_DER
     (16) expresion -> expresion . operador expresion
@@ -1024,54 +1518,46 @@ state 53
     (35) operador -> . O
     (36) operador -> . NO
 
-    PARENTESIS_DER  shift and go to state 66
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PARENTESIS_DER  shift and go to state 80
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 54
+state 67
 
-    (21) expresion -> BOOL .
+    (18) expresion -> IDENTIFICADOR .
 
-    PARENTESIS_DER  reduce using rule 21 (expresion -> BOOL .)
-    MAS             reduce using rule 21 (expresion -> BOOL .)
-    MENOS           reduce using rule 21 (expresion -> BOOL .)
-    POR             reduce using rule 21 (expresion -> BOOL .)
-    DIVIDIDO        reduce using rule 21 (expresion -> BOOL .)
-    IGUAL           reduce using rule 21 (expresion -> BOOL .)
-    DIFERENTE       reduce using rule 21 (expresion -> BOOL .)
-    MENOR           reduce using rule 21 (expresion -> BOOL .)
-    MAYOR           reduce using rule 21 (expresion -> BOOL .)
-    MENOR_IGUAL     reduce using rule 21 (expresion -> BOOL .)
-    MAYOR_IGUAL     reduce using rule 21 (expresion -> BOOL .)
-    Y               reduce using rule 21 (expresion -> BOOL .)
-    O               reduce using rule 21 (expresion -> BOOL .)
-    NO              reduce using rule 21 (expresion -> BOOL .)
-    PUNTO_COMA      reduce using rule 21 (expresion -> BOOL .)
+    PARENTESIS_DER  reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MAS             reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MENOS           reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    POR             reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    DIVIDIDO        reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    IGUAL           reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    DIFERENTE       reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MENOR           reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MAYOR           reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MENOR_IGUAL     reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    MAYOR_IGUAL     reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    Y               reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    O               reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    NO              reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    PUNTO_COMA      reduce using rule 18 (expresion -> IDENTIFICADOR .)
+    error           reduce using rule 18 (expresion -> IDENTIFICADOR .)
 
 
-state 55
-
-    (37) lista -> LISTA . menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
-    (38) menor_tipo -> . MENOR IDENTIFICADOR MAYOR
-
-    MENOR           shift and go to state 52
-
-    menor_tipo                     shift and go to state 51
-
-state 56
+state 68
 
     (44) si -> SI PARENTESIS_IZQ . expresion PARENTESIS_DER bloque_codigo
     (45) si -> SI PARENTESIS_IZQ . expresion Y expresion PARENTESIS_DER bloque_codigo
@@ -1087,19 +1573,19 @@ state 56
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    NO              shift and go to state 68
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    NO              shift and go to state 82
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 67
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 81
+    lista                          shift and go to state 57
 
-state 57
+state 69
 
     (48) para -> PARA PARENTESIS_IZQ . tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
     (11) tipo -> . ENTERO
@@ -1108,15 +1594,15 @@ state 57
     (14) tipo -> . LISTA
     (15) tipo -> . DICCIONARIO
 
-    ENTERO          shift and go to state 16
-    DECIMAL         shift and go to state 17
-    BOOL            shift and go to state 70
-    LISTA           shift and go to state 71
-    DICCIONARIO     shift and go to state 20
+    ENTERO          shift and go to state 21
+    DECIMAL         shift and go to state 22
+    BOOL            shift and go to state 84
+    LISTA           shift and go to state 85
+    DICCIONARIO     shift and go to state 24
 
-    tipo                           shift and go to state 69
+    tipo                           shift and go to state 83
 
-state 58
+state 70
 
     (49) mientras -> MIENTRAS PARENTESIS_IZQ . expresion PARENTESIS_DER bloque_codigo
     (16) expresion -> . expresion operador expresion
@@ -1129,18 +1615,18 @@ state 58
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 72
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 86
+    lista                          shift and go to state 57
 
-state 59
+state 71
 
     (50) mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ . expresion PARENTESIS_DER PUNTO_COMA
     (16) expresion -> . expresion operador expresion
@@ -1153,20 +1639,21 @@ state 59
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 73
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 87
+    lista                          shift and go to state 57
 
-state 60
+state 72
 
     (5) declaracion -> tipo IDENTIFICADOR IGUAL . expresion PUNTO_COMA
+    (68) declaracion -> tipo IDENTIFICADOR IGUAL . expresion error
     (16) expresion -> . expresion operador expresion
     (17) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
     (18) expresion -> . IDENTIFICADOR
@@ -1177,18 +1664,42 @@ state 60
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 74
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 88
+    lista                          shift and go to state 57
 
-state 61
+state 73
+
+    (67) declaracion -> tipo IDENTIFICADOR error . expresion PUNTO_COMA
+    (16) expresion -> . expresion operador expresion
+    (17) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
+    (18) expresion -> . IDENTIFICADOR
+    (19) expresion -> . NUMENTERO
+    (20) expresion -> . NUMDECIMAL
+    (21) expresion -> . BOOL
+    (22) expresion -> . CADENA
+    (23) expresion -> . lista
+    (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
+
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
+
+    expresion                      shift and go to state 89
+    lista                          shift and go to state 57
+
+state 74
 
     (52) declaracion -> tipo error IGUAL . expresion PUNTO_COMA
     (16) expresion -> . expresion operador expresion
@@ -1201,18 +1712,18 @@ state 61
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 75
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 90
+    lista                          shift and go to state 57
 
-state 62
+state 75
 
     (16) expresion -> expresion operador expresion .
     (16) expresion -> expresion . operador expresion
@@ -1245,19 +1756,20 @@ state 62
   ! shift/reduce conflict for NO resolved as shift
     PUNTO_COMA      reduce using rule 16 (expresion -> expresion operador expresion .)
     PARENTESIS_DER  reduce using rule 16 (expresion -> expresion operador expresion .)
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    error           reduce using rule 16 (expresion -> expresion operador expresion .)
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
   ! MAS             [ reduce using rule 16 (expresion -> expresion operador expresion .) ]
   ! MENOS           [ reduce using rule 16 (expresion -> expresion operador expresion .) ]
@@ -1273,9 +1785,9 @@ state 62
   ! O               [ reduce using rule 16 (expresion -> expresion operador expresion .) ]
   ! NO              [ reduce using rule 16 (expresion -> expresion operador expresion .) ]
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 63
+state 76
 
     (51) declaracion -> error IDENTIFICADOR IGUAL . expresion PUNTO_COMA
     (16) expresion -> . expresion operador expresion
@@ -1288,18 +1800,40 @@ state 63
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 76
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 91
+    lista                          shift and go to state 57
 
-state 64
+state 77
+
+    (54) declaracion -> error expresion PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    error           reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    NUMENTERO       reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    BOOL            reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    CADENA          reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    ENTERO          reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    DECIMAL         reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    LISTA           reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    SI              reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    PARA            reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    MIENTRAS        reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 54 (declaracion -> error expresion PUNTO_COMA .)
+
+
+state 78
 
     (37) lista -> LISTA menor_tipo LLAVE_IZQ . valores_lista LLAVE_DER
     (39) valores_lista -> . valores_lista COMA valor_lista
@@ -1308,21 +1842,21 @@ state 64
     (42) valor_lista -> . NUMDECIMAL
     (43) valor_lista -> . BOOL
 
-    NUMENTERO       shift and go to state 79
-    NUMDECIMAL      shift and go to state 80
-    BOOL            shift and go to state 81
+    NUMENTERO       shift and go to state 94
+    NUMDECIMAL      shift and go to state 95
+    BOOL            shift and go to state 96
 
-    valores_lista                  shift and go to state 77
-    valor_lista                    shift and go to state 78
+    valores_lista                  shift and go to state 92
+    valor_lista                    shift and go to state 93
 
-state 65
+state 79
 
     (38) menor_tipo -> MENOR IDENTIFICADOR . MAYOR
 
-    MAYOR           shift and go to state 82
+    MAYOR           shift and go to state 97
 
 
-state 66
+state 80
 
     (17) expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .
 
@@ -1341,9 +1875,10 @@ state 66
     O               reduce using rule 17 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
     NO              reduce using rule 17 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
     PARENTESIS_DER  reduce using rule 17 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    error           reduce using rule 17 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
 
 
-state 67
+state 81
 
     (44) si -> SI PARENTESIS_IZQ expresion . PARENTESIS_DER bloque_codigo
     (45) si -> SI PARENTESIS_IZQ expresion . Y expresion PARENTESIS_DER bloque_codigo
@@ -1363,24 +1898,24 @@ state 67
     (35) operador -> . O
     (36) operador -> . NO
 
-    PARENTESIS_DER  shift and go to state 83
-    Y               shift and go to state 84
-    O               shift and go to state 85
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    NO              shift and go to state 48
+    PARENTESIS_DER  shift and go to state 98
+    Y               shift and go to state 99
+    O               shift and go to state 100
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 68
+state 82
 
     (47) si -> SI PARENTESIS_IZQ NO . expresion PARENTESIS_DER bloque_codigo
     (16) expresion -> . expresion operador expresion
@@ -1393,39 +1928,39 @@ state 68
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 86
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 101
+    lista                          shift and go to state 57
 
-state 69
+state 83
 
     (48) para -> PARA PARENTESIS_IZQ tipo . IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
 
-    IDENTIFICADOR   shift and go to state 87
+    IDENTIFICADOR   shift and go to state 102
 
 
-state 70
+state 84
 
     (13) tipo -> BOOL .
 
     IDENTIFICADOR   reduce using rule 13 (tipo -> BOOL .)
 
 
-state 71
+state 85
 
     (14) tipo -> LISTA .
 
     IDENTIFICADOR   reduce using rule 14 (tipo -> LISTA .)
 
 
-state 72
+state 86
 
     (49) mientras -> MIENTRAS PARENTESIS_IZQ expresion . PARENTESIS_DER bloque_codigo
     (16) expresion -> expresion . operador expresion
@@ -1443,24 +1978,24 @@ state 72
     (35) operador -> . O
     (36) operador -> . NO
 
-    PARENTESIS_DER  shift and go to state 88
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PARENTESIS_DER  shift and go to state 103
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 73
+state 87
 
     (50) mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion . PARENTESIS_DER PUNTO_COMA
     (16) expresion -> expresion . operador expresion
@@ -1478,26 +2013,27 @@ state 73
     (35) operador -> . O
     (36) operador -> . NO
 
-    PARENTESIS_DER  shift and go to state 89
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PARENTESIS_DER  shift and go to state 104
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 74
+state 88
 
     (5) declaracion -> tipo IDENTIFICADOR IGUAL expresion . PUNTO_COMA
+    (68) declaracion -> tipo IDENTIFICADOR IGUAL expresion . error
     (16) expresion -> expresion . operador expresion
     (24) operador -> . MAS
     (25) operador -> . MENOS
@@ -1513,24 +2049,60 @@ state 74
     (35) operador -> . O
     (36) operador -> . NO
 
-    PUNTO_COMA      shift and go to state 90
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PUNTO_COMA      shift and go to state 105
+    error           shift and go to state 106
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 75
+state 89
+
+    (67) declaracion -> tipo IDENTIFICADOR error expresion . PUNTO_COMA
+    (16) expresion -> expresion . operador expresion
+    (24) operador -> . MAS
+    (25) operador -> . MENOS
+    (26) operador -> . POR
+    (27) operador -> . DIVIDIDO
+    (28) operador -> . IGUAL
+    (29) operador -> . DIFERENTE
+    (30) operador -> . MENOR
+    (31) operador -> . MAYOR
+    (32) operador -> . MENOR_IGUAL
+    (33) operador -> . MAYOR_IGUAL
+    (34) operador -> . Y
+    (35) operador -> . O
+    (36) operador -> . NO
+
+    PUNTO_COMA      shift and go to state 107
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
+
+    operador                       shift and go to state 36
+
+state 90
 
     (52) declaracion -> tipo error IGUAL expresion . PUNTO_COMA
     (16) expresion -> expresion . operador expresion
@@ -1548,24 +2120,24 @@ state 75
     (35) operador -> . O
     (36) operador -> . NO
 
-    PUNTO_COMA      shift and go to state 91
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PUNTO_COMA      shift and go to state 108
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 76
+state 91
 
     (51) declaracion -> error IDENTIFICADOR IGUAL expresion . PUNTO_COMA
     (16) expresion -> expresion . operador expresion
@@ -1583,33 +2155,33 @@ state 76
     (35) operador -> . O
     (36) operador -> . NO
 
-    PUNTO_COMA      shift and go to state 92
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PUNTO_COMA      shift and go to state 109
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 77
+state 92
 
     (37) lista -> LISTA menor_tipo LLAVE_IZQ valores_lista . LLAVE_DER
     (39) valores_lista -> valores_lista . COMA valor_lista
 
-    LLAVE_DER       shift and go to state 93
-    COMA            shift and go to state 94
+    LLAVE_DER       shift and go to state 110
+    COMA            shift and go to state 111
 
 
-state 78
+state 93
 
     (40) valores_lista -> valor_lista .
 
@@ -1617,7 +2189,7 @@ state 78
     COMA            reduce using rule 40 (valores_lista -> valor_lista .)
 
 
-state 79
+state 94
 
     (41) valor_lista -> NUMENTERO .
 
@@ -1625,7 +2197,7 @@ state 79
     COMA            reduce using rule 41 (valor_lista -> NUMENTERO .)
 
 
-state 80
+state 95
 
     (42) valor_lista -> NUMDECIMAL .
 
@@ -1633,7 +2205,7 @@ state 80
     COMA            reduce using rule 42 (valor_lista -> NUMDECIMAL .)
 
 
-state 81
+state 96
 
     (43) valor_lista -> BOOL .
 
@@ -1641,23 +2213,23 @@ state 81
     COMA            reduce using rule 43 (valor_lista -> BOOL .)
 
 
-state 82
+state 97
 
     (38) menor_tipo -> MENOR IDENTIFICADOR MAYOR .
 
     LLAVE_IZQ       reduce using rule 38 (menor_tipo -> MENOR IDENTIFICADOR MAYOR .)
 
 
-state 83
+state 98
 
     (44) si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER . bloque_codigo
     (2) bloque_codigo -> . LLAVE_IZQ lista_declaraciones LLAVE_DER
 
     LLAVE_IZQ       shift and go to state 4
 
-    bloque_codigo                  shift and go to state 95
+    bloque_codigo                  shift and go to state 112
 
-state 84
+state 99
 
     (45) si -> SI PARENTESIS_IZQ expresion Y . expresion PARENTESIS_DER bloque_codigo
     (34) operador -> Y .
@@ -1678,13 +2250,13 @@ state 84
   ! shift/reduce conflict for BOOL resolved as shift
   ! shift/reduce conflict for CADENA resolved as shift
   ! shift/reduce conflict for LISTA resolved as shift
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
   ! PARENTESIS_IZQ  [ reduce using rule 34 (operador -> Y .) ]
   ! IDENTIFICADOR   [ reduce using rule 34 (operador -> Y .) ]
@@ -1694,10 +2266,10 @@ state 84
   ! CADENA          [ reduce using rule 34 (operador -> Y .) ]
   ! LISTA           [ reduce using rule 34 (operador -> Y .) ]
 
-    expresion                      shift and go to state 96
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 113
+    lista                          shift and go to state 57
 
-state 85
+state 100
 
     (46) si -> SI PARENTESIS_IZQ expresion O . expresion PARENTESIS_DER bloque_codigo
     (35) operador -> O .
@@ -1718,13 +2290,13 @@ state 85
   ! shift/reduce conflict for BOOL resolved as shift
   ! shift/reduce conflict for CADENA resolved as shift
   ! shift/reduce conflict for LISTA resolved as shift
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
   ! PARENTESIS_IZQ  [ reduce using rule 35 (operador -> O .) ]
   ! IDENTIFICADOR   [ reduce using rule 35 (operador -> O .) ]
@@ -1734,10 +2306,10 @@ state 85
   ! CADENA          [ reduce using rule 35 (operador -> O .) ]
   ! LISTA           [ reduce using rule 35 (operador -> O .) ]
 
-    expresion                      shift and go to state 97
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 114
+    lista                          shift and go to state 57
 
-state 86
+state 101
 
     (47) si -> SI PARENTESIS_IZQ NO expresion . PARENTESIS_DER bloque_codigo
     (16) expresion -> expresion . operador expresion
@@ -1755,117 +2327,177 @@ state 86
     (35) operador -> . O
     (36) operador -> . NO
 
-    PARENTESIS_DER  shift and go to state 98
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PARENTESIS_DER  shift and go to state 115
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 87
+state 102
 
     (48) para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR . IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
 
-    IGUAL           shift and go to state 99
+    IGUAL           shift and go to state 116
 
 
-state 88
+state 103
 
     (49) mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER . bloque_codigo
     (2) bloque_codigo -> . LLAVE_IZQ lista_declaraciones LLAVE_DER
 
     LLAVE_IZQ       shift and go to state 4
 
-    bloque_codigo                  shift and go to state 100
+    bloque_codigo                  shift and go to state 117
 
-state 89
+state 104
 
     (50) mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER . PUNTO_COMA
 
-    PUNTO_COMA      shift and go to state 101
+    PUNTO_COMA      shift and go to state 118
 
 
-state 90
+state 105
 
     (5) declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .
 
     LLAVE_DER       reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     error           reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    NUMENTERO       reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    BOOL            reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    CADENA          reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     ENTERO          reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     DECIMAL         reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    BOOL            reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     LISTA           reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     DICCIONARIO     reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     PARENTESIS_IZQ  reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    NUMENTERO       reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    NUMDECIMAL      reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    CADENA          reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     SI              reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     PARA            reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     MIENTRAS        reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     MOSTRAR_EN_PANTALLA reduce using rule 5 (declaracion -> tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
 
 
-state 91
+state 106
+
+    (68) declaracion -> tipo IDENTIFICADOR IGUAL expresion error .
+
+    LLAVE_DER       reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    error           reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    NUMENTERO       reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    NUMDECIMAL      reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    BOOL            reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    IDENTIFICADOR   reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    CADENA          reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    ENTERO          reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    DECIMAL         reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    LISTA           reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    DICCIONARIO     reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    PARENTESIS_IZQ  reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    SI              reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    PARA            reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    MIENTRAS        reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+    MOSTRAR_EN_PANTALLA reduce using rule 68 (declaracion -> tipo IDENTIFICADOR IGUAL expresion error .)
+
+
+state 107
+
+    (67) declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .
+
+    LLAVE_DER       reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    error           reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    NUMENTERO       reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    BOOL            reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    CADENA          reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    ENTERO          reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    DECIMAL         reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    LISTA           reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    DICCIONARIO     reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    PARENTESIS_IZQ  reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    SI              reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    PARA            reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    MIENTRAS        reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+    MOSTRAR_EN_PANTALLA reduce using rule 67 (declaracion -> tipo IDENTIFICADOR error expresion PUNTO_COMA .)
+
+
+state 108
 
     (52) declaracion -> tipo error IGUAL expresion PUNTO_COMA .
 
     LLAVE_DER       reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     error           reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
+    NUMENTERO       reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
+    BOOL            reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
+    CADENA          reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     ENTERO          reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     DECIMAL         reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
-    BOOL            reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     LISTA           reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     DICCIONARIO     reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     PARENTESIS_IZQ  reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
-    NUMENTERO       reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
-    NUMDECIMAL      reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
-    CADENA          reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     SI              reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     PARA            reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     MIENTRAS        reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
     MOSTRAR_EN_PANTALLA reduce using rule 52 (declaracion -> tipo error IGUAL expresion PUNTO_COMA .)
 
 
-state 92
+state 109
 
     (51) declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .
 
     LLAVE_DER       reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     error           reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    NUMENTERO       reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    BOOL            reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
+    CADENA          reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     ENTERO          reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     DECIMAL         reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    BOOL            reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     LISTA           reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     DICCIONARIO     reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     PARENTESIS_IZQ  reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    NUMENTERO       reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    NUMDECIMAL      reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
-    CADENA          reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     SI              reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     PARA            reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     MIENTRAS        reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
     MOSTRAR_EN_PANTALLA reduce using rule 51 (declaracion -> error IDENTIFICADOR IGUAL expresion PUNTO_COMA .)
 
 
-state 93
+state 110
 
     (37) lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .
 
     PUNTO_COMA      reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    LLAVE_DER       reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    error           reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    NUMENTERO       reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    NUMDECIMAL      reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    BOOL            reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    IDENTIFICADOR   reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    CADENA          reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    ENTERO          reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    DECIMAL         reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    LISTA           reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    DICCIONARIO     reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    PARENTESIS_IZQ  reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    SI              reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    PARA            reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    MIENTRAS        reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
+    MOSTRAR_EN_PANTALLA reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
     MAS             reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
     MENOS           reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
     POR             reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
@@ -1882,42 +2514,42 @@ state 93
     PARENTESIS_DER  reduce using rule 37 (lista -> LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER .)
 
 
-state 94
+state 111
 
     (39) valores_lista -> valores_lista COMA . valor_lista
     (41) valor_lista -> . NUMENTERO
     (42) valor_lista -> . NUMDECIMAL
     (43) valor_lista -> . BOOL
 
-    NUMENTERO       shift and go to state 79
-    NUMDECIMAL      shift and go to state 80
-    BOOL            shift and go to state 81
+    NUMENTERO       shift and go to state 94
+    NUMDECIMAL      shift and go to state 95
+    BOOL            shift and go to state 96
 
-    valor_lista                    shift and go to state 102
+    valor_lista                    shift and go to state 119
 
-state 95
+state 112
 
     (44) si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .
 
     LLAVE_DER       reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     error           reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    NUMENTERO       reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    NUMDECIMAL      reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    BOOL            reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    IDENTIFICADOR   reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    CADENA          reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     ENTERO          reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     DECIMAL         reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    BOOL            reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     LISTA           reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     DICCIONARIO     reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     PARENTESIS_IZQ  reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    IDENTIFICADOR   reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    NUMENTERO       reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    NUMDECIMAL      reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    CADENA          reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     SI              reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     PARA            reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     MIENTRAS        reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     MOSTRAR_EN_PANTALLA reduce using rule 44 (si -> SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
 
 
-state 96
+state 113
 
     (45) si -> SI PARENTESIS_IZQ expresion Y expresion . PARENTESIS_DER bloque_codigo
     (16) expresion -> expresion . operador expresion
@@ -1935,24 +2567,24 @@ state 96
     (35) operador -> . O
     (36) operador -> . NO
 
-    PARENTESIS_DER  shift and go to state 103
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PARENTESIS_DER  shift and go to state 120
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 97
+state 114
 
     (46) si -> SI PARENTESIS_IZQ expresion O expresion . PARENTESIS_DER bloque_codigo
     (16) expresion -> expresion . operador expresion
@@ -1970,33 +2602,33 @@ state 97
     (35) operador -> . O
     (36) operador -> . NO
 
-    PARENTESIS_DER  shift and go to state 104
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PARENTESIS_DER  shift and go to state 121
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 98
+state 115
 
     (47) si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER . bloque_codigo
     (2) bloque_codigo -> . LLAVE_IZQ lista_declaraciones LLAVE_DER
 
     LLAVE_IZQ       shift and go to state 4
 
-    bloque_codigo                  shift and go to state 105
+    bloque_codigo                  shift and go to state 122
 
-state 99
+state 116
 
     (48) para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL . expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
     (16) expresion -> . expresion operador expresion
@@ -2009,62 +2641,62 @@ state 99
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 106
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 123
+    lista                          shift and go to state 57
 
-state 100
+state 117
 
     (49) mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .
 
     LLAVE_DER       reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     error           reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    NUMENTERO       reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    NUMDECIMAL      reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    BOOL            reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    IDENTIFICADOR   reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
+    CADENA          reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     ENTERO          reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     DECIMAL         reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    BOOL            reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     LISTA           reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     DICCIONARIO     reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     PARENTESIS_IZQ  reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    IDENTIFICADOR   reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    NUMENTERO       reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    NUMDECIMAL      reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
-    CADENA          reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     SI              reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     PARA            reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     MIENTRAS        reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
     MOSTRAR_EN_PANTALLA reduce using rule 49 (mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo .)
 
 
-state 101
+state 118
 
     (50) mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .
 
     LLAVE_DER       reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     error           reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    NUMENTERO       reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    NUMDECIMAL      reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    BOOL            reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    CADENA          reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     ENTERO          reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     DECIMAL         reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    BOOL            reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     LISTA           reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     DICCIONARIO     reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     PARENTESIS_IZQ  reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    NUMENTERO       reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    NUMDECIMAL      reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    CADENA          reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     SI              reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     PARA            reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     MIENTRAS        reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
     MOSTRAR_EN_PANTALLA reduce using rule 50 (mostrar_en_pantalla -> MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
 
 
-state 102
+state 119
 
     (39) valores_lista -> valores_lista COMA valor_lista .
 
@@ -2072,47 +2704,47 @@ state 102
     COMA            reduce using rule 39 (valores_lista -> valores_lista COMA valor_lista .)
 
 
-state 103
+state 120
 
     (45) si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER . bloque_codigo
     (2) bloque_codigo -> . LLAVE_IZQ lista_declaraciones LLAVE_DER
 
     LLAVE_IZQ       shift and go to state 4
 
-    bloque_codigo                  shift and go to state 107
+    bloque_codigo                  shift and go to state 124
 
-state 104
+state 121
 
     (46) si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER . bloque_codigo
     (2) bloque_codigo -> . LLAVE_IZQ lista_declaraciones LLAVE_DER
 
     LLAVE_IZQ       shift and go to state 4
 
-    bloque_codigo                  shift and go to state 108
+    bloque_codigo                  shift and go to state 125
 
-state 105
+state 122
 
     (47) si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .
 
     LLAVE_DER       reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     error           reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
+    NUMENTERO       reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
+    NUMDECIMAL      reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
+    BOOL            reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
+    IDENTIFICADOR   reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
+    CADENA          reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     ENTERO          reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     DECIMAL         reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
-    BOOL            reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     LISTA           reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     DICCIONARIO     reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     PARENTESIS_IZQ  reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
-    IDENTIFICADOR   reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
-    NUMENTERO       reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
-    NUMDECIMAL      reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
-    CADENA          reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     SI              reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     PARA            reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     MIENTRAS        reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
     MOSTRAR_EN_PANTALLA reduce using rule 47 (si -> SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo .)
 
 
-state 106
+state 123
 
     (48) para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion . PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
     (16) expresion -> expresion . operador expresion
@@ -2130,68 +2762,68 @@ state 106
     (35) operador -> . O
     (36) operador -> . NO
 
-    PUNTO_COMA      shift and go to state 109
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PUNTO_COMA      shift and go to state 126
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 107
+state 124
 
     (45) si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .
 
     LLAVE_DER       reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     error           reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
+    NUMENTERO       reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
+    NUMDECIMAL      reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
+    BOOL            reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
+    IDENTIFICADOR   reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
+    CADENA          reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     ENTERO          reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     DECIMAL         reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
-    BOOL            reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     LISTA           reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     DICCIONARIO     reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     PARENTESIS_IZQ  reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
-    IDENTIFICADOR   reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
-    NUMENTERO       reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
-    NUMDECIMAL      reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
-    CADENA          reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     SI              reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     PARA            reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     MIENTRAS        reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
     MOSTRAR_EN_PANTALLA reduce using rule 45 (si -> SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo .)
 
 
-state 108
+state 125
 
     (46) si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .
 
     LLAVE_DER       reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     error           reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
+    NUMENTERO       reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
+    NUMDECIMAL      reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
+    BOOL            reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
+    IDENTIFICADOR   reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
+    CADENA          reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     ENTERO          reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     DECIMAL         reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
-    BOOL            reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     LISTA           reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     DICCIONARIO     reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     PARENTESIS_IZQ  reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
-    IDENTIFICADOR   reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
-    NUMENTERO       reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
-    NUMDECIMAL      reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
-    CADENA          reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     SI              reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     PARA            reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     MIENTRAS        reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
     MOSTRAR_EN_PANTALLA reduce using rule 46 (si -> SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo .)
 
 
-state 109
+state 126
 
     (48) para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA . expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
     (16) expresion -> . expresion operador expresion
@@ -2204,18 +2836,18 @@ state 109
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 110
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 127
+    lista                          shift and go to state 57
 
-state 110
+state 127
 
     (48) para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion . PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
     (16) expresion -> expresion . operador expresion
@@ -2233,24 +2865,24 @@ state 110
     (35) operador -> . O
     (36) operador -> . NO
 
-    PUNTO_COMA      shift and go to state 111
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PUNTO_COMA      shift and go to state 128
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 111
+state 128
 
     (48) para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA . expresion PARENTESIS_DER bloque_codigo
     (16) expresion -> . expresion operador expresion
@@ -2263,18 +2895,18 @@ state 111
     (23) expresion -> . lista
     (37) lista -> . LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
 
-    PARENTESIS_IZQ  shift and go to state 21
-    IDENTIFICADOR   shift and go to state 9
-    NUMENTERO       shift and go to state 22
-    NUMDECIMAL      shift and go to state 23
-    BOOL            shift and go to state 54
-    CADENA          shift and go to state 24
-    LISTA           shift and go to state 55
+    PARENTESIS_IZQ  shift and go to state 25
+    IDENTIFICADOR   shift and go to state 67
+    NUMENTERO       shift and go to state 53
+    NUMDECIMAL      shift and go to state 54
+    BOOL            shift and go to state 55
+    CADENA          shift and go to state 56
+    LISTA           shift and go to state 58
 
-    expresion                      shift and go to state 112
-    lista                          shift and go to state 25
+    expresion                      shift and go to state 129
+    lista                          shift and go to state 57
 
-state 112
+state 129
 
     (48) para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion . PARENTESIS_DER bloque_codigo
     (16) expresion -> expresion . operador expresion
@@ -2292,48 +2924,48 @@ state 112
     (35) operador -> . O
     (36) operador -> . NO
 
-    PARENTESIS_DER  shift and go to state 113
-    MAS             shift and go to state 36
-    MENOS           shift and go to state 37
-    POR             shift and go to state 38
-    DIVIDIDO        shift and go to state 39
-    IGUAL           shift and go to state 40
-    DIFERENTE       shift and go to state 41
-    MENOR           shift and go to state 42
-    MAYOR           shift and go to state 43
-    MENOR_IGUAL     shift and go to state 44
-    MAYOR_IGUAL     shift and go to state 45
-    Y               shift and go to state 46
-    O               shift and go to state 47
-    NO              shift and go to state 48
+    PARENTESIS_DER  shift and go to state 130
+    MAS             shift and go to state 37
+    MENOS           shift and go to state 38
+    POR             shift and go to state 39
+    DIVIDIDO        shift and go to state 40
+    IGUAL           shift and go to state 41
+    DIFERENTE       shift and go to state 42
+    MENOR           shift and go to state 43
+    MAYOR           shift and go to state 44
+    MENOR_IGUAL     shift and go to state 45
+    MAYOR_IGUAL     shift and go to state 46
+    Y               shift and go to state 47
+    O               shift and go to state 48
+    NO              shift and go to state 49
 
-    operador                       shift and go to state 35
+    operador                       shift and go to state 36
 
-state 113
+state 130
 
     (48) para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER . bloque_codigo
     (2) bloque_codigo -> . LLAVE_IZQ lista_declaraciones LLAVE_DER
 
     LLAVE_IZQ       shift and go to state 4
 
-    bloque_codigo                  shift and go to state 114
+    bloque_codigo                  shift and go to state 131
 
-state 114
+state 131
 
     (48) para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .
 
     LLAVE_DER       reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
     error           reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
+    NUMENTERO       reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
+    NUMDECIMAL      reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
+    BOOL            reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
+    IDENTIFICADOR   reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
+    CADENA          reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
     ENTERO          reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
     DECIMAL         reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
-    BOOL            reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
     LISTA           reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
     DICCIONARIO     reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
     PARENTESIS_IZQ  reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
-    IDENTIFICADOR   reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
-    NUMENTERO       reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
-    NUMDECIMAL      reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
-    CADENA          reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
     SI              reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
     PARA            reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
     MIENTRAS        reduce using rule 48 (para -> PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo .)
@@ -2342,30 +2974,39 @@ state 114
 WARNING: 
 WARNING: Conflicts:
 WARNING: 
-WARNING: shift/reduce conflict for MAS in state 62 resolved as shift
-WARNING: shift/reduce conflict for MENOS in state 62 resolved as shift
-WARNING: shift/reduce conflict for POR in state 62 resolved as shift
-WARNING: shift/reduce conflict for DIVIDIDO in state 62 resolved as shift
-WARNING: shift/reduce conflict for IGUAL in state 62 resolved as shift
-WARNING: shift/reduce conflict for DIFERENTE in state 62 resolved as shift
-WARNING: shift/reduce conflict for MENOR in state 62 resolved as shift
-WARNING: shift/reduce conflict for MAYOR in state 62 resolved as shift
-WARNING: shift/reduce conflict for MENOR_IGUAL in state 62 resolved as shift
-WARNING: shift/reduce conflict for MAYOR_IGUAL in state 62 resolved as shift
-WARNING: shift/reduce conflict for Y in state 62 resolved as shift
-WARNING: shift/reduce conflict for O in state 62 resolved as shift
-WARNING: shift/reduce conflict for NO in state 62 resolved as shift
-WARNING: shift/reduce conflict for PARENTESIS_IZQ in state 84 resolved as shift
-WARNING: shift/reduce conflict for IDENTIFICADOR in state 84 resolved as shift
-WARNING: shift/reduce conflict for NUMENTERO in state 84 resolved as shift
-WARNING: shift/reduce conflict for NUMDECIMAL in state 84 resolved as shift
-WARNING: shift/reduce conflict for BOOL in state 84 resolved as shift
-WARNING: shift/reduce conflict for CADENA in state 84 resolved as shift
-WARNING: shift/reduce conflict for LISTA in state 84 resolved as shift
-WARNING: shift/reduce conflict for PARENTESIS_IZQ in state 85 resolved as shift
-WARNING: shift/reduce conflict for IDENTIFICADOR in state 85 resolved as shift
-WARNING: shift/reduce conflict for NUMENTERO in state 85 resolved as shift
-WARNING: shift/reduce conflict for NUMDECIMAL in state 85 resolved as shift
-WARNING: shift/reduce conflict for BOOL in state 85 resolved as shift
-WARNING: shift/reduce conflict for CADENA in state 85 resolved as shift
-WARNING: shift/reduce conflict for LISTA in state 85 resolved as shift
+WARNING: shift/reduce conflict for PUNTO_COMA in state 9 resolved as shift
+WARNING: shift/reduce conflict for PUNTO_COMA in state 16 resolved as shift
+WARNING: shift/reduce conflict for PUNTO_COMA in state 17 resolved as shift
+WARNING: shift/reduce conflict for PUNTO_COMA in state 18 resolved as shift
+WARNING: shift/reduce conflict for PUNTO_COMA in state 19 resolved as shift
+WARNING: shift/reduce conflict for PUNTO_COMA in state 20 resolved as shift
+WARNING: shift/reduce conflict for IGUAL in state 50 resolved as shift
+WARNING: shift/reduce conflict for MAS in state 75 resolved as shift
+WARNING: shift/reduce conflict for MENOS in state 75 resolved as shift
+WARNING: shift/reduce conflict for POR in state 75 resolved as shift
+WARNING: shift/reduce conflict for DIVIDIDO in state 75 resolved as shift
+WARNING: shift/reduce conflict for IGUAL in state 75 resolved as shift
+WARNING: shift/reduce conflict for DIFERENTE in state 75 resolved as shift
+WARNING: shift/reduce conflict for MENOR in state 75 resolved as shift
+WARNING: shift/reduce conflict for MAYOR in state 75 resolved as shift
+WARNING: shift/reduce conflict for MENOR_IGUAL in state 75 resolved as shift
+WARNING: shift/reduce conflict for MAYOR_IGUAL in state 75 resolved as shift
+WARNING: shift/reduce conflict for Y in state 75 resolved as shift
+WARNING: shift/reduce conflict for O in state 75 resolved as shift
+WARNING: shift/reduce conflict for NO in state 75 resolved as shift
+WARNING: shift/reduce conflict for PARENTESIS_IZQ in state 99 resolved as shift
+WARNING: shift/reduce conflict for IDENTIFICADOR in state 99 resolved as shift
+WARNING: shift/reduce conflict for NUMENTERO in state 99 resolved as shift
+WARNING: shift/reduce conflict for NUMDECIMAL in state 99 resolved as shift
+WARNING: shift/reduce conflict for BOOL in state 99 resolved as shift
+WARNING: shift/reduce conflict for CADENA in state 99 resolved as shift
+WARNING: shift/reduce conflict for LISTA in state 99 resolved as shift
+WARNING: shift/reduce conflict for PARENTESIS_IZQ in state 100 resolved as shift
+WARNING: shift/reduce conflict for IDENTIFICADOR in state 100 resolved as shift
+WARNING: shift/reduce conflict for NUMENTERO in state 100 resolved as shift
+WARNING: shift/reduce conflict for NUMDECIMAL in state 100 resolved as shift
+WARNING: shift/reduce conflict for BOOL in state 100 resolved as shift
+WARNING: shift/reduce conflict for CADENA in state 100 resolved as shift
+WARNING: shift/reduce conflict for LISTA in state 100 resolved as shift
+WARNING: reduce/reduce conflict in state 18 resolved using rule (tipo -> BOOL)
+WARNING: rejected rule (declaracion -> BOOL) in state 18

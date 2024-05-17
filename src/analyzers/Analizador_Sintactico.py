@@ -2,12 +2,32 @@ from flask import jsonify
 import ply.yacc as yacc
 from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens, find_column 
 
-from Error import Error
-
-errores=obtener_errores_lexico()
+tabla_errores=obtener_errores_lexico()
 def agregar_error_sintactico(error_type,error_description, value, line, column):
-    errores.append(Error(error_type,error_description, value, line, column))
+    tabla_errores.append({
+        'type': error_type,
+        'description': error_description,
+        'value': value,
+        'line': line,
+        'column': column
+    })
 
+def obtener_errores_sintactico():
+    return tabla_errores
+
+# Función para encontrar la columna del token en la línea
+def find_column(input, token,n):
+    last_cr = input.rfind('\n', 0, token.lexpos(n))
+    if last_cr < 0:
+        last_cr = 0
+    column = (token.lexpos(n) - last_cr)
+    if column == 0:
+        return 1 
+    return column
+
+def reiniciar_analizador_sintactico():
+    global tabla_errores
+    tabla_errores = []
 
 # Clase para representar el nodo PARA en el árbol sintáctico
 class NodoPara:
@@ -185,14 +205,46 @@ def p_mostrar_en_pantalla(p):
     p[0] = ('mostrar_en_pantalla', p[3])
     
 # Manejo de Errores
-def p_error_tipo(p):
+
+#>>>>>>>>>>>>>>>>>>>>> DECLARACIONES
+def p_error_declaracion(p):
     """
     declaracion : error IDENTIFICADOR IGUAL expresion PUNTO_COMA
-                | tipo error IGUAL expresion PUNTO_COMA
-                | error PUNTO_COMA
     """
-    agregar_error_sintactico('Sintactico','Declaración inválida',p[2],p.lineno(2),p.lexpos(2))
-    #print("Error: Declaración inválida en la linea",p.lineno(2), ", columna:",p.lexpos(2))
+    agregar_error_sintactico('Sintactico','No se indicó el tipo de dato antes de',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
+def p_error_declaracion_2(p):
+    """
+    declaracion : tipo error IGUAL expresion PUNTO_COMA
+    """
+    agregar_error_sintactico('Sintactico','Se esperaba un identificador',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+def p_error_declaracion_3(p):
+    """
+    declaracion : error PUNTO_COMA
+                | error expresion PUNTO_COMA
+                | NUMENTERO PUNTO_COMA
+                | NUMDECIMAL PUNTO_COMA
+                | BOOL PUNTO_COMA
+                | IDENTIFICADOR PUNTO_COMA
+                | CADENA PUNTO_COMA
+                | lista PUNTO_COMA
+                | NUMENTERO
+                | NUMDECIMAL
+                | BOOL
+                | IDENTIFICADOR
+                | CADENA
+                | lista
+    """
+    agregar_error_sintactico('Sintactico','Declaración inválida',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
+def p_error_declaracion_4(p):
+    """
+    declaracion : tipo IDENTIFICADOR error expresion PUNTO_COMA
+    """
+    agregar_error_sintactico('Sintactico','Se esperaba un signo (=) para la declaración',p[3],p.lineno(3),find_column(p.lexer.lexdata,p,3))
+def p_error_declaracion_5(p):
+    """
+    declaracion : tipo IDENTIFICADOR IGUAL expresion error
+    """
+    agregar_error_sintactico('Sintactico','Se esperaba un ;',p[4],p.lineno(3),find_column(p.lexer.lexdata,p,3))
 
 
 def p_error(p):
@@ -201,9 +253,9 @@ def p_error(p):
 
 
 # Construir el analizador
-parser = yacc.yacc()
-# def construir_analizador_sintactico():
-#     return yacc.yacc()
+
+def construir_analizador_sintactico():
+    return yacc.yacc()
 
 
 def tree_to_json(node):
@@ -230,55 +282,53 @@ def tree_to_json(node):
 
 
 
-######################################################
-lexer = construir_analizador_lexico()
-tokens=[]
-# Función de prueba
-def test_parser(input_string):
-    #global errores
-    lexer.input(input_string)
+######################################################ZONA PARA PRUEBAS
+# parser = yacc.yacc()
+# lexer = construir_analizador_lexico()
+# tokens_analisis=[]
+# # Función de prueba
+# def test_parser(input_string):
     
-    for token in lexer:
-        tokens.append(token)
-        #print(token)
-    result = parser.parse(input_string)
-    reiniciar_analizador_lexico(lexer)
-    for error in errores:
-        print(error)
-    for t in tokens:
-        print(t)
-    print_tree(result)
+#     lexer.input(input_string)
+    
+#     for token in lexer:
+#         tokens_analisis.append(token)
+        
+#     reiniciar_analizador_lexico(lexer)
+#     for t in tokens_analisis:
+#         print(t)
+#     result = parser.parse(input_string)
+#     for error in tabla_errores:
+#         print(error)
+#     print_tree(result)
 
-# Función para imprimir el árbol sintáctico
-def print_tree(node, depth=0):
-    if isinstance(node, tuple):
-        print("  " * depth + node[0])
-        for child in node[1:]:
-            print_tree(child, depth + 1)
-    elif isinstance(node, NodoPara):
-        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-    elif isinstance(node, list):
-        for item in node:
-            print_tree(item, depth)
-    else:
-        print("  " * depth + str(node))
+# # Función para imprimir el árbol sintáctico
+# def print_tree(node, depth=0):
+#     if isinstance(node, tuple):
+#         print("  " * depth + node[0])
+#         for child in node[1:]:
+#             print_tree(child, depth + 1)
+#     elif isinstance(node, NodoPara):
+#         print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+#         print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+#     elif isinstance(node, list):
+#         for item in node:
+#             print_tree(item, depth)
+#     else:
+#         print("  " * depth + str(node))
 
 
-# # Código de prueba
-test_code = """
-COMENZAR{
-    0..0;
-    @
-    0..2;
-    ENTERO = 0;
-PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
-    MOSTRAR_EN_PANTALLA(contador);
-    ENTERO s = 0;
-}
+# # # Código de prueba
+# test_code = """
+# COMENZAR{
+#     x  0;
+# PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
+#     MOSTRAR_EN_PANTALLA(contador);
+#     ENTERO s = 0;
+# }
 
-}
-TERMINAR
-"""
+# }
+# TERMINAR
+# """
 
-test_parser(test_code)
+# test_parser(test_code)
