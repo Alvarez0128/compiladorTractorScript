@@ -120,18 +120,37 @@ function App() {
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor;
   }
-  const goToLineAndColumn = (line, column) => {
+  const goToLineAndColumn = (line, column, text) => {
     if (editorRef.current) {
+      const model = editorRef.current.getModel();
       const position = { lineNumber: line, column: column };
-      const range = new monaco.Range(
-        line, 
-        column, 
-        line, 
-        column + 1
-      );
+      const startOffset = model.getOffsetAt(position);
+      const textLength = text.length;
+      let endOffset = startOffset + textLength;
+      let endPosition = model.getPositionAt(endOffset);
+
+      // Check if the text exists at the position
+      const currentText = model.getValueInRange({
+        startLineNumber: line,
+        startColumn: column,
+        endLineNumber: endPosition.lineNumber,
+        endColumn: endPosition.column,
+      });
+
+      if (currentText !== text) {
+        // If text not found, select only one character
+        endOffset = startOffset + 1;
+        endPosition = model.getPositionAt(endOffset);
+      }
 
       editorRef.current.revealPositionInCenter(position);
-      editorRef.current.setSelection(range);
+      editorRef.current.setPosition(position);
+      editorRef.current.setSelection({
+        startLineNumber: line,
+        startColumn: column,
+        endLineNumber: endPosition.lineNumber,
+        endColumn: endPosition.column,
+      });
       editorRef.current.focus();
     }
   };
@@ -147,9 +166,14 @@ function App() {
       .then(response => response.json())
       .then(data => {
         //console.log(data[0].errors);
+        console.log(data[1].title);
         if (data[0].tokens) {
           setTokens(data[0].tokens);
-          setArbol([data[1]])
+          if(data[1].title==="Error encontrado"){
+            setArbol([{title: "No se logró generar el árbol debido a un error inesperado"}])
+          }else{
+            setArbol([data[1]])
+          }
           setErrors([]);
         }
         if (data[0].errors) {
@@ -379,7 +403,7 @@ function App() {
             <div className='px-5 '>
               {errors.length === 0 && <p>{compilationMessage}</p>}
               {errors.map((error, index) => (
-                <p key={index}>Error {error.type} - {error.description} en la <a onClick={() => goToLineAndColumn(error.line, error.column)}className="font-bold hover:underline">línea {error.line}, columna {error.column}</a> lexema: {error.value}</p>
+                <p key={index}>Error {error.type} - {error.description} en la <a onClick={() => goToLineAndColumn(error.line, error.column, error.value)}className="font-bold hover:underline">línea {error.line}, columna {error.column}</a> lexema: {error.value}</p>
               ))}
             </div>
           </Card>
