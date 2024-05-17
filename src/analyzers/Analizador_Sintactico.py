@@ -259,6 +259,8 @@ def construir_analizador_sintactico():
 
 
 def tree_to_json(node):
+    if node is None:
+        return {'title': 'Error encontrado'}
     if isinstance(node, tuple):
         result = {'title': node[0], 'children': []}
         for child in node[1:]:

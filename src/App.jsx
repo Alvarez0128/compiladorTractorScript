@@ -120,6 +120,21 @@ function App() {
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor;
   }
+  const goToLineAndColumn = (line, column) => {
+    if (editorRef.current) {
+      const position = { lineNumber: line, column: column };
+      const range = new monaco.Range(
+        line, 
+        column, 
+        line, 
+        column + 1
+      );
+
+      editorRef.current.revealPositionInCenter(position);
+      editorRef.current.setSelection(range);
+      editorRef.current.focus();
+    }
+  };
 
   const compileCode = () => {
     fetch('http://localhost:5000/compile', {
@@ -131,7 +146,7 @@ function App() {
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data[0].errors);
+        //console.log(data[0].errors);
         if (data[0].tokens) {
           setTokens(data[0].tokens);
           setArbol([data[1]])
@@ -364,7 +379,7 @@ function App() {
             <div className='px-5 '>
               {errors.length === 0 && <p>{compilationMessage}</p>}
               {errors.map((error, index) => (
-                <p key={index}>Error {error.type} - {error.description} en la línea {error.line}, columna {error.column} lexema: {error.value}</p>
+                <p key={index}>Error {error.type} - {error.description} en la <a onClick={() => goToLineAndColumn(error.line, error.column)}className="font-bold hover:underline">línea {error.line}, columna {error.column}</a> lexema: {error.value}</p>
               ))}
             </div>
           </Card>
