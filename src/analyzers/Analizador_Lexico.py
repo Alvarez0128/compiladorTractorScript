@@ -24,7 +24,7 @@ def agregar_error_lexico(error_type,error_description, value, line, column):
     })
     
 # Función para encontrar la columna del token en la línea
-def find_column(input, token):
+def find_column_lexico(input, token):
     last_cr = input.rfind('\n', 0, token.lexpos)
     if last_cr < 0:
         last_cr = 0
@@ -39,25 +39,25 @@ def find_column(input, token):
 # Manejo de errores para identificadores mal formados
 def t_error_IDENTIFICADOR(t):
     r'\d+[a-zA-Z_ñÑ][a-zA-Z0-9_ñÑ]*'
-    agregar_error_lexico('Léxico','Identificador inválido',t.value,t.lineno,find_column(t.lexer.lexdata, t))
+    agregar_error_lexico('Léxico','Identificador inválido',t.value,t.lineno,find_column_lexico(t.lexer.lexdata, t))
 
 def t_error_PUNTO(t):
     r'\.'
-    agregar_error_lexico('Léxico','No se esperaba ese caracter en esa posicion',t.value,t.lineno,find_column(t.lexer.lexdata, t))
+    agregar_error_lexico('Léxico','No se esperaba ese caracter en esa posicion',t.value,t.lineno,find_column_lexico(t.lexer.lexdata, t))
 
 # Manejo de errores para números enteros invalidos
 def t_error_NUMERO_ENTERO(t):
     r'[+-]{2,}\d+'
-    agregar_error_lexico('Léxico','Formato de número entero inválido',t.value,t.lineno,find_column(t.lexer.lexdata, t))
+    agregar_error_lexico('Léxico','Formato de número entero inválido',t.value,t.lineno,find_column_lexico(t.lexer.lexdata, t))
 
 # Manejo de errores para números decimales invalidos
 def t_error_NUMERO_DECIMAL(t):
     r'\d+([\.]{2,}\d+[\.|\d]*)+ | \d+\.\d+(\.+\d+)+ | \.+\d+(\.|\d)* | (\d?\.\.\d)+ | \d+\.(?!\d)'
-    agregar_error_lexico('Léxico','Formato de número decimal inválido',t.value,t.lineno,find_column(t.lexer.lexdata, t))
+    agregar_error_lexico('Léxico','Formato de número decimal inválido',t.value,t.lineno,find_column_lexico(t.lexer.lexdata, t))
 
 # Manejo de errores para cualquier carácter no reconocido
 def t_error(t):
-    agregar_error_lexico('Léxico','Carácter no reconocido',t.value[0],t.lineno,find_column(t.lexer.lexdata, t))
+    agregar_error_lexico('Léxico','Carácter no reconocido',t.value[0],t.lineno,find_column_lexico(t.lexer.lexdata, t))
     t.lexer.skip(1)
 
 # Definición de tokens
@@ -193,7 +193,7 @@ def t_CADENA(t):
 # Manejo de errores para cadenas no cerradas
 def t_error_CADENA(t):
     r'"(?:\\.|[^\n\"])*[^"]?'
-    agregar_error_lexico('Léxico','Cadena no cerrada',t.value,t.lineno,find_column(t.lexer.lexdata, t))
+    agregar_error_lexico('Léxico','Cadena no cerrada',t.value,t.lineno,find_column_lexico(t.lexer.lexdata, t))
     t.lexer.skip(1)
 
 # Expresión regular para comentarios

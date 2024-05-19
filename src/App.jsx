@@ -39,6 +39,22 @@ function App() {
   const [codigo, setCodigo] = useState('');
   const [arbol, setArbol] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalImageSrc, setModalImageSrc] = useState('');
+
+
+  const imageMap = {
+    1: '../public/Bloque_CodigoAF.png',
+    2: '../public/expresionAF.png',
+    3: '../public/DeclaracionAF.png',
+    4: '../public/listaAF.png',
+    5: '../public/menor_tipoAF.png',
+    6: '../public/valores_listaAF.png',
+    7: '../public/siAF.png',
+    8: '../public/paraAF.png',
+    9: '../public/mientrasAF.png',
+    10: '../public/mostrar_en_pantallaAF.png',
+    11: '../public/ProgramaAF.png',
+  };
 
   let table = <ConfigProvider theme={{
     components: {
@@ -167,14 +183,9 @@ function App() {
       .then(response => response.json())
       .then(data => {
         //console.log(data[0].errors);
-        console.log(data[1].title);
         if (data[0].tokens) {
           setTokens(data[0].tokens);
-          if (data[1].title === "Producción detenida") {
-            setArbol([{ title: "Árbol no generado" }])
-          } else {
-            setArbol([data[1]])
-          }
+          setArbol([data[1]])
           setErrors([]);
         }
         if (data[0].errors) {
@@ -236,9 +247,11 @@ function App() {
   const onClick = ({ key }) => { }
 
   // Función para mostrar el modal
-  const showModalInfoErrores = () => {
+  function showModalInfoErrores(id) {
+    const imageSrc = imageMap[id] || '../public/example.jpg'; // Fallback image if id not found
+    setModalImageSrc(imageSrc);
     setModalVisible(true);
-  };
+  }
 
   // Función para ocultar el modal
   const handleCancel = () => {
@@ -397,6 +410,9 @@ function App() {
               colorBorderSecondary: '#14532D',
               paddingLG: 10,
               algorithm: true
+            },
+            Modal:{
+              titleFontSize: 20
             }
           }
         }}>
@@ -414,21 +430,22 @@ function App() {
             <div className='px-5 '>
               {errors.length === 0 && <p>{compilationMessage}</p>}
               {errors.map((error, index) => (
-                <li key={index} onClick={showModalInfoErrores} className='hover:text-green-600 cursor-pointer transition'>
+                <li key={index} onClick={() => showModalInfoErrores(error.index)} className='hover:text-green-600 cursor-pointer transition'>
                   Error {error.type} - {error.description} en la <a onClick={(e) => { e.stopPropagation(); goToLineAndColumn(error.line, error.column, error.value); }} className="font-bold hover:underline"> línea {error.line}, columna {error.column}</a> lexema: {error.value}
                 </li>
               ))}
 
+
               <Modal
-                title="Gramatica de validación para el error"
+                title="Autómata de validación para el error"
                 open={modalVisible}
                 onCancel={handleCancel}
                 footer={null}
               >
-                foto de ejemplo de las gramaticas que quiere el fic
+                <h1>Imagen:</h1>
                 <Image
-                  width="90%"
-                  src="../public/example.jpg"
+                  width="100%"
+                  src={modalImageSrc}
                 />
               </Modal>
             </div>
