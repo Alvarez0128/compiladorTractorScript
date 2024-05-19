@@ -1,13 +1,18 @@
 from flask import jsonify
 import ply.yacc as yacc
-from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens, find_column 
+from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens
+from SymbolTable import Symbol, SymbolTable 
 
 tabla_errores=obtener_errores_lexico()
+
+# simbolo=Symbol()
+# tabla_simbolos=SymbolTable()
+
 def agregar_error_sintactico(error_type,error_description, value, line, column):
     tabla_errores.append({
         'type': error_type,
         'description': error_description,
-        'value': value,
+        'value': str(value),
         'line': line,
         'column': column
     })
@@ -64,6 +69,7 @@ def p_lista_declaraciones(p):
     """
     lista_declaraciones : lista_declaraciones declaracion 
                         | declaracion
+                        | empty
     """
     if len(p) == 3:
         p[0] = p[1] + [p[2]]
@@ -203,10 +209,42 @@ def p_mostrar_en_pantalla(p):
     mostrar_en_pantalla : MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
     """
     p[0] = ('mostrar_en_pantalla', p[3])
-    
+
+def p_empty(p):
+    'empty :'
+    p[0] = 'VACÍO'
+
+
 # Manejo de Errores
 
-#>>>>>>>>>>>>>>>>>>>>> DECLARACIONES
+
+#>>>>>>>>>>>>>>>>>>>>>> BLOQUE_CODIGO
+def p_error_bloque_codigo(p): 
+    """
+    bloque_codigo : error lista_declaraciones LLAVE_DER
+    """
+    agregar_error_sintactico('Sintactico','Falta la llave de apertura {',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
+    
+def p_error_bloque_codigo_2(p):
+    """
+    bloque_codigo : LLAVE_IZQ lista_declaraciones error
+    """
+    agregar_error_sintactico('Sintactico','Falta la llave de cierre }',p[3],p.lineno(3),find_column(p.lexer.lexdata,p,3))
+
+#>>>>>>>>>>>>>>>>>>>>>> EXPRESION
+def p_error_expresion(p): #expresion operador expresion
+    """
+    expresion : error operador expresion
+              | expresion error expresion
+              | expresion operador error
+              | error expresion PARENTESIS_DER
+              | PARENTESIS_IZQ error PARENTESIS_DER
+              | PARENTESIS_IZQ expresion error
+    """
+    agregar_error_sintactico('Sintactico','Expresión inválida',p[2],p.lineno(2),p.lexpos(2))
+
+
+#>>>>>>>>>>>>>>>>>>>>> DECLARACION
 def p_error_declaracion(p):
     """
     declaracion : error IDENTIFICADOR IGUAL expresion PUNTO_COMA
@@ -246,9 +284,119 @@ def p_error_declaracion_5(p):
     """
     agregar_error_sintactico('Sintactico','Se esperaba un ;',p[4],p.lineno(3),find_column(p.lexer.lexdata,p,3))
 
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>LISTA
+def p_error_lista(p): #LISTA menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
+    """
+    lista : error menor_tipo LLAVE_IZQ valores_lista LLAVE_DER
+          | LISTA error LLAVE_IZQ valores_lista LLAVE_DER
+          | LISTA menor_tipo error valores_lista LLAVE_DER
+          | LISTA menor_tipo LLAVE_IZQ error LLAVE_DER
+          | LISTA menor_tipo LLAVE_IZQ valores_lista error
+    """
+    agregar_error_sintactico('Sintactico','Declaración inválida. Verifique que la sintaxis de la lista sea correcta',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LISTA ->> <IDENTIFICADOR>
+def p_error_menor_tipo(p): #MENOR IDENTIFICADOR MAYOR
+    """
+    menor_tipo : MENOR error MAYOR
+    """
+    agregar_error_sintactico('Sintactico','Declaración inválida',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+def p_error_menor_tipo_2(p): #MENOR IDENTIFICADOR MAYOR
+    """
+    menor_tipo : MENOR IDENTIFICADOR error
+    """
+    agregar_error_sintactico('Sintactico','Falta el signo de cierre >',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+def p_error_menor_tipo_3(p): #MENOR IDENTIFICADOR MAYOR
+    """
+    menor_tipo : error IDENTIFICADOR MAYOR
+    """
+    agregar_error_sintactico('Sintactico','Falta el signo de apertura <',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+#>>>>>>>>>>>>>>>>>>>>>>>> VALORES LISTA
+def p_error_valores_lista(p):
+    """
+    valores_lista : error COMA valor_lista
+    """
+    agregar_error_sintactico('Sintactico','Valor inválido',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
+def p_error_valores_lista_2(p):
+    """
+    valores_lista : valores_lista COMA error
+    """
+    agregar_error_sintactico('Sintactico','Valor inválido',p[3],p.lineno(3),find_column(p.lexer.lexdata,p,3))
+def p_error_valores_lista_3(p):
+    """
+    valores_lista : valores_lista error valor_lista
+    """
+    agregar_error_sintactico('Sintactico','Se esperaba una ","',p[3],p.lineno(3),find_column(p.lexer.lexdata,p,3))
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CONDICIONAL SI
+def p_error_si(p): #SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
+    """
+    si : error PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
+                  | SI error expresion PARENTESIS_DER bloque_codigo
+                  | SI PARENTESIS_IZQ error PARENTESIS_DER bloque_codigo
+                  | SI PARENTESIS_IZQ expresion error bloque_codigo
+                  | SI PARENTESIS_IZQ expresion PARENTESIS_DER error
+                  | SI PARENTESIS_IZQ expresion error expresion PARENTESIS_DER bloque_codigo
+                  | SI PARENTESIS_IZQ error expresion PARENTESIS_DER bloque_codigo
+    """
+    agregar_error_sintactico('Sintactico','Verifique que la sintaxis de la estructura condicional SI sea correcta',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CICLO PARA
+def p_error_para(p): #PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+    """
+    para : error PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+         | PARA error tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+         | PARA PARENTESIS_IZQ error IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+         | PARA PARENTESIS_IZQ tipo error IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+         | PARA PARENTESIS_IZQ tipo IDENTIFICADOR error expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+         | PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL error PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+         | PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion error expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+         | PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA error PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
+         | PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion error expresion PARENTESIS_DER bloque_codigo
+         | PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA error PARENTESIS_DER bloque_codigo
+         | PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion error bloque_codigo
+         | PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER error
+    """
+    agregar_error_sintactico('Sintactico','Verifique que la sintaxis de la estructura PARA sea correcta',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CICLO MIENTRAS
+def p_error_mientras(p): #MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
+    """
+    mientras : error PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
+             | MIENTRAS error expresion PARENTESIS_DER bloque_codigo
+             | MIENTRAS PARENTESIS_IZQ error PARENTESIS_DER bloque_codigo
+             | MIENTRAS PARENTESIS_IZQ expresion error bloque_codigo
+             | MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER error
+    """
+    agregar_error_sintactico('Sintactico','Verifique que la sintaxis de la estructura MIENTRAS sea correcta',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FUNCION MOSTRAR_EN_PANTALLA
+def p_error_mostrar_en_pantalla(p): #MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
+    """
+    mostrar_en_pantalla : MOSTRAR_EN_PANTALLA error expresion PARENTESIS_DER PUNTO_COMA
+    """
+    agregar_error_sintactico('Sintactico','Falta el paréntesis de apertura (',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+def p_error_mostrar_en_pantalla_2(p):
+    """
+    mostrar_en_pantalla : MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion error PUNTO_COMA
+    """
+    agregar_error_sintactico('Sintactico','Falta el paréntesis de cierre )',p[4],p.lineno(4),find_column(p.lexer.lexdata,p,4))
+def p_error_mostrar_en_pantalla_3(p):
+    """
+    mostrar_en_pantalla : MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER error
+    """
+    agregar_error_sintactico('Sintactico','Se esperaba el ; al final de la sentencia',p[4],p.lineno(4),find_column(p.lexer.lexdata,p,4))
+def p_error_mostrar_en_pantalla_4(p):
+    """
+    mostrar_en_pantalla : MOSTRAR_EN_PANTALLA PARENTESIS_IZQ error PARENTESIS_DER PUNTO_COMA
+    """
+    agregar_error_sintactico('Sintactico','Verifique que el argumento para MOSTRAR_EN_PANTALLA sea válido',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+
 
 def p_error(p):
-    pass
+    if p:
+        pass
+    else:
+        agregar_error_sintactico('Sintactico','Inicio de programa inválido. El programa debe iniciar con COMENZAR y finalizar con TERMINAR','','','')
     #print("Error: Se esperaba otra cadena antes de",p)
 
 
@@ -256,7 +404,6 @@ def p_error(p):
 
 def construir_analizador_sintactico():
     return yacc.yacc()
-
 
 def tree_to_json(node):
     if node is None:
@@ -285,7 +432,7 @@ def tree_to_json(node):
 
 
 ######################################################ZONA PARA PRUEBAS
-#DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
+# DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 
 # parser = yacc.yacc()
 # lexer = construir_analizador_lexico()
@@ -325,12 +472,8 @@ def tree_to_json(node):
 # # # Código de prueba
 # test_code = """
 # COMENZAR{
-#     ENTERO x 0;
-# PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
-#     MOSTRAR_EN_PANTALLA(contador);
-#     ENTERO s = 0;
-# }
-
+#     ENTERO x = '+2;
+#     MOSTRAR_EN_PANTALLA();
 # }
 # TERMINAR
 # """

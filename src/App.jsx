@@ -170,7 +170,7 @@ function App() {
         console.log(data[1].title);
         if (data[0].tokens) {
           setTokens(data[0].tokens);
-          if (data[1].title === "Error encontrado") {
+          if (data[1].title === "Producción detenida") {
             setArbol([{ title: "Árbol no generado" }])
           } else {
             setArbol([data[1]])
@@ -428,7 +428,7 @@ function App() {
                 foto de ejemplo de las gramaticas que quiere el fic
                 <Image
                   width="90%"
-                  src="https://i.ibb.co/BgbnGf1/example.jpg"
+                  src="../public/example.jpg"
                 />
               </Modal>
             </div>
