@@ -8,6 +8,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+src/analyzers/parser.out
+src/analyzers/parsertab.py
 src/analyzers/__pycache__/
 src-tauri/Cargo.toml
 dist

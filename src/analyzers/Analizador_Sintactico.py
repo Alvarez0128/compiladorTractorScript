@@ -90,6 +90,7 @@ def p_declaracion(p):
     """
     if len(p) == 6:
         p[0] = ('declaracion', p[1], p[2], p[4])
+        print("info:",p[1], p[2], p[4])
     else:
         p[0] = ('declaracion', p[1])
 
@@ -218,6 +219,25 @@ def p_empty(p):
 
 
 # Manejo de Errores
+def p_programa_error(p):
+    """
+    programa : COMENZAR TERMINAR
+    """
+    agregar_error_sintactico(11,'Sintactico','Inicio de programa inválido. No se declaró un bloque de código',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
+    p[0] = 'Error en programa'
+def p_programa_error_2(p):
+    """
+    programa : COMENZAR lista_declaraciones TERMINAR
+    """
+    agregar_error_sintactico(11,'Sintactico','Inicio de programa inválido. No se declaró un bloque de código',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
+    p[0] = 'Error en programa'
+def p_programa_error_3(p):
+    """
+    programa : lista_declaraciones
+    """
+    agregar_error_sintactico(11,'Sintactico','Inicio de programa inválido','',1,1)
+    p[0] = 'Error en programa'
+
 
 #>>>>>>>>>>>>>>>>>>>>>> BLOQUE_CODIGO
 def p_error_bloque_codigo(p): 
@@ -238,6 +258,18 @@ def p_error_bloque_codigo_3(p):
     bloque_codigo : LLAVE_IZQ error LLAVE_DER
     """
     agregar_error_sintactico(1,'Sintactico','Error en el cuerpo del bloque de codigo',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+    p[0] = 'Error en bloque_codigo'
+def p_error_bloque_codigo_4(p):
+    """
+    bloque_codigo : LLAVE_IZQ error 
+    """
+    agregar_error_sintactico(1,'Sintactico','Falta la llave de cierre }',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+    p[0] = 'Error en bloque_codigo'
+def p_error_bloque_codigo_5(p):
+    """
+    bloque_codigo : error LLAVE_DER 
+    """
+    agregar_error_sintactico(1,'Sintactico','Falta la llave de apertura {',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
     p[0] = 'Error en bloque_codigo'
 
 #>>>>>>>>>>>>>>>>>>>>>> EXPRESION
@@ -499,8 +531,8 @@ def tree_to_json(node):
 # # # Código de prueba
 # test_code = """
 # COMENZAR{
-#     x;
-# TERMINAR
+#     ENTERO x = 0;
+# }TERMINAR
 # """
 
 # test_parser(test_code)

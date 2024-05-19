@@ -54,6 +54,7 @@ function App() {
     9: '../public/mientrasAF.png',
     10: '../public/mostrar_en_pantallaAF.png',
     11: '../public/ProgramaAF.png',
+    12: '../public/IdentificadorError.png',
   };
 
   let table = <ConfigProvider theme={{
@@ -248,10 +249,13 @@ function App() {
 
   // Función para mostrar el modal
   function showModalInfoErrores(id) {
-    const imageSrc = imageMap[id] || '../public/example.jpg'; // Fallback image if id not found
-    setModalImageSrc(imageSrc);
-    setModalVisible(true);
+    const imageSrc = imageMap[id];
+    if (imageSrc) {
+      setModalImageSrc(imageSrc);
+      setModalVisible(true);
+    }
   }
+
 
   // Función para ocultar el modal
   const handleCancel = () => {
@@ -411,7 +415,7 @@ function App() {
               paddingLG: 10,
               algorithm: true
             },
-            Modal:{
+            Modal: {
               titleFontSize: 20
             }
           }
