@@ -17,14 +17,10 @@ class SymbolTable:
         self.children = []  # Mantener un registro de tablas de símbolos hijas para ámbitos anidados
 
     def add(self, symbol):
-        # Manejar la posible sobrecarga de funciones aquí, si es parte de tu lenguaje
-        if symbol.category == 'function':
-            if symbol.name in self.symbols:
-                self.symbols[symbol.name].append(symbol)
-            else:
-                self.symbols[symbol.name] = [symbol]
+        if symbol.name in self.symbols:
+            self.symbols[symbol.name].append(symbol)
         else:
-            self.symbols[symbol.name] = symbol
+            self.symbols[symbol.name] = [symbol]
 
     def get(self, name, category=None):
         # Buscar en la tabla actual

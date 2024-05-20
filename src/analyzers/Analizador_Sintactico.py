@@ -1,12 +1,9 @@
-from flask import jsonify
 import ply.yacc as yacc
 from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens, find_column_lexico
-from TablaSimbolos import TablaSimbolos
+from SymbolTable import Symbol, SymbolTable
 
 tabla_errores=obtener_errores_lexico()
-
-tabla_simbolos = TablaSimbolos()
-
+tabla_simbolos_global = SymbolTable()
 
 def agregar_error_sintactico(id,error_type,error_description, value, line, column):
     tabla_errores.append({
@@ -64,9 +61,7 @@ def p_bloque_codigo(p):
     """
     bloque_codigo : LLAVE_IZQ lista_declaraciones LLAVE_DER
     """
-    tabla_simbolos.abrir_ambito()
     p[0] = ('bloque_codigo', p[2])
-    tabla_simbolos.cerrar_ambito()
 
 # Lista de declaraciones
 def p_lista_declaraciones(p):
@@ -91,22 +86,9 @@ def p_declaracion(p):
                 | mostrar_en_pantalla
     """
     if len(p) == 6:
-        tipo = p[1]
-        nombre = p[2]
-        valor = p[4]
-        try:
-            tabla_simbolos.declarar(nombre, tipo, valor)
-        except Exception as e:
-            agregar_error_sintactico(0, 'Semantico', str(e), p[2], p.lineno(2), find_column(p.lexer.lexdata, p, 2))
-        p[0] = ('declaracion', tipo, nombre, valor)
-    elif len(p) == 5:
-        nombre = p[1]
-        valor = p[3]
-        try:
-            tabla_simbolos.asignar(nombre, valor)
-        except Exception as e:
-            agregar_error_sintactico(0, 'Semantico', str(e), p[1], p.lineno(1), find_column(p.lexer.lexdata, p, 1))
-        p[0] = ('asignacion', nombre, valor)
+        symbol = Symbol(name=p[2], category='variable', symbol_type=p[1], attributes={'value': p[4]})
+        tabla_simbolos_global.add(symbol)
+        p[0] = ('declaracion', p[1], p[2], p[4])
     else:
         p[0] = ('declaracion', p[1])
 
@@ -138,12 +120,6 @@ def p_expresion(p):
             p[0] = ('grupo', p[2])
         else:
             p[0] = ('expresion', p[1], p[2], p[3])
-    elif p.slice[1].type == 'IDENTIFICADOR':
-        nombre = p[1]
-        try:
-            p[0] = tabla_simbolos.obtener(nombre)
-        except Exception as e:
-            agregar_error_sintactico(0, 'Semantico', str(e), nombre, p.lineno(1), find_column(p.lexer.lexdata, p, 1))
     else:
         p[0] = p[1]
 
@@ -219,13 +195,7 @@ def p_para(p):
     """
     para : PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
     """
-    tabla_simbolos.abrir_ambito()
-    try:
-        tabla_simbolos.declarar(p[4], p[3], p[6])
-    except Exception as e:
-        agregar_error_sintactico(0, 'Semántico', str(e), p[4], p.lineno(4), find_column(p.lexer.lexdata, p, 4))
     p[0] = NodoPara(p[3], p[4], p[6], p[8], p[10], p[12])
-    tabla_simbolos.cerrar_ambito()
 
 # Estructura de control de flujo MIENTRAS
 def p_mientras(p):
@@ -486,7 +456,6 @@ def p_error(p):
         pass
     else:
         agregar_error_sintactico(11,'Sintactico','Inicio de programa inválido. El programa debe iniciar con COMENZAR y finalizar con TERMINAR','','','')
-    #print("Error: Se esperaba otra cadena antes de",p)
 
 
 # Construir el analizador
@@ -521,48 +490,49 @@ def tree_to_json(node):
 ######################################################ZONA PARA PRUEBAS
 # DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 
-# parser = yacc.yacc()
-# lexer = construir_analizador_lexico()
-# tokens_analisis=[]
-# # Función de prueba
-# def test_parser(input_string):
+parser = yacc.yacc()
+lexer = construir_analizador_lexico()
+tokens_analisis=[]
+# Función de prueba
+def test_parser(input_string):
     
-#     lexer.input(input_string)
+    lexer.input(input_string)
     
-#     for token in lexer:
-#         tokens_analisis.append(token)
+    for token in lexer:
+        tokens_analisis.append(token)
         
-#     reiniciar_analizador_lexico(lexer)
-#     for t in tokens_analisis:
-#         print(t)
-#     result = parser.parse(input_string)
-#     for error in tabla_errores:
-#         print(error)
-#     print_tree(result)
+    reiniciar_analizador_lexico(lexer)
+    for t in tokens_analisis:
+        print(t)
+    result = parser.parse(input_string)
+    for error in tabla_errores:
+        print(error)
+    print_tree(result)
 
-# # Función para imprimir el árbol sintáctico
-# def print_tree(node, depth=0):
-#     if isinstance(node, tuple):
-#         print("  " * depth + node[0])
-#         for child in node[1:]:
-#             print_tree(child, depth + 1)
-#     elif isinstance(node, NodoPara):
-#         print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-#         print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-#     elif isinstance(node, list):
-#         for item in node:
-#             print_tree(item, depth)
-#     else:
-#         print("  " * depth + str(node))
+# Función para imprimir el árbol sintáctico
+def print_tree(node, depth=0):
+    if isinstance(node, tuple):
+        print("  " * depth + node[0])
+        for child in node[1:]:
+            print_tree(child, depth + 1)
+    elif isinstance(node, NodoPara):
+        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+    elif isinstance(node, list):
+        for item in node:
+            print_tree(item, depth)
+    else:
+        print("  " * depth + str(node))
 
 
-# # # Código de prueba
-# test_code = """
-# COMENZAR{
-#     ENTERO x = 0;
-#     DECIMAL x = 2.0;
-# }TERMINAR
-# """
+# # Código de prueba
+test_code = """
+COMENZAR{
+    ENTERO x = 0;
+    DECIMAL x = 2.0;
+}TERMINAR
+"""
 
-# test_parser(test_code)
-# print(str(tabla_simbolos))
+test_parser(test_code)
+tabla_simbolos_global.print_table()
+
