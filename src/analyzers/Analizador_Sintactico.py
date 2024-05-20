@@ -1,12 +1,12 @@
 from flask import jsonify
 import ply.yacc as yacc
 from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens, find_column_lexico
-from SymbolTable import Symbol, SymbolTable 
+from TablaSimbolos import TablaSimbolos
 
 tabla_errores=obtener_errores_lexico()
 
-# simbolo=Symbol()
-# tabla_simbolos=SymbolTable()
+tabla_simbolos = TablaSimbolos()
+
 
 def agregar_error_sintactico(id,error_type,error_description, value, line, column):
     tabla_errores.append({
@@ -64,7 +64,9 @@ def p_bloque_codigo(p):
     """
     bloque_codigo : LLAVE_IZQ lista_declaraciones LLAVE_DER
     """
+    tabla_simbolos.abrir_ambito()
     p[0] = ('bloque_codigo', p[2])
+    tabla_simbolos.cerrar_ambito()
 
 # Lista de declaraciones
 def p_lista_declaraciones(p):
@@ -89,8 +91,22 @@ def p_declaracion(p):
                 | mostrar_en_pantalla
     """
     if len(p) == 6:
-        p[0] = ('declaracion', p[1], p[2], p[4])
-        print("info:",p[1], p[2], p[4])
+        tipo = p[1]
+        nombre = p[2]
+        valor = p[4]
+        try:
+            tabla_simbolos.declarar(nombre, tipo, valor)
+        except Exception as e:
+            agregar_error_sintactico(0, 'Semantico', str(e), p[2], p.lineno(2), find_column(p.lexer.lexdata, p, 2))
+        p[0] = ('declaracion', tipo, nombre, valor)
+    elif len(p) == 5:
+        nombre = p[1]
+        valor = p[3]
+        try:
+            tabla_simbolos.asignar(nombre, valor)
+        except Exception as e:
+            agregar_error_sintactico(0, 'Semantico', str(e), p[1], p.lineno(1), find_column(p.lexer.lexdata, p, 1))
+        p[0] = ('asignacion', nombre, valor)
     else:
         p[0] = ('declaracion', p[1])
 
@@ -122,6 +138,12 @@ def p_expresion(p):
             p[0] = ('grupo', p[2])
         else:
             p[0] = ('expresion', p[1], p[2], p[3])
+    elif p.slice[1].type == 'IDENTIFICADOR':
+        nombre = p[1]
+        try:
+            p[0] = tabla_simbolos.obtener(nombre)
+        except Exception as e:
+            agregar_error_sintactico(0, 'Semantico', str(e), nombre, p.lineno(1), find_column(p.lexer.lexdata, p, 1))
     else:
         p[0] = p[1]
 
@@ -197,7 +219,13 @@ def p_para(p):
     """
     para : PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
     """
+    tabla_simbolos.abrir_ambito()
+    try:
+        tabla_simbolos.declarar(p[4], p[3], p[6])
+    except Exception as e:
+        agregar_error_sintactico(0, 'Semántico', str(e), p[4], p.lineno(4), find_column(p.lexer.lexdata, p, 4))
     p[0] = NodoPara(p[3], p[4], p[6], p[8], p[10], p[12])
+    tabla_simbolos.cerrar_ambito()
 
 # Estructura de control de flujo MIENTRAS
 def p_mientras(p):
@@ -532,7 +560,9 @@ def tree_to_json(node):
 # test_code = """
 # COMENZAR{
 #     ENTERO x = 0;
+#     DECIMAL x = 2.0;
 # }TERMINAR
 # """
 
 # test_parser(test_code)
+# print(str(tabla_simbolos))
