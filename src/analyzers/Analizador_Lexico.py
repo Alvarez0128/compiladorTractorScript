@@ -76,6 +76,7 @@ tokens = [
     'DICCIONARIO',
     'A_CADENA',
     'MOSTRAR_EN_PANTALLA',
+    'OBSTACULO_DETECTADO',
     'IGUAL',
     'MENOR',
     'MAYOR',
