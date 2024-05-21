@@ -1,113 +1,105 @@
-# Importar los analizadores y la tabla de símbolos
-from Analizador_Lexico import construir_analizador_lexico, reiniciar_analizador_lexico
+import ply.yacc as yacc
+from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens
+from SymbolTable import Symbol, SymbolTable
 from Analizador_Sintactico import construir_analizador_sintactico, NodoPara
-from SymbolTable import SymbolTable, Symbol
-import Analizador_Semantico as sem
 
-def analizar_codigo(input_code):
-    # Construir analizadores léxico y sintáctico
-    lexer = construir_analizador_lexico()
-    parser = construir_analizador_sintactico()
-    
-    # Reiniciar analizadores
-    reiniciar_analizador_lexico(lexer)
-    
-    # Realizar el análisis léxico
-    lexer.input(input_code)
-    tokens = list(lexer)
-    
-    # Realizar el análisis sintáctico
-    ast = parser.parse(input_code, lexer=lexer)
-    
-    return tokens, ast
-
-def verificar_semantica(ast, symbol_table):
-    try:
-        # Aquí se realizarían las verificaciones semánticas necesarias
-        # Por ejemplo, verificar asignaciones, expresiones, estructuras de control, etc.
-        sem.check_expression(symbol_table, ast)
-    except Exception as e:
-        print(f"Error semántico: {e}")
-
-def generar_codigo_intermedio(ast, symbol_table):
+# Función para generar el código intermedio a partir del AST
+def generar_codigo_intermedio(node):
     codigo_intermedio = []
-
-    def recorrer_ast(node):
-        if isinstance(node, tuple):
-            if node[0] == 'declaracion':
-                # Procesar una declaración
-                tipo, identificador, valor = node[1], node[2], node[3]
-                simbolo = Symbol(name=identificador, category='variable', symbol_type=tipo, attributes={'value': valor})
-                symbol_table.add(simbolo)
-                codigo_intermedio.append(f"{tipo} {identificador} = {valor};")
-            elif node[0] == 'mostrar_en_pantalla':
-                # Procesar una instrucción de mostrar en pantalla
-                valor = node[1]
-                codigo_intermedio.append(f"Serial.println({valor});")
-            elif node[0] == 'si':
-                # Procesar una estructura condicional
-                condicion, bloque = node[1], node[2]
-                codigo_intermedio.append(f"if ({condicion}) {{")
-                recorrer_ast(bloque)
-                codigo_intermedio.append("}")
-            elif node[0] == 'mientras':
-                # Procesar un bucle mientras
-                condicion, bloque = node[1], node[2]
-                codigo_intermedio.append(f"while ({condicion}) {{")
-                recorrer_ast(bloque)
-                codigo_intermedio.append("}")
-            else:
-                # Procesar otros nodos
-                for child in node:
-                    recorrer_ast(child)
-        elif isinstance(node, NodoPara):
-            # Procesar un bucle para
-            codigo_intermedio.append(f"for ({node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}) {{")
-            recorrer_ast(node.bloque)
-            codigo_intermedio.append("}")
-        elif isinstance(node, list):
-            # Procesar una lista de nodos
-            for item in node:
-                recorrer_ast(item)
     
-    recorrer_ast(ast)
+    def recorrer_arbol(node):
+        if isinstance(node, tuple):
+            if node[0] == 'programa':
+                recorrer_arbol(node[1])
+            elif node[0] == 'bloque_codigo':
+                codigo_intermedio.append("{")
+                for decl in node[1]:
+                    recorrer_arbol(decl)
+                codigo_intermedio.append("}")
+            elif node[0] == 'declaracion':
+                if len(node) == 4:
+                    tipo, ident, valor = node[1], node[2], node[3]
+                    codigo_intermedio.append(f"{tipo} {ident} = {valor};")
+                else:
+                    recorrer_arbol(node[1])
+            elif node[0] == 'si':
+                condicion, bloque = node[1], node[2]
+                codigo_intermedio.append(f"IF ({condicion})")
+                recorrer_arbol(bloque)
+            elif node[0] == 'si_no':
+                condicion, bloque = node[1], node[2]
+                codigo_intermedio.append(f"IF (NOT {condicion})")
+                recorrer_arbol(bloque)
+            elif node[0] == 'mientras':
+                condicion, bloque = node[1], node[2]
+                codigo_intermedio.append(f"WHILE ({condicion})")
+                recorrer_arbol(bloque)
+            elif node[0] == 'expresion':
+                izq, op, der = node[1], node[2], node[3]
+                codigo_intermedio.append(f"{izq} {op} {der}")
+            elif node[0] == 'grupo':
+                recorrer_arbol(node[1])
+            elif node[0] == 'mostrar_en_pantalla':
+                expresion = node[1]
+                codigo_intermedio.append(f"PRINT({expresion});")
+            elif node[0] == 'obstaculo_detectado':
+                codigo_intermedio.append("OBSTACLE_DETECTED();")
+        elif isinstance(node, NodoPara):
+            tipo, ident, inicio, condicion, incremento, bloque = node.tipo, node.identificador, node.inicio, node.condicion, node.incremento, node.bloque
+            codigo_intermedio.append(f"FOR ({tipo} {ident} = {inicio}; {condicion}; {incremento})")
+            recorrer_arbol(bloque)
+    
+    recorrer_arbol(node)
     return codigo_intermedio
 
-def generar_codigo_arduino(codigo_intermedio):
-    codigo_arduino = []
-    # Código de inicialización (setup)
-    setup_code = ["void setup() {", "Serial.begin(9600);", "}"]
-    # Código principal del loop
-    loop_code = ["void loop() {"]
+# Probar el código de ejemplo
+test_code = """
+COMENZAR{
 
-    for linea in codigo_intermedio:
-        loop_code.append(f"  {linea}")
+BOOL obstaculo_detectado = F;
+DECIMAL distancia_objetivo = 500.0;
 
-    loop_code.append("}")
+MIENTRAS(distancia_recorrida < distancia_objetivo){
+    SI(obstaculo_detectado){
+        SI(calcular_distancia_restante(distancia_objetivo) < 100){
+            detener_motor();
+            SONAR_ALERTA();
+            ESPERAR(5); // Espera 5 segundos antes de reanudar
+            activar_freno();
+            ESPERAR(2); // Espera 2 segundos con los frenos activados
+            obstaculo_detectado = F; // Reinicia la detección de obstáculos
+        }SINO{
+            ajustar_velocidad(20); // Reducir la velocidad para evitar el obstáculo
+        }
+    }SINO{
+        SI(verificar_sensor_obstaculos()){
+            obstaculo_detectado = V;
+        }SINO{
+            ajustar_velocidad(50); // Mantener velocidad constante
+        }
+    }
+    // Simulación de movimiento del tractor
+    distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
+}
 
-    # Combinar el código de setup y loop
-    codigo_arduino.extend(setup_code)
-    codigo_arduino.extend(loop_code)
-    return codigo_arduino
+}TERMINAR
+"""
 
-def compilar_codigo(input_code):
-    symbol_table = SymbolTable()
-    tokens, ast = analizar_codigo(input_code)
-    verificar_semantica(ast, symbol_table)
-    codigo_intermedio = generar_codigo_intermedio(ast, symbol_table)
-    codigo_arduino = generar_codigo_arduino(codigo_intermedio)
-    return codigo_arduino
+# Construir los analizadores
+lexer = construir_analizador_lexico()
+parser = construir_analizador_sintactico()
 
-if __name__ == "__main__":
-    # Ejemplo de código fuente
-    codigo_fuente = """
-    COMENZAR{
-        ENTERO x = 0;
-        MOSTRAR_EN_PANTALLA(x);
-    }TERMINAR
-    """
-    
-    # Compilar el código fuente a código Arduino
-    codigo_arduino = compilar_codigo(codigo_fuente)
-    # Imprimir el código Arduino generado
-    print("\n".join(codigo_arduino))
+# Realizar el análisis léxico y sintáctico
+lexer.input(test_code)
+tokens_analisis = [token for token in lexer]
+reiniciar_analizador_lexico(lexer)
+
+# Obtener el AST
+ast = parser.parse(test_code)
+
+# Generar el código intermedio
+codigo_intermedio = generar_codigo_intermedio(ast)
+
+# Imprimir el código intermedio
+for linea in codigo_intermedio:
+    print(linea)
