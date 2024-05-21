@@ -33,6 +33,16 @@ def reiniciar_analizador_sintactico():
     global tabla_errores
     tabla_errores = []
 
+# Función para procesar las declaraciones y agregar símbolos a la tabla de símbolos
+def procesar_declaracion(declaracion, symbol_table):
+    if declaracion[0] == 'declaracion':
+        if len(declaracion) == 4:
+            symbol = Symbol(name=declaracion[2], category='variable', symbol_type=declaracion[1], attributes={'value': declaracion[3]})
+            symbol_table.add(symbol)
+        else:
+            # Pendiente para otros tipos de declaración
+            pass
+
 # Clase para representar el nodo PARA en el árbol sintáctico
 class NodoPara:
     def __init__(self, tipo, identificador, inicio, condicion, incremento, bloque):
@@ -62,8 +72,14 @@ def p_bloque_codigo(p):
     """
     bloque_codigo : LLAVE_IZQ lista_declaraciones LLAVE_DER
     """
+    tabla_simbolos_local = tabla_simbolos_global.enter_scope()
+    # Procesar las declaraciones en el ámbito local
+    for declaracion in p[2]:
+        procesar_declaracion(declaracion, tabla_simbolos_local)
+    # Salir del ámbito local al cerrar el bloque de código
+    tabla_simbolos_global.exit_scope()
     p[0] = ('bloque_codigo', p[2])
-
+    
 # Lista de declaraciones
 def p_lista_declaraciones(p):
     """
@@ -87,8 +103,8 @@ def p_declaracion(p):
                 | mostrar_en_pantalla
     """
     if len(p) == 6:
-        symbol = Symbol(name=p[2], category='variable', symbol_type=p[1], attributes={'value': p[4]})
-        tabla_simbolos_global.add(symbol)
+        # symbol = Symbol(name=p[2], category='variable', symbol_type=p[1], attributes={'value': p[4]})
+        # tabla_simbolos_global.add(symbol)
         p[0] = ('declaracion', p[1], p[2], p[4])
     else:
         p[0] = ('declaracion', p[1])
@@ -524,54 +540,54 @@ def tree_to_json(node):
 ######################################################ZONA PARA PRUEBAS
 # DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 
-parser = yacc.yacc()
-lexer = construir_analizador_lexico()
-tokens_analisis=[]
-# Función de prueba
-def test_parser(input_string):
+# parser = yacc.yacc()
+# lexer = construir_analizador_lexico()
+# tokens_analisis=[]
+# # Función de prueba
+# def test_parser(input_string):
     
-    lexer.input(input_string)
+#     lexer.input(input_string)
     
-    for token in lexer:
-        tokens_analisis.append(token)
+#     for token in lexer:
+#         tokens_analisis.append(token)
         
-    reiniciar_analizador_lexico(lexer)
-    for t in tokens_analisis:
-        print(t)
-    result = parser.parse(input_string)
-    for error in tabla_errores:
-        print(error)
-    print_tree(result)
+#     reiniciar_analizador_lexico(lexer)
+#     for t in tokens_analisis:
+#         print(t)
+#     result = parser.parse(input_string)
+#     for error in tabla_errores:
+#         print(error)
+#     print_tree(result)
 
-# Función para imprimir el árbol sintáctico
-def print_tree(node, depth=0):
-    if isinstance(node, tuple):
-        print("  " * depth + node[0])
-        for child in node[1:]:
-            print_tree(child, depth + 1)
-    elif isinstance(node, NodoPara):
-        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-    elif isinstance(node, list):
-        for item in node:
-            print_tree(item, depth)
-    else:
-        print("  " * depth + str(node))
+# # Función para imprimir el árbol sintáctico
+# def print_tree(node, depth=0):
+#     if isinstance(node, tuple):
+#         print("  " * depth + node[0])
+#         for child in node[1:]:
+#             print_tree(child, depth + 1)
+#     elif isinstance(node, NodoPara):
+#         print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+#         print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+#     elif isinstance(node, list):
+#         for item in node:
+#             print_tree(item, depth)
+#     else:
+#         print("  " * depth + str(node))
 
 
-# # Código de prueba
-test_code = """
-COMENZAR{
-    ENTERO contador = 0;
-    ENTERO s = 0;
-    PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
-        MOSTRAR_EN_PANTALLA(contador);
-        ENTERO s = 0;
-    }
-    DECIMAL dec = 0.4;
-}TERMINAR
-"""
+# # # Código de prueba
+# test_code = """
+# COMENZAR{
+#     ENTERO x = 0;
+#     ENTERO y = 0;
+#     PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
+#         MOSTRAR_EN_PANTALLA(contador);
+#         ENTERO dentroPara = 0;
+#     }
+#     DECIMAL z = 0.4;
+# }TERMINAR
+# """
 
-test_parser(test_code)
-tabla_simbolos_global.print_table()
+# test_parser(test_code)
+# tabla_simbolos_global.print_table()
 
