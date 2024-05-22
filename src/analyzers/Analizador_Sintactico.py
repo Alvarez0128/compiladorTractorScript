@@ -558,55 +558,55 @@ def tree_to_json(node):
 ######################################################ZONA PARA PRUEBAS
 # DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 
-parser = yacc.yacc()
-lexer = construir_analizador_lexico()
-tokens_analisis=[]
+#parser = yacc.yacc()
+#lexer = construir_analizador_lexico()
+#tokens_analisis=[]
 # Función de prueba
-def test_parser(input_string):
+#def test_parser(input_string):
     
-    lexer.input(input_string)
+#    lexer.input(input_string)
     
-    for token in lexer:
-        tokens_analisis.append(token)
+#    for token in lexer:
+#        tokens_analisis.append(token)
         
-    reiniciar_analizador_lexico(lexer)
-    for t in tokens_analisis:
+#    reiniciar_analizador_lexico(lexer)
+#    for t in tokens_analisis:
         print(t)
-    result = parser.parse(input_string)
-    for error in tabla_errores:
-        print(error)
-    print_tree(result)
+#    result = parser.parse(input_string)
+#    for error in tabla_errores:
+#        print(error)
+#    print_tree(result)
 
 # Función para imprimir el árbol sintáctico
-def print_tree(node, depth=0):
-    if isinstance(node, tuple):
-        print("  " * depth + node[0])
-        for child in node[1:]:
-            print_tree(child, depth + 1)
-    elif isinstance(node, NodoPara):
-        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-    elif isinstance(node, list):
-        for item in node:
-            print_tree(item, depth)
-    else:
-        print("  " * depth + str(node))
+#def print_tree(node, depth=0):
+#    if isinstance(node, tuple):
+#        print("  " * depth + node[0])
+#        for child in node[1:]:
+#            print_tree(child, depth + 1)
+#    elif isinstance(node, NodoPara):
+#        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+#        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+#    elif isinstance(node, list):
+#        for item in node:
+#            print_tree(item, depth)
+#    else:
+#        print("  " * depth + str(node))
 
 
 # # Código de prueba
-test_code = """
-COMENZAR{
-    ENTERO x = 0;
-    ENTERO y = 0;
-    PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
-        MOSTRAR_EN_PANTALLA(contador);
-        ENTERO dentroPara = 0;
-        DECIMAL otra = 2.1;
-    }
-    DECIMAL z = 0.4;
-}TERMINAR
-"""
+#test_code = """
+#COMENZAR{
+#    ENTERO x = 0;
+#    ENTERO y = 0;
+#    PARA(ENTERO contador = 0; contador < 10; contador = contador + 1){
+#        MOSTRAR_EN_PANTALLA(contador);
+#        ENTERO dentroPara = 0;
+#        DECIMAL otra = 2.1;
+#    }
+#    DECIMAL z = 0.4;
+#}TERMINAR
+#"""
 
-test_parser(test_code)
-tabla_simbolos_global.print_table()
+#test_parser(test_code)
+#tabla_simbolos_global.print_table()
 
