@@ -110,6 +110,25 @@ def p_declaracion(p):
                 | mientras
                 | mostrar_en_pantalla
                 | obstaculo_detectado
+                | activar_freno
+                | esperar
+                | ajustar_velocidad
+                | detener_motor
+                | sonar_alerta
+                | verificar_sensor_obstaculos
+                | calcular_distancia_restante
+                | motor_encendido
+                | velocidad
+                | cambiar_direccion
+                | verificar_freno
+                | distancia_recorrida
+                | frenos_activados
+                | distancia_restante
+                | acelerar
+                | nueva_velocidad
+                | distancia_objetivo
+                | tiempo_transcurrido
+
                 
                 
     """
@@ -248,6 +267,41 @@ def p_obstaculo_detectado(p):
                         | OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER 
     """
     p[0] = ('obstaculo_detectado',p[1])
+
+def p_detener_motor(p):
+    """
+    detener_motor : DETENER_MOTOR PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                    | OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('detener_motor',p[1])
+
+def p_motor_encendido(p):
+    """
+    motor_encendido : MOTOR_ENCENDIDO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                      | MOTOR_ENCENDIDO PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('motor_encendido',p[1])
+
+def p_velocidad(p):
+    """
+    velocidad : VELOCIDAD PARENTESIS_IZQ  PARENTESIS_DER PUNTO_COMA
+                | VELOCIDAD PARENTESIS_IZQ  PARENTESIS_DER 
+    """
+    p[0] = ('velocidad',p[1])
+
+def p_cambiar_direccion(p):
+    """
+    cambiar_direccion : CAMBIAR_DIRECCION PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                        | CAMBIAR_DIRECCION  PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('cambiar_direccion',p[1])
+
+def p_verificar_freno(p):
+    """
+    verificar_freno : VERIFICAR_FRENO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                        | VERIFICAR_FRENO PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('verificar_freno',p[1])
 
 def p_empty(p):
     'empty :'
@@ -602,7 +656,7 @@ DECIMAL distancia_objetivo = 500.0;
 MIENTRAS(distancia_recorrida < distancia_objetivo){
     SI(obstaculo_detectado){
         SI(calcular_distancia_restante(distancia_objetivo) < 100){
-            detener_motor();
+            DETENER_MOTOR();
             SONAR_ALERTA();
             ESPERAR(5); // Espera 5 segundos antes de reanudar
             activar_freno();
