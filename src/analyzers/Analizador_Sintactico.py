@@ -92,7 +92,7 @@ def p_lista_declaraciones(p):
     else:
         p[0] = [p[1]]
 
-# | sonar_alerta
+# | sonar_alarma
 #                 | activar_freno
 #                 | esperar
 #                 | ajustar_velocidad
@@ -114,7 +114,7 @@ def p_declaracion(p):
                 | esperar
                 | ajustar_velocidad
                 | detener_motor
-                | sonar_alerta
+                | sonar_alarma
                 | verificar_sensor_obstaculos
                 | calcular_distancia_restante
                 | motor_encendido
@@ -278,30 +278,121 @@ def p_detener_motor(p):
 def p_motor_encendido(p):
     """
     motor_encendido : MOTOR_ENCENDIDO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                      | MOTOR_ENCENDIDO PARENTESIS_IZQ PARENTESIS_DER 
+                    | MOTOR_ENCENDIDO PARENTESIS_IZQ PARENTESIS_DER 
     """
     p[0] = ('motor_encendido',p[1])
 
 def p_velocidad(p):
     """
     velocidad : VELOCIDAD PARENTESIS_IZQ  PARENTESIS_DER PUNTO_COMA
-                | VELOCIDAD PARENTESIS_IZQ  PARENTESIS_DER 
+              | VELOCIDAD PARENTESIS_IZQ  PARENTESIS_DER 
     """
     p[0] = ('velocidad',p[1])
 
 def p_cambiar_direccion(p):
     """
     cambiar_direccion : CAMBIAR_DIRECCION PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                        | CAMBIAR_DIRECCION  PARENTESIS_IZQ PARENTESIS_DER 
+                      | CAMBIAR_DIRECCION  PARENTESIS_IZQ PARENTESIS_DER 
     """
     p[0] = ('cambiar_direccion',p[1])
 
 def p_verificar_freno(p):
     """
     verificar_freno : VERIFICAR_FRENO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                        | VERIFICAR_FRENO PARENTESIS_IZQ PARENTESIS_DER 
+                    | VERIFICAR_FRENO PARENTESIS_IZQ PARENTESIS_DER 
     """
     p[0] = ('verificar_freno',p[1])
+
+def p_distancia_recorrida(p):
+    """
+    distancia_recorrida : DISTANCIA_RECORRIDA PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                        | DISTANCIA_RECORRIDA PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('distancia_recorrida',p[1])
+
+def p_frenos_activados(p):
+    """
+    frenos_activados : FRENOS_ACTIVADOS PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                     | FRENOS_ACTIVADOS PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('frenos_activados',p[1])
+
+def p_calcular_distancia_restante(p):
+    """
+    calcular_distancia_restante : CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                                | CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('calcular_distancia_restante',p[1])
+
+def p_distancia_restante(p):
+    """
+    distancia_restante : DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                       | DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('distancia_restante',p[1])
+
+def p_acelerar(p):
+    """
+    acelerar : ACELERAR PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+             | ACELERAR PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('acelerar',p[1])
+
+def p_ajustar_velocidad(p):
+    """
+    ajustar_velocidad : AJUSTAR_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                      | AJUSTAR_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('ajustar_velocidad',p[1])
+
+def p_nueva_velocidad(p):
+    """
+    nueva_velocidad : NUEVA_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                    | NUEVA_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('nueva_velocidad',p[1])
+
+def p_obstaculo_detectado(p):
+    """
+    obstaculo_detectado : OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                        | OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('obstaculo_detectado',p[1])
+
+def p_distancia_objetivo(p):
+    """
+    distancia_objetivo : DISTANCIA_OBJETIVO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                       | DISTANCIA_OBJETIVO PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('distancia_objetivo',p[1])
+
+def p_sonar_alarma(p):
+    """
+    sonar_alarma : SONAR_ALARMA PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                 | SONAR_ALARMA PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('sonar_alarma',p[1])
+
+def p_esperar(p):
+    """
+    esperar : ESPERAR PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+            | ESPERAR PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('esperar',p[1])
+
+def p_verificar_sensor_obstaculos(p):
+    """
+    verificar_sensor_obstaculos : VERIFICAR_SENSOR_OBSTACULOS PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                                | VERIFICAR_SENSOR_OBSTACULOS PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('verificar_sensor_obstaculos',p[1])
+
+def p_tiempo_transcurrido(p):
+    """
+    tiempo_transcurrido : TIEMPO_TRANSCURRIDO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                        | TIEMPO_TRANSCURRIDO PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('tiempo_transcurrido',p[1])
 
 def p_empty(p):
     'empty :'
@@ -657,7 +748,7 @@ MIENTRAS(distancia_recorrida < distancia_objetivo){
     SI(obstaculo_detectado){
         SI(calcular_distancia_restante(distancia_objetivo) < 100){
             DETENER_MOTOR();
-            SONAR_ALERTA();
+            SONAR_ALARMA();
             ESPERAR(5); // Espera 5 segundos antes de reanudar
             activar_freno();
             ESPERAR(2); // Espera 2 segundos con los frenos activados
