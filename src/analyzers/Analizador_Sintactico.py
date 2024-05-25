@@ -260,7 +260,8 @@ def p_mostrar_en_pantalla(p):
     mostrar_en_pantalla : MOSTRAR_EN_PANTALLA PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
     """
     p[0] = ('mostrar_en_pantalla', p[3])
-    
+
+# Estructura expresion OBSTACULO_DETECTADO   
 def p_obstaculo_detectado(p):
     """
     obstaculo_detectado : OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -268,13 +269,15 @@ def p_obstaculo_detectado(p):
     """
     p[0] = ('obstaculo_detectado',p[1])
 
+# Estructura expresion DETENER_MOTOR
 def p_detener_motor(p):
     """
     detener_motor : DETENER_MOTOR PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                    | OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER 
+                    | DETENER_MOTOR PARENTESIS_IZQ PARENTESIS_DER 
     """
     p[0] = ('detener_motor',p[1])
 
+# Estructura expresion MOTOR_ENCENDIDO
 def p_motor_encendido(p):
     """
     motor_encendido : MOTOR_ENCENDIDO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -282,6 +285,7 @@ def p_motor_encendido(p):
     """
     p[0] = ('motor_encendido',p[1])
 
+# Estructura expresion VELOCIDAD
 def p_velocidad(p):
     """
     velocidad : VELOCIDAD PARENTESIS_IZQ  PARENTESIS_DER PUNTO_COMA
@@ -289,6 +293,7 @@ def p_velocidad(p):
     """
     p[0] = ('velocidad',p[1])
 
+# Estructura expresion CAMBIAR_DIRECCION
 def p_cambiar_direccion(p):
     """
     cambiar_direccion : CAMBIAR_DIRECCION PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -296,6 +301,7 @@ def p_cambiar_direccion(p):
     """
     p[0] = ('cambiar_direccion',p[1])
 
+# Estructura expresion VERIFICAR_FRENO
 def p_verificar_freno(p):
     """
     verificar_freno : VERIFICAR_FRENO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -303,13 +309,16 @@ def p_verificar_freno(p):
     """
     p[0] = ('verificar_freno',p[1])
 
+# Estructura expresion DISTANCIA_RECORRIDA
 def p_distancia_recorrida(p):
     """
     distancia_recorrida : DISTANCIA_RECORRIDA PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                        | DISTANCIA_RECORRIDA PARENTESIS_IZQ PARENTESIS_DER 
+                        | DISTANCIA_RECORRIDA PARENTESIS_IZQ PARENTESIS_DER
+                        | DISTANCIA_RECORRIDA  
     """
     p[0] = ('distancia_recorrida',p[1])
 
+# Estructura expresion FRENOS_ACTIVADOS
 def p_frenos_activados(p):
     """
     frenos_activados : FRENOS_ACTIVADOS PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -317,6 +326,7 @@ def p_frenos_activados(p):
     """
     p[0] = ('frenos_activados',p[1])
 
+# Estructura expresion CALCULAR_DISTANCIA_RESTANTE
 def p_calcular_distancia_restante(p):
     """
     calcular_distancia_restante : CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -324,6 +334,7 @@ def p_calcular_distancia_restante(p):
     """
     p[0] = ('calcular_distancia_restante',p[1])
 
+# Estructura expresion DISTANCIA_RESTANTE
 def p_distancia_restante(p):
     """
     distancia_restante : DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -331,6 +342,7 @@ def p_distancia_restante(p):
     """
     p[0] = ('distancia_restante',p[1])
 
+# Estructura expresion ACELERAR
 def p_acelerar(p):
     """
     acelerar : ACELERAR PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -338,6 +350,7 @@ def p_acelerar(p):
     """
     p[0] = ('acelerar',p[1])
 
+# Estructura expresion AJUSTAR_VELOCIDAD
 def p_ajustar_velocidad(p):
     """
     ajustar_velocidad : AJUSTAR_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -345,6 +358,7 @@ def p_ajustar_velocidad(p):
     """
     p[0] = ('ajustar_velocidad',p[1])
 
+# Estructura expresion NUEVA_VELOCIDAD
 def p_nueva_velocidad(p):
     """
     nueva_velocidad : NUEVA_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -352,13 +366,7 @@ def p_nueva_velocidad(p):
     """
     p[0] = ('nueva_velocidad',p[1])
 
-def p_obstaculo_detectado(p):
-    """
-    obstaculo_detectado : OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                        | OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER 
-    """
-    p[0] = ('obstaculo_detectado',p[1])
-
+# Estructura expresion DISTANCIA_OBJETIVO
 def p_distancia_objetivo(p):
     """
     distancia_objetivo : DISTANCIA_OBJETIVO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -366,6 +374,7 @@ def p_distancia_objetivo(p):
     """
     p[0] = ('distancia_objetivo',p[1])
 
+# Estructura expresion SONAR_ALARMA
 def p_sonar_alarma(p):
     """
     sonar_alarma : SONAR_ALARMA PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -373,6 +382,7 @@ def p_sonar_alarma(p):
     """
     p[0] = ('sonar_alarma',p[1])
 
+# Estructura expresion ESPERAR
 def p_esperar(p):
     """
     esperar : ESPERAR PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -380,6 +390,7 @@ def p_esperar(p):
     """
     p[0] = ('esperar',p[1])
 
+# Estructura expresion VERIFICAR_SENSOR_OBSTACULO
 def p_verificar_sensor_obstaculos(p):
     """
     verificar_sensor_obstaculos : VERIFICAR_SENSOR_OBSTACULOS PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
@@ -387,12 +398,21 @@ def p_verificar_sensor_obstaculos(p):
     """
     p[0] = ('verificar_sensor_obstaculos',p[1])
 
+# Estructura expresion TIEMPO_TRANSCURRIDO
 def p_tiempo_transcurrido(p):
     """
     tiempo_transcurrido : TIEMPO_TRANSCURRIDO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
                         | TIEMPO_TRANSCURRIDO PARENTESIS_IZQ PARENTESIS_DER 
     """
     p[0] = ('tiempo_transcurrido',p[1])
+
+# Estructura expresion ACTIVAR_FRENO
+def p_activar_freno(p):
+    """
+    activar_freno : ACTIVAR_FRENO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                  | ACTIVAR_FRENO PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('activar_freno',p[1])
 
 def p_empty(p):
     'empty :'
