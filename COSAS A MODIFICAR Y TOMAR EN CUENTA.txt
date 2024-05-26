@@ -1,0 +1,6 @@
+distancia_recorrida --- se define en el programa
+calcular_distancia_restante ---------- se define en el programa
+distancia objetivo ------------ se define en el programa
+esperar() ---- se ingresan valores enteros (segundos)
+velocidad ---- se define en el programa 
+tiempo_transcurrido ----- se define en el programa

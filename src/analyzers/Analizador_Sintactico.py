@@ -92,13 +92,6 @@ def p_lista_declaraciones(p):
     else:
         p[0] = [p[1]]
 
-# | sonar_alarma
-#                 | activar_freno
-#                 | esperar
-#                 | ajustar_velocidad
-# | detener_motor
-#                 | verificar_sensor_obstaculos
-#                 | calcular_distancia_restante
 
 # Declaración
 def p_declaracion(p):
@@ -109,7 +102,6 @@ def p_declaracion(p):
                 | para
                 | mientras
                 | mostrar_en_pantalla
-                | obstaculo_detectado
                 | activar_freno
                 | esperar
                 | ajustar_velocidad
@@ -126,7 +118,6 @@ def p_declaracion(p):
                 | distancia_restante
                 | acelerar
                 | nueva_velocidad
-                | distancia_objetivo
                 | tiempo_transcurrido
 
                 
@@ -223,7 +214,7 @@ def p_valor_lista(p):
 # Estructuras de Control de Flujo
 def p_si(p):
     """
-    si : SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
+     si : SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
         | SI PARENTESIS_IZQ expresion Y expresion PARENTESIS_DER bloque_codigo
         | SI PARENTESIS_IZQ expresion O expresion PARENTESIS_DER bloque_codigo
         | SI PARENTESIS_IZQ NO expresion PARENTESIS_DER bloque_codigo
@@ -261,14 +252,6 @@ def p_mostrar_en_pantalla(p):
     """
     p[0] = ('mostrar_en_pantalla', p[3])
 
-# Estructura expresion OBSTACULO_DETECTADO   
-def p_obstaculo_detectado(p):
-    """
-    obstaculo_detectado : OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                        | OBSTACULO_DETECTADO PARENTESIS_IZQ PARENTESIS_DER 
-    """
-    p[0] = ('obstaculo_detectado',p[1])
-
 # Estructura expresion DETENER_MOTOR
 def p_detener_motor(p):
     """
@@ -290,6 +273,7 @@ def p_velocidad(p):
     """
     velocidad : VELOCIDAD PARENTESIS_IZQ  PARENTESIS_DER PUNTO_COMA
               | VELOCIDAD PARENTESIS_IZQ  PARENTESIS_DER 
+              | VELOCIDAD
     """
     p[0] = ('velocidad',p[1])
 
@@ -329,8 +313,8 @@ def p_frenos_activados(p):
 # Estructura expresion CALCULAR_DISTANCIA_RESTANTE
 def p_calcular_distancia_restante(p):
     """
-    calcular_distancia_restante : CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                                | CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER 
+    calcular_distancia_restante : CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ IDENTIFICADOR PARENTESIS_DER PUNTO_COMA
+                                | CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ IDENTIFICADOR PARENTESIS_DER 
     """
     p[0] = ('calcular_distancia_restante',p[1])
 
@@ -353,26 +337,24 @@ def p_acelerar(p):
 # Estructura expresion AJUSTAR_VELOCIDAD
 def p_ajustar_velocidad(p):
     """
-    ajustar_velocidad : AJUSTAR_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                      | AJUSTAR_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER 
+    ajustar_velocidad : AJUSTAR_VELOCIDAD PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER PUNTO_COMA
+                      | AJUSTAR_VELOCIDAD PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
+                      | AJUSTAR_VELOCIDAD PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER
+                      | AJUSTAR_VELOCIDAD PARENTESIS_IZQ NUMENTERO PARENTESIS_DER
     """
     p[0] = ('ajustar_velocidad',p[1])
 
 # Estructura expresion NUEVA_VELOCIDAD
 def p_nueva_velocidad(p):
     """
-    nueva_velocidad : NUEVA_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                    | NUEVA_VELOCIDAD PARENTESIS_IZQ PARENTESIS_DER 
+    nueva_velocidad : NUEVA_VELOCIDAD PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER PUNTO_COMA
+                    | NUEVA_VELOCIDAD PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
+                    | NUEVA_VELOCIDAD PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER
+                    | NUEVA_VELOCIDAD PARENTESIS_IZQ NUMENTERO PARENTESIS_DER
     """
     p[0] = ('nueva_velocidad',p[1])
 
-# Estructura expresion DISTANCIA_OBJETIVO
-def p_distancia_objetivo(p):
-    """
-    distancia_objetivo : DISTANCIA_OBJETIVO PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                       | DISTANCIA_OBJETIVO PARENTESIS_IZQ PARENTESIS_DER 
-    """
-    p[0] = ('distancia_objetivo',p[1])
+
 
 # Estructura expresion SONAR_ALARMA
 def p_sonar_alarma(p):
@@ -418,6 +400,52 @@ def p_empty(p):
     'empty :'
     p[0] = 'VACÍO'
 
+#Definir las funciones-----------------------------------------------
+#funcion verificar sensor obstaculos
+def verificar_sensor_obstaculos():
+    global obstaculo
+    if obstaculo == True:
+        return True
+    else:
+        return False
+#funcion distancia restante
+def calcular_distancia_restante(distancia_objetivo):
+    global distancia_restante
+    global distancia_actual
+    distancia_restante = distancia_objetivo - distancia_actual
+    return distancia_restante
+#detener motor
+def detener_motor():
+    global velocidad
+    velocidad = 0
+#sonar alarma
+def sonar_alarma():
+    global sonar
+    sonar = True
+#esperar
+def esperar(tiempo):
+    global tiempo_transcurrido
+    tiempo_transcurrido = tiempo
+#activar freno
+def activar_freno():
+    global freno
+    freno = True
+#ajustar velocidad
+def ajustar_velocidad():
+    global velocidad
+    velocidad = velocidad - 1
+#distancia recorrida
+def distancia_recorrida():
+    global distancia_recorrida
+    distancia_recorrida = distancia_recorrida + 1
+#velocidad
+def velocidad():
+    global velocidad
+    velocidad = velocidad + 1
+#tiempo transcurrido
+def tiempo_transcurrido():
+    global tiempo_transcurrido
+    tiempo_transcurrido = tiempo_transcurrido + 1
 
 # Manejo de Errores
 def p_programa_error(p):
@@ -766,6 +794,7 @@ DECIMAL distancia_objetivo = 500.0;
 
 MIENTRAS(distancia_recorrida < distancia_objetivo){
     SI(obstaculo_detectado){
+        //CORREGIR ESTA SENTENCIA SI POR QUE ES INVALIDA
         SI(calcular_distancia_restante(distancia_objetivo) < 100){
             DETENER_MOTOR();
             SONAR_ALARMA();
