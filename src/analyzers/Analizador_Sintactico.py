@@ -241,6 +241,7 @@ def p_sino(p):
     sino : si SINO bloque_codigo
     """
     p[0] = ('sino',p[1],p[3])
+    
 # Estructuras de Control de Flujo
 def p_si(p):
     """
@@ -682,6 +683,16 @@ def p_error_si(p): #SI PARENTESIS_IZQ expresion PARENTESIS_DER bloque_codigo
     """
     agregar_error_sintactico(7,'Sintactico','Verifique que la sintaxis de la estructura condicional SI sea correcta',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
     p[0] = 'Error en estructura SI'
+
+def p_error_sino(p):
+    """
+    sino : error SINO bloque_codigo
+         | si error bloque_codigo
+         | si SINO error
+         | si IDENTIFICADOR bloque_codigo
+    """
+    agregar_error_sintactico(13,'Sintactico','Verifique que la sintaxis de la estructura condicional SINO sea correcta',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+    p[0] = 'Error en estructura SINO'
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CICLO PARA
 def p_error_para(p): #PARA PARENTESIS_IZQ tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA expresion PUNTO_COMA expresion PARENTESIS_DER bloque_codigo
