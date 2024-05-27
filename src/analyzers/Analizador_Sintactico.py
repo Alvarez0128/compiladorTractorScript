@@ -820,7 +820,7 @@ def print_tree(node, depth=0):
 test_code = """
 COMENZAR{
 
-BOOL obstaculo_detectado = Falso;
+BOOL obstaculo_detectado = falso;
 DECIMAL distancia_objetivo = 500.0;
 
 MIENTRAS(distancia_recorrida < distancia_objetivo){
@@ -854,6 +854,6 @@ errores = obtener_errores_sintactico()
 # Imprimir los errores
 for error in errores:
     print(error)
-    
+
 tabla_simbolos_global.print_table()
 

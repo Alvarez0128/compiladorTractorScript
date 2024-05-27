@@ -11,13 +11,13 @@ MIENTRAS(distancia_recorrida < distancia_objetivo){
             ESPERAR(5); // Espera 5 segundos antes de reanudar
             ACTIVAR_FRENO();
             ESPERAR(2); // Espera 2 segundos con los frenos activados
-            obstaculo_detectado = F; // Reinicia la detección de obstáculos
+            obstaculo_detectado = Falso; // Reinicia la detección de obstáculos
         }SINO{
             AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
         }
     }SINO{
         SI(VERIFICAR_SENSOR_OBSTACULOS()){
-            obstaculo_detectado = V;
+            obstaculo_detectado = Verdadero;
         }SINO{
             AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
         }
