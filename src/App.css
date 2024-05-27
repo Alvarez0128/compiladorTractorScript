@@ -37,7 +37,7 @@ body::-webkit-scrollbar {
   overflow: auto;
   height: 55vh;
 }
-#arbol{
+#baseInteriorTabs{
   overflow: auto;
   height: 55vh;
   background-color: #303030;

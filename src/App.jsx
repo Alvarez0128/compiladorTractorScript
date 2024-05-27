@@ -38,6 +38,9 @@ function App() {
   const [compilationMessage, setCompilationMessage] = useState('');
   const [codigo, setCodigo] = useState('');
   const [arbol, setArbol] = useState([]);
+  const [codigoIntermedio, setcodigoIntermedio] = useState('');
+  const [codigoOptimizado, setcodigoOptimizado] = useState('');
+  const [codigoObjeto, setcodigoObjeto] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState('');
 
@@ -73,7 +76,7 @@ function App() {
     <Table pagination={false} columns={columns} dataSource={tokens} id='tabla' />
   </ConfigProvider>
 
-  let tree = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='arbol'>
+  let tree = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
     <pre className='font-mono font-bold text-lg p-2'>
       Gramatica generada:<br />
       <ConfigProvider theme={{
@@ -100,6 +103,16 @@ function App() {
     </pre>
   </div>
 
+  let intermedio = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
+    <pre className='font-mono font-bold text-base p-2'>{!codigoIntermedio ? "Código intermedio no generado" : codigoIntermedio}</pre>
+  </div>
+  let optimizado = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
+    <pre className='font-mono font-bold text-base p-2'>{!codigoOptimizado ? "Código optimizado no generado" : codigoOptimizado}</pre>
+  </div>
+  let objeto = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
+    <pre className='font-mono font-bold text-base p-2'>{!codigoObjeto ? "Código Arduino no generado" : codigoObjeto}</pre>
+  </div>
+
   const itemsTabs = [
     {
       key: '1',
@@ -112,24 +125,19 @@ function App() {
       children: tree,
     },
     {
-      key: '3',
-      label: 'Análisis Semántico',
-      children: 'Content of Tab Pane 2',
-    },
-    {
       key: '4',
       label: 'Codigo Intermedio',
-      children: 'Content of Tab Pane 3',
+      children: intermedio,
     },
     {
       key: '5',
       label: 'Codigo Optimizado',
-      children: 'Content of Tab Pane 4',
+      children: optimizado,
     },
     {
       key: '6',
       label: 'Codigo Objeto',
-      children: 'Content of Tab Pane 5',
+      children:  objeto,
     },
   ];
 
@@ -192,6 +200,9 @@ function App() {
         if (data[0].errors) {
           setErrors(data[0].errors);
           setCompilationMessage('Compilación exitosa');
+          setcodigoIntermedio(data[2]);
+          setcodigoOptimizado(data[3]);
+          setcodigoObjeto(data[4]);
         }
         editorRef.current.setPosition({ lineNumber: 1, column: 1 });
 
