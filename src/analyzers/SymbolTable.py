@@ -40,6 +40,16 @@ class SymbolTable:
             exists_in_current_scope = exists_in_current_scope and isinstance(self.symbols.get(name, None), list)
         return exists_in_current_scope or (self.parent and self.parent.exists(name, category))
 
+    def lookup(self, name):
+        # Buscar en la tabla de símbolos actual
+        symbol = self.symbols.get(name, None)
+        if symbol is not None:
+            return symbol[0] if isinstance(symbol, list) else symbol
+        # Si no se encuentra, buscar en el ámbito padre
+        if self.parent is not None:
+            return self.parent.lookup(name)
+        return None
+
     def enter_scope(self):
         # Crea una nueva tabla de símbolos para el nuevo ámbito, con `self` como padre
         new_scope = SymbolTable(parent=self)

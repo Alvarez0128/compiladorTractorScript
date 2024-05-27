@@ -259,42 +259,42 @@ t_ignore = ' \t'
 def construir_analizador_lexico():
     return lex.lex()
 
-code = """
-COMENZAR{
+# code = """
+# COMENZAR{
 
-BOOL obstaculo_detectado = F;
-DECIMAL distancia_objetivo = 500.0;
+# BOOL obstaculo_detectado = F;
+# DECIMAL distancia_objetivo = 500.0;
 
-MIENTRAS(distancia_recorrida < distancia_objetivo){
-    SI(obstaculo_detectado){
-        SI(calcular_distancia_restante(distancia_objetivo) < 100){
-            DETENER_MOTOR();
-            SONAR_ALARMA();
-            ESPERAR(5); // Espera 5 segundos antes de reanudar
-            activar_freno();
-            ESPERAR(2); // Espera 2 segundos con los frenos activados
-            obstaculo_detectado = F; // Reinicia la detección de obstáculos
-        }SINO{
-            ajustar_velocidad(20); // Reducir la velocidad para evitar el obstáculo
-        }
-    }SINO{
-        SI(verificar_sensor_obstaculos()){
-            obstaculo_detectado = V;
-        }SINO{
-            ajustar_velocidad(50); // Mantener velocidad constante
-        }
-    }
-    // Simulación de movimiento del tractor
-    distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
-}
+# MIENTRAS(distancia_recorrida < distancia_objetivo){
+#     SI(obstaculo_detectado){
+#         SI(calcular_distancia_restante(distancia_objetivo) < 100){
+#             DETENER_MOTOR();
+#             SONAR_ALARMA();
+#             ESPERAR(5); // Espera 5 segundos antes de reanudar
+#             activar_freno();
+#             ESPERAR(2); // Espera 2 segundos con los frenos activados
+#             obstaculo_detectado = F; // Reinicia la detección de obstáculos
+#         }SINO{
+#             ajustar_velocidad(20); // Reducir la velocidad para evitar el obstáculo
+#         }
+#     }SINO{
+#         SI(verificar_sensor_obstaculos()){
+#             obstaculo_detectado = V;
+#         }SINO{
+#             ajustar_velocidad(50); // Mantener velocidad constante
+#         }
+#     }
+#     // Simulación de movimiento del tractor
+#     distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
+# }
 
-}TERMINAR
-"""
-lexer = construir_analizador_lexico()
+# }TERMINAR
+# """
+# lexer = construir_analizador_lexico()
 
-lexer.input(code)
+# lexer.input(code)
 
-for token in lexer:
-   print(token)
-for error in tabla_errores:
-   print(error)
+# for token in lexer:
+#    print(token)
+# for error in tabla_errores:
+#    print(error)
