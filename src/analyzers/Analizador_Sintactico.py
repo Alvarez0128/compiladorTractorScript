@@ -781,74 +781,79 @@ def tree_to_json(node):
 ######################################################ZONA PARA PRUEBAS
 # DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 
-# parser = yacc.yacc()
-# lexer = construir_analizador_lexico()
-# tokens_analisis=[]
-# #Función de prueba
-# def test_parser(input_string):
+parser = yacc.yacc()
+lexer = construir_analizador_lexico()
+tokens_analisis=[]
+#Función de prueba
+def test_parser(input_string):
     
-#    lexer.input(input_string)
+   lexer.input(input_string)
     
-#    for token in lexer:
-#        tokens_analisis.append(token)
+   for token in lexer:
+       tokens_analisis.append(token)
         
-#    reiniciar_analizador_lexico(lexer)
-#    for t in tokens_analisis:
-#         print(t)
-#    result = parser.parse(input_string)
-#    for error in tabla_errores:
-#        print(error)
-#    print_tree(result)
+   reiniciar_analizador_lexico(lexer)
+   for t in tokens_analisis:
+        print(t)
+   result = parser.parse(input_string)
+   for error in tabla_errores:
+       print(error)
+   print_tree(result)
 
-# #Función para imprimir el árbol sintáctico
-# def print_tree(node, depth=0):
-#    if isinstance(node, tuple):
-#        print("  " * depth + node[0])
-#        for child in node[1:]:
-#            print_tree(child, depth + 1)
-#    elif isinstance(node, NodoPara):
-#        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-#        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-#    elif isinstance(node, list):
-#        for item in node:
-#            print_tree(item, depth)
-#    else:
-#        print("  " * depth + str(node))
+#Función para imprimir el árbol sintáctico
+def print_tree(node, depth=0):
+   if isinstance(node, tuple):
+       print("  " * depth + node[0])
+       for child in node[1:]:
+           print_tree(child, depth + 1)
+   elif isinstance(node, NodoPara):
+       print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+       print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+   elif isinstance(node, list):
+       for item in node:
+           print_tree(item, depth)
+   else:
+       print("  " * depth + str(node))
 
 
-# # Código de prueba
-# test_code = """
-# COMENZAR{
+# Código de prueba
+test_code = """
+COMENZAR{
 
-# BOOL obstaculo_detectado = F;
-# DECIMAL distancia_objetivo = 500.0;
+BOOL obstaculo_detectado = Falso;
+DECIMAL distancia_objetivo = 500.0;
 
-# MIENTRAS(distancia_recorrida < distancia_objetivo){
-#     SI(obstaculo_detectado){
-#         SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
-#             DETENER_MOTOR();
-#             SONAR_ALARMA();
-#             ESPERAR(5); // Espera 5 segundos antes de reanudar
-#             ACTIVAR_FRENO();
-#             ESPERAR(2); // Espera 2 segundos con los frenos activados
-#             obstaculo_detectado = F; // Reinicia la detección de obstáculos
-#         }SINO{
-#             AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
-#         }
-#     }SINO{
-#         SI(VERIFICAR_SENSOR_OBSTACULOS()){
-#             obstaculo_detectado = V;
-#         }SINO{
-#             AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
-#         }
-#     }
-#     // Simulación de movimiento del tractor
-#     distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
-# }
+MIENTRAS(distancia_recorrida < distancia_objetivo){
+    SI(obstaculo_detectado){
+        SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
+            DETENER_MOTOR();
+            SONAR_ALARMA();
+            ESPERAR(5); // Espera 5 segundos antes de reanudar
+            ACTIVAR_FRENO();
+            ESPERAR(2); // Espera 2 segundos con los frenos activados
+            obstaculo_detectado = Falso; // Reinicia la detección de obstáculos
+        }SINO{
+            AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
+        }
+    }SINO{
+        SI(VERIFICAR_SENSOR_OBSTACULOS()){
+            obstaculo_detectado = Verdadero;
+        }SINO{
+            AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
+        }
+    }
+    // Simulación de movimiento del tractor
+    distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
+}
 
-# }TERMINAR
-# """
-
-# test_parser(test_code)
-# tabla_simbolos_global.print_table()
+}TERMINAR
+"""
+test_parser(test_code)
+# Obtener los errores sintácticos
+errores = obtener_errores_sintactico()
+# Imprimir los errores
+for error in errores:
+    print(error)
+    
+tabla_simbolos_global.print_table()
 

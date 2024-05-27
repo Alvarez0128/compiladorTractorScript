@@ -178,8 +178,8 @@ def t_NUMENTERO(t):
 
 # Expresión regular para booleanos
 def t_BOOL(t):
-    r'[Vv]alor|[Ff]also'
-    t.value = True if t.value.lower() == 'valor' else False
+    r'[Vv]erdadero|[Ff]also'
+    t.value = True if t.value.lower() == 'verdadero' else False
     return t
 
 # Expresión regular para identificadores (nombres de variables, funciones, etc.)
@@ -262,7 +262,7 @@ def construir_analizador_lexico():
 # code = """
 # COMENZAR{
 
-# BOOL obstaculo_detectado = F;
+# BOOL obstaculo_detectado = Falso;
 # DECIMAL distancia_objetivo = 500.0;
 
 # MIENTRAS(distancia_recorrida < distancia_objetivo){
