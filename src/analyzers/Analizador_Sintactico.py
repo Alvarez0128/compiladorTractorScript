@@ -751,6 +751,17 @@ def p_error_mostrar_en_pantalla_4(p):
     """
     agregar_error_sintactico(10,'Sintactico','Verifique que el argumento para MOSTRAR_EN_PANTALLA sea válido',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
     p[0] = 'Error en mostrar_en_pantalla'
+def p_error_esperar(p):
+    """
+    esperar : ESPERAR PARENTESIS_IZQ
+            | ESPERAR PARENTESIS_DER
+            | ESPERAR error
+            | ESPERAR PARENTESIS_IZQ error PARENTESIS_DER PUNTO_COMA
+            | ESPERAR PARENTESIS_IZQ error PARENTESIS_DER 
+            | ESPERAR PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    agregar_error_sintactico(14,'Sintactico','Declaración inválida para la funcion ESPERAR',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
+    p[0] = 'Error en esperar'
 
 def p_error(p):
     if p:

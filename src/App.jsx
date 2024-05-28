@@ -58,7 +58,8 @@ function App() {
     10: '../public/mostrar_en_pantallaAF.png',
     11: '../public/ProgramaAF.png',
     12: '../public/IdentificadorError.png',
-    13: '../public/SinoAF(Nuevo).png'
+    13: '../public/SinoAF(Nuevo).png',
+    14: '../public/ESPERAR_AF.png'
   };
 
   let table = <ConfigProvider theme={{
