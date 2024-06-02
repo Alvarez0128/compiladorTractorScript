@@ -139,7 +139,7 @@ function App() {
     {
       key: '6',
       label: 'Codigo Objeto',
-      children:  objeto,
+      children: objeto,
     },
   ];
 
@@ -147,7 +147,92 @@ function App() {
 
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor;
+
+    // Aquí defines el lenguaje y el tema personalizados
+    monaco.languages.register({ id: 'TractorScript' });
+    monaco.languages.setMonarchTokensProvider('TractorScript', {
+      tokenizer: {
+        root: [
+          [/\b(COMENZAR|TERMINAR|PARA|MIENTRAS|SI|SINO|INTENTAR|CAPTURAR|EXCEPCION|FUNCION|CODIGO|RETORNA)\b/, 'keyword'],
+          [/\b(A_CADENA|MOSTRAR_EN_PANTALLA|DETENER_MOTOR|MOTOR_ENCENDIDO|VELOCIDAD|CAMBIAR_DIRECCION|VERIFICAR_FRENO|DISTANCIA_RECORRIDA|ACTIVAR_FRENO|FRENOS_ACTIVADOS|CALCULAR_DISTANCIA_RESTANTE|DISTANCIA_RESTANTE|ACELERAR|AJUSTAR_VELOCIDAD|NUEVA_VELOCIDAD|SONAR_ALARMA|ESPERAR|VERIFICAR_SENSOR_OBSTACULOS|TIEMPO_TRANSCURRIDO)\b/, 'functions'],
+          [/\b(ENTERO|DECIMAL|BOOL|LISTA|DICCIONARIO)\b/, 'datatypes'],
+          [/\b(COMENZAR|TERMINAR)\b/, 'keyword'],
+          [/\b\d+\.\d+\b/, 'number.decimal'],
+          [/\d+(\.\d*){2,}|\d+\.\d+(\.\d+)+|\.\d+(\.\d*)*|(\d?\.\.\d+)|\d+\.(?!\d)/, 'number.decimal.invalid'],
+          [/\b\d+\b/, 'number'],
+          [/[+-]{2,}\d+/, 'number.invalid'],
+          [/\/\/.*/, 'comment'],
+          [/\/\*.*\*\//, 'comment'],
+          [/"([^"\\]|\\.)*$/, 'string.invalid'],
+          [/"/, { token: 'string.quote', bracket: '@open', next: '@string' }],
+          [/'[^\\']'/, 'string'],
+          [/'/, 'string.invalid'],
+          [/[<>]=?|==/, 'operator.logical'],
+          [/\b[<>]=?|==|(Falso|Verdadero|falso|verdadero|o|O|NO|No|nO|no|y|Y)\b/, 'operator.logical.words'],
+          [/[+\-*/]|=/, 'operator.arit'],
+          [/\b[a-zA-Z_ñÑ][a-zA-Z0-9_ñÑ]*\b/, 'identifier'],
+          [/\b\d+[a-zA-Z_ñÑ][a-zA-Z0-9_ñÑ]*\b/, 'identifier.error']
+        ],
+        string: [
+          [/[^\\"]+/, 'string'],
+          [/\\./, 'string.escape.invalid'],
+          [/"/, { token: 'string.quote', bracket: '@close', next: '@pop' }]
+        ]
+      }
+    });
+
+    monaco.languages.setLanguageConfiguration('TractorScript', {
+      comments: {
+        lineComment: '//',
+        blockComment: ['/*', '*/']
+      },
+      brackets: [
+        ['{', '}'],
+        ['[', ']'],
+        ['(', ')']
+      ],
+      autoClosingPairs: [
+        { open: '{', close: '}' },
+        { open: '[', close: ']' },
+        { open: '(', close: ')' },
+        { open: '"', close: '"' },
+        { open: "'", close: "'" }
+      ]
+    });
+
+    monaco.editor.defineTheme('myCustomTheme', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'keyword', foreground: '44bd54', fontStyle: 'bold' },
+        { token: 'functions', foreground: '71b3ff'},
+        { token: 'datatypes', foreground: 'ff4dd8', fontStyle: 'bold' },
+        { token: 'identifier', foreground: 'ffd374' },
+        { token: 'identifier.error', foreground: 'FF0000', fontStyle: 'bold' },
+        { token: 'number', foreground: 'd66835', fontStyle: 'bold' },
+        { token: 'number.invalid', foreground: 'FF0000', fontStyle: 'bold' },
+        { token: 'number.decimal.invalid', foreground: 'FF0000', fontStyle: 'bold' },
+        { token: 'comment', foreground: 'b8b8b8' },
+        { token: 'string', foreground: 'CE9178' },
+        { token: 'string.invalid', foreground: 'FF0000', fontStyle: 'bold' },
+        { token: 'operator.arit', foreground: 'a371ff' },
+        { token: 'operator.logical', foreground: 'ff70cf' }
+      ],
+      colors: {
+        'editor.foreground': '#F8F8F8',
+        'editor.background': '#1E1E1E',
+        'editorCursor.foreground': '#A7A7A7',
+        'editor.lineHighlightBackground': '#333333',
+        'editorLineNumber.foreground': '#858585',
+        'editor.selectionBackground': '#264F78',
+        'editor.inactiveSelectionBackground': '#3A3D41'
+      }
+    });
+
+    monaco.editor.setTheme('myCustomTheme');
   }
+
+
   const goToLineAndColumn = (line, column, text) => {
     if (editorRef.current) {
       const model = editorRef.current.getModel();
@@ -387,8 +472,10 @@ function App() {
             theme='vs-dark'
             height='100%'
             width='100%'
+            defaultLanguage="TractorScript"
             options={{
-              fontSize: '18',
+              fontSize: 18,
+              fontFamily: 'Cascadia Mono' ?? 'Arial',
             }}
             value={`${codigo}` ?? ""}
             onChange={(value) => setCodigo(value)}
