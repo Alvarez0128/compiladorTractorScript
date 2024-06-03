@@ -10,9 +10,6 @@ class SemanticError(Exception):
 class UndeclaredVariableError(SemanticError):
     pass
 
-class ConstantModificationError(SemanticError):
-    pass
-
 class TypeError(SemanticError):
     pass
 
@@ -38,8 +35,6 @@ def check_assignment(symbol_table, identifier, value, line_number):
     symbol = symbol_table.get(identifier)
     if not symbol:
         raise UndeclaredVariableError(f"Variable '{identifier}' no declarada", line_number)
-    if symbol.attributes.get('constant', False):
-        raise ConstantModificationError(f"Intento de modificar la constante '{identifier}'", line_number)
     if type(value).__name__ != symbol.type:
         raise TypeError(f"Asignación de un valor de tipo {type(value).__name__} a una variable de tipo {symbol.type}", line_number)
     symbol.attributes['value'] = value
@@ -139,33 +134,7 @@ def check_control_structure(symbol_table, condition, line_number):
     if condition_type != 'bool':
         raise TypeError(f"La condición en una estructura de control debe ser booleana, pero se recibió {condition_type}", line_number)
 
-def check_scope_exit(symbol_table, scope_level, line_number):
-    """
-    Verifica que la salida de un ámbito sea coherente con el ámbito actual.
-    Args:
-        symbol_table (SymbolTable): La tabla de símbolos en uso.
-        scope_level: Nivel de ámbito que se pretende salir.
-        line_number (int): Línea en el código fuente donde ocurre la salida de ámbito.
-    Raises:
-        ScopeError: Si el ámbito actual no coincide con el ámbito que se intenta salir.
-    """
-    if symbol_table.current_scope() != scope_level:
-        raise ScopeError(f"Desajuste de ámbito al intentar salir del bloque de código.", line_number)
-    symbol_table.exit_scope()
 
-def check_constant_modification(symbol_table, identifier, line_number):
-    """
-    Verifica que no se modifiquen constantes.
-    Args:
-        symbol_table (SymbolTable): La tabla de símbolos en uso.
-        identifier (str): Identificador de la constante.
-        line_number (int): Línea en el código fuente donde se intenta la modificación.
-    Raises:
-        ConstantModificationError: Si se intenta modificar una constante.
-    """
-    symbol = symbol_table.get(identifier)
-    if symbol and symbol.attributes.get('constant', False):
-        raise ConstantModificationError(f"Intento de modificar la constante '{identifier}'", line_number)
 
 def main():
     # Punto de entrada principal del programa.

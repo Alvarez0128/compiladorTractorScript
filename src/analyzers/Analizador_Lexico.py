@@ -72,6 +72,7 @@ tokens = [
     'DECIMAL',
     'NUMDECIMAL',
     'BOOL',
+    'T_BOOL',
     'IDENTIFICADOR',
     'LISTA',
     'DICCIONARIO',
@@ -177,7 +178,7 @@ def t_NUMENTERO(t):
 #    return t
 
 # Expresión regular para booleanos
-def t_BOOL(t):
+def t_T_BOOL(t):
     r'[Vv]erdadero|[Ff]also'
     t.value = True if t.value.lower() == 'verdadero' else False
     return t

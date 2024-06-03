@@ -41,7 +41,7 @@ def procesar_declaracion(declaracion, symbol_table, line, column):
             identificador = declaracion[2]
             valor = declaracion[3]
             
-            if symbol_table.lookup(identificador):
+            if symbol_table.exists(identificador,'variable'):
                 agregar_error_sintactico(0, 'Semantico', f'Variable {identificador} ya declarada en este ámbito', identificador, line, column)
             else:
                 if not validar_tipo_asignacion(tipo, valor):
@@ -49,6 +49,7 @@ def procesar_declaracion(declaracion, symbol_table, line, column):
                 else:
                     symbol = Symbol(name=identificador, category='variable', symbol_type=tipo, attributes={'value': valor})
                     symbol_table.add(symbol)
+    
 
 # Función para validar tipos de asignación
 def validar_tipo_asignacion(tipo, valor):
@@ -92,44 +93,66 @@ def p_bloque_codigo(p):
     """
     bloque_codigo : LLAVE_IZQ lista_declaraciones LLAVE_DER
     """
-    tabla_simbolos_local = tabla_simbolos_global.enter_scope()
-    # Procesar las declaraciones en el ámbito local
-    for declaracion in p[2]:
-        procesar_declaracion(declaracion, tabla_simbolos_local, p.lineno(1), find_column(p.lexer.lexdata, p, 1))
-    # Salir del ámbito local al cerrar el bloque de código
-    tabla_simbolos_global.exit_scope()
     p[0] = ('bloque_codigo', p[2])
     
 # Lista de declaraciones
 def p_lista_declaraciones(p):
     """
-    lista_declaraciones : lista_declaraciones declaracion 
-                        | declaracion
+    lista_declaraciones : lista_declaraciones declaracion
                         | empty
     """
     if len(p) == 3:
-        p[0] = p[1] + [p[2]]
+        # Asegurarnos que p[1] es una lista
+        if not isinstance(p[1], list):
+            p[1] = [p[1]]
+        # Asegurarnos que p[2] es una lista
+        if not isinstance(p[2], list):
+            p[2] = [p[2]]
+        p[0] = p[1] + p[2]
     else:
-        p[0] = [p[1]]
+        p[0] = []
 
-
-# Declaración
 def p_declaracion(p):
     """
-    declaracion : tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA
-                | expresion PUNTO_COMA
-                | si
-                | sino
-                | para
-                | mientras
-                | funciones_internas
+    declaracion : declaracion_variable
+                | declaracion_estruc
+    """
+    p[0] = [p[1]]
+
+# Declaración
+def p_declaracion_variable(p):
+    """
+    declaracion_variable : tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA
+                         | IDENTIFICADOR IGUAL expresion PUNTO_COMA
     """
     if len(p) == 6:
-        # symbol = Symbol(name=p[2], category='variable', symbol_type=p[1], attributes={'value': p[4]})
-        # tabla_simbolos_global.add(symbol)
-        p[0] = ('declaracion', p[1], p[2], p[4])
+        tipo = p[1]
+        identificador = p[2]
+        valor = p[4]
+        
+        if tabla_simbolos_global.exists(identificador, 'variable'):
+            agregar_error_sintactico(0, 'Semantico', f'Variable {identificador} ya declarada en este ámbito', identificador, p.lineno(2), find_column(p.lexer.lexdata, p, 2))
+        else:
+            if not validar_tipo_asignacion(tipo, valor):
+                agregar_error_sintactico(0, 'Semantico', f'Tipo de asignación incompatible para la variable {identificador}', identificador, p.lineno(2), find_column(p.lexer.lexdata, p, 2))
+            else:
+                symbol = Symbol(name=identificador, category='variable', symbol_type=tipo, attributes={'value': valor})
+                tabla_simbolos_global.add(symbol)
+        p[0] = ('declaracion', tipo, identificador, valor)
     else:
-        p[0] = ('declaracion', p[1])
+        identificador = p[1]
+        valor = p[3]
+        p[0] = ('declaracion', identificador, valor)
+
+def p_declaracion_estruc(p):
+    """
+    declaracion_estruc : si
+                       | sino
+                       | para
+                       | mientras
+                       | funciones_internas
+    """
+    p[0] = ('declaracion_estructura', p[1])
 
 def p_funciones_internas(p):
     """
@@ -173,7 +196,7 @@ def p_expresion(p):
               | IDENTIFICADOR
               | NUMENTERO
               | NUMDECIMAL
-              | BOOL
+              | T_BOOL
               | CADENA
               | lista
               | funciones_internas
@@ -185,6 +208,10 @@ def p_expresion(p):
             p[0] = ('expresion', p[1], p[2], p[3])
     else:
         p[0] = p[1]
+        if p.slice[1].type == 'IDENTIFICADOR':
+            identificador = p[1]
+            if not tabla_simbolos_global.exists(identificador, 'variable'):
+                agregar_error_sintactico(0, 'Semantico', f'Variable {identificador} no declarada', identificador, p.lineno(1), find_column(p.lexer.lexdata, p,1))
 
 # Operadores
 def p_operador(p):
@@ -498,6 +525,24 @@ def p_programa_error_3(p):
     """
     agregar_error_sintactico(11,'Sintactico','Inicio de programa inválido','',1,1)
     p[0] = 'Error en programa'
+def p_programa_error_4(p):
+    """
+    programa : COMENZAR error TERMINAR
+    """
+    agregar_error_sintactico(11,'Sintactico','Inicio de programa inválido','',1,1)
+    p[0] = 'Error en programa'
+def p_programa_error_5(p):
+    """
+    programa : bloque_codigo TERMINAR
+    """
+    agregar_error_sintactico(11,'Sintactico','Inicio de programa inválido. Falta COMENZAR al inicio del programa','',1,1)
+    p[0] = 'Error en programa'
+def p_programa_error_6(p):
+    """
+    programa : COMENZAR bloque_codigo 
+    """
+    agregar_error_sintactico(11,'Sintactico','Inicio de programa inválido. Falta TERMINAR al final del programa','',1,1)
+    p[0] = 'Error en programa'
 
 #>>>>>>>>>>>>>>>>>>>>>> BLOQUE_CODIGO
 def p_error_bloque_codigo(p): 
@@ -546,76 +591,76 @@ def p_error_expresion(p): #expresion operador expresion
     p[0] = 'Error en expresion'
 
 #>>>>>>>>>>>>>>>>>>>>> DECLARACION
-def p_error_declaracion(p):
+def p_error_declaracion_variable(p):
     """
-    declaracion : error IDENTIFICADOR IGUAL expresion PUNTO_COMA
+    declaracion_variable : error IDENTIFICADOR IGUAL expresion PUNTO_COMA
     """
     agregar_error_sintactico(3,'Sintactico','No se indicó el tipo de dato antes de',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
     p[0] = 'Error en declaracion'
-def p_error_declaracion_2(p):
+def p_error_declaracion_variable_2(p):
     """
-    declaracion : tipo error IGUAL expresion PUNTO_COMA
+    declaracion_variable : tipo error IGUAL expresion PUNTO_COMA
     """
     agregar_error_sintactico(3,'Sintactico','Se esperaba un identificador',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
     p[0] = 'Error en declaracion'
-def p_error_declaracion_3(p):
+def p_error_declaracion_variable_3(p):
     """
-    declaracion : error PUNTO_COMA
-                | error expresion PUNTO_COMA
-                | NUMENTERO PUNTO_COMA
-                | NUMDECIMAL PUNTO_COMA
-                | BOOL PUNTO_COMA
-                | IDENTIFICADOR PUNTO_COMA
-                | CADENA PUNTO_COMA
-                | lista PUNTO_COMA
-                | NUMENTERO
-                | NUMDECIMAL
-                | BOOL
-                | IDENTIFICADOR
-                | CADENA
-                | lista
+    declaracion_variable : error PUNTO_COMA
+                         | error expresion PUNTO_COMA
+                         | NUMENTERO PUNTO_COMA
+                         | NUMDECIMAL PUNTO_COMA
+                         | BOOL PUNTO_COMA
+                         | IDENTIFICADOR PUNTO_COMA
+                         | CADENA PUNTO_COMA
+                         | lista PUNTO_COMA
+                         | NUMENTERO
+                         | NUMDECIMAL
+                         | BOOL
+                         | IDENTIFICADOR
+                         | CADENA
+                         | lista
     """
     agregar_error_sintactico(3,'Sintactico','Declaración inválida',p[1],p.lineno(1),find_column(p.lexer.lexdata,p,1))
     p[0] = 'Error en declaracion'
-def p_error_declaracion_4(p):
+def p_error_declaracion_variable_4(p):
     """
-    declaracion : tipo IDENTIFICADOR error expresion PUNTO_COMA
+    declaracion_variable : tipo IDENTIFICADOR error expresion PUNTO_COMA
     """
     agregar_error_sintactico(3,'Sintactico','Se esperaba un signo (=) para la declaración',p[4],p.lineno(3),find_column(p.lexer.lexdata,p,3))
     p[0] = 'Error en declaracion'
-def p_error_declaracion_5(p):
+def p_error_declaracion_variable_5(p):
     """
-    declaracion : tipo IDENTIFICADOR IGUAL expresion error
+    declaracion_variable : tipo IDENTIFICADOR IGUAL expresion error
     """
     agregar_error_sintactico(3,'Sintactico','Se esperaba un ;',p[4],p.lineno(3),find_column(p.lexer.lexdata,p,3))
     p[0] = 'Error en declaracion'
-def p_error_declaracion_6(p):
+def p_error_declaracion_variable_6(p):
     """
-    declaracion : tipo expresion PUNTO_COMA
+    declaracion_variable : tipo expresion PUNTO_COMA
     """
     agregar_error_sintactico(3,'Sintactico','Declaración inválida. No se incializó correctamente la variable',p[2],p.lineno(3),find_column(p.lexer.lexdata,p,3))
     p[0] = 'Error en declaracion'
-def p_error_declaracion_7(p):
+def p_error_declaracion_variable_7(p):
     """
-    declaracion : tipo expresion error
+    declaracion_variable : tipo expresion error
     """
     agregar_error_sintactico(3,'Sintactico','Declaracion inválida',p[2],p.lineno(3)-1,find_column(p.lexer.lexdata,p,3))
     p[0] = 'Error en declaracion'
-def p_error_declaracion_8(p):
+def p_error_declaracion_variable_8(p):
     """
-    declaracion : tipo IDENTIFICADOR IGUAL error
+    declaracion_variable : tipo IDENTIFICADOR IGUAL error
     """
     agregar_error_sintactico(3,'Sintactico','Declaración inválida',p[3],p.lineno(3),find_column(p.lexer.lexdata,p,3))
     p[0] = 'Error en declaracion'
-def p_error_declaracion_9(p):
+def p_error_declaracion_variable_9(p):
     """
-    declaracion : tipo IDENTIFICADOR error
+    declaracion_variable : tipo IDENTIFICADOR error
     """
     agregar_error_sintactico(3,'Sintactico','Declaración inválida. Verifique la sintaxis',p[2],p.lineno(2),find_column(p.lexer.lexdata,p,2))
     p[0] = 'Error en declaracion'
-def p_error_declaracion_10(p):
+def p_error_declaracion_variable_10(p):
     """
-    declaracion : tipo error
+    declaracion_variable : tipo error
     """
     agregar_error_sintactico(3,'Sintactico','Declaración inválida. Verifique la ',p[1],p.lineno(2),find_column(p.lexer.lexdata,p,1))
     p[0] = 'Error en declaracion'
@@ -765,7 +810,7 @@ def p_error_esperar(p):
 
 def p_error(p):
     if p:
-        # agregar_error_sintactico(1,'Sintactico','🔍',p.value,p.lineno,find_column_lexico(p.lexer.lexdata,p))
+        #agregar_error_sintactico(1,'Sintactico','🔍',p.value,p.lineno,find_column_lexico(p.lexer.lexdata,p))
         pass
     else:
         agregar_error_sintactico(11,'Sintactico','Inicio de programa inválido. El programa debe iniciar con COMENZAR y finalizar con TERMINAR','','','')
@@ -803,79 +848,86 @@ def tree_to_json(node):
 ######################################################ZONA PARA PRUEBAS
 # DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 
-# parser = yacc.yacc()
-# lexer = construir_analizador_lexico()
-# tokens_analisis=[]
-# #Función de prueba
-# def test_parser(input_string):
+parser = yacc.yacc()
+lexer = construir_analizador_lexico()
+tokens_analisis=[]
+#Función de prueba
+def test_parser(input_string):
     
-#    lexer.input(input_string)
+   lexer.input(input_string)
     
-#    for token in lexer:
-#        tokens_analisis.append(token)
+   for token in lexer:
+       tokens_analisis.append(token)
         
-#    reiniciar_analizador_lexico(lexer)
+   reiniciar_analizador_lexico(lexer)
 #    for t in tokens_analisis:
 #         print(t)
-#    result = parser.parse(input_string)
-#    for error in tabla_errores:
-#        print(error)
-#    print_tree(result)
+   result = parser.parse(input_string)
+   print_tree(result)
 
-# #Función para imprimir el árbol sintáctico
-# def print_tree(node, depth=0):
-#    if isinstance(node, tuple):
-#        print("  " * depth + node[0])
-#        for child in node[1:]:
-#            print_tree(child, depth + 1)
-#    elif isinstance(node, NodoPara):
-#        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-#        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-#    elif isinstance(node, list):
-#        for item in node:
-#            print_tree(item, depth)
-#    else:
-#        print("  " * depth + str(node))
+#Función para imprimir el árbol sintáctico
+def print_tree(node, depth=0):
+   if isinstance(node, tuple):
+       print("  " * depth + node[0])
+       for child in node[1:]:
+           print_tree(child, depth + 1)
+   elif isinstance(node, NodoPara):
+       print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+       print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+   elif isinstance(node, list):
+       for item in node:
+           print_tree(item, depth)
+   else:
+       print("  " * depth + str(node))
 
 
-# # Código de prueba
-# test_code = """
-# COMENZAR{
+# Código de prueba
+test_code = """COMENZAR{
+    BOOL obstaculo_detectado = Falso;
+    DECIMAL distancia_objetivo = 500.0;
+    DECIMAL distancia_recorrida = 0.0; // Declarar distancia_recorrida
+    DECIMAL velocidad = 0.0; // Declarar velocidad
+    DECIMAL tiempo_transcurrido = 1.0; // Asumir un tiempo transcurrido constante para la simulación
 
-# BOOL obstaculo_detectado = falso;
-# DECIMAL distancia_objetivo = 500.0;
+    MOTOR_ENCENDIDO();  // Se enciende el motor al inicio
+    AJUSTAR_VELOCIDAD(50);  // Se ajusta la velocidad inicial
+    ACELERAR(); // Iniciar el avance del vehículo
 
-# MIENTRAS(distancia_recorrida < distancia_objetivo){
-#     SI(obstaculo_detectado){
-#         SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
-#             DETENER_MOTOR();
-#             SONAR_ALARMA();
-#             ESPERAR(5); // Espera 5 segundos antes de reanudar
-#             ACTIVAR_FRENO();
-#             ESPERAR(2); // Espera 2 segundos con los frenos activados
-#             obstaculo_detectado = Falso; // Reinicia la detección de obstáculos
-#         }SINO{
-#             AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
-#         }
-#     }SINO{
-#         SI(VERIFICAR_SENSOR_OBSTACULOS()){
-#             obstaculo_detectado = Verdadero;
-#         }SINO{
-#             AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
-#         }
-#     }
-#     // Simulación de movimiento del tractor
-#     distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
-# }
+    MIENTRAS(distancia_recorrida < distancia_objetivo){
+        SI(obstaculo_detectado){
+            SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
+                AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
+                DETENER_MOTOR(); // Detener el motor después de ajustar la velocidad a 0
+                SONAR_ALARMA();
+                ACTIVAR_FRENO(); // Activar freno inmediatamente después de detener el motor
+                ESPERAR(5); // Esperar 5 segundos con los frenos activados
+                obstaculo_detectado = Falso; // Reiniciar la detección de obstáculos
+                MOTOR_ENCENDIDO(); // Encender el motor de nuevo
+                AJUSTAR_VELOCIDAD(50); // Volver a la velocidad inicial
+                ACELERAR(); // Reanudar el avance del vehículo
+            } SINO {
+                AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
+            }
+        } SINO {
+            SI(VERIFICAR_SENSOR_OBSTACULOS()){
+                obstaculo_detectado = V; // Detectar obstáculo
+            } SINO {
+                AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
+            }
+        }
+        distancia_recorrida = distancia_recorrida + (velocidad * tiempo_transcurrido);
+    }
 
-# }TERMINAR
-# """
-# test_parser(test_code)
-# # Obtener los errores sintácticos
-# errores = obtener_errores_sintactico()
-# # Imprimir los errores
-# for error in errores:
-#     print(error)
+    AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
+    DETENER_MOTOR(); // Detener el motor al final del recorrido
+}TERMINAR"""
+test_parser(test_code)
+# Obtener los errores sintácticos
+errores = obtener_errores_sintactico()
+# Imprimir los errores
+for error in errores:
+    print(error)
 
-# tabla_simbolos_global.print_table()
+
+tabla_simbolos_global.print_table()
 
