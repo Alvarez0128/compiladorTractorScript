@@ -6,6 +6,8 @@ tabla_errores=obtener_errores_lexico()
 tabla_simbolos_global = SymbolTable()
 para_scope = tabla_simbolos_global.enter_scope()
 
+motor_encendido = False  # Variable global para rastrear el estado del motor
+
 def agregar_error_sintactico(id,error_type,error_description, value, line, column):
     tabla_errores.append({
         'index':id,
@@ -32,24 +34,19 @@ def find_column(input, token,n):
 def reiniciar_analizador_sintactico():
     global tabla_errores
     tabla_errores = []
+    motor_encendido = False
 
-# Función para procesar las declaraciones y agregar símbolos a la tabla de símbolos
-def procesar_declaracion(declaracion, symbol_table, line, column):
-    if declaracion[0] == 'declaracion':
-        if len(declaracion) == 4:
-            tipo = declaracion[1]
-            identificador = declaracion[2]
-            valor = declaracion[3]
-            
-            if symbol_table.exists(identificador,'variable'):
-                agregar_error_sintactico(0, 'Semantico', f'Variable {identificador} ya declarada en este ámbito', identificador, line, column)
-            else:
-                if not validar_tipo_asignacion(tipo, valor):
-                    agregar_error_sintactico(0, 'Semantico', f'Tipo de asignación incompatible para la variable {identificador}', identificador, line, column)
-                else:
-                    symbol = Symbol(name=identificador, category='variable', symbol_type=tipo, attributes={'value': valor})
-                    symbol_table.add(symbol)
-    
+   
+# Función para procesar las llamadas a funciones y agregar lógica de validación
+def procesar_llamada_funcion(funcion, line, column):
+    global motor_encendido
+    if funcion[0] == 'motor_encendido':
+        motor_encendido = True
+    elif funcion[0] == 'detener_motor':
+        if not motor_encendido:
+            agregar_error_sintactico(0, 'Semantico', 'DETENER_MOTOR() llamado antes de MOTOR_ENCENDIDO()', funcion[1], line, column)
+        else:
+            motor_encendido = False  # Se puede asumir que el motor se detiene después de esta llamada
 
 # Función para validar tipos de asignación
 def validar_tipo_asignacion(tipo, valor):
@@ -116,6 +113,7 @@ def p_declaracion(p):
     """
     declaracion : declaracion_variable
                 | declaracion_estruc
+                | declaracion_funcion_interna
     """
     p[0] = [p[1]]
 
@@ -150,9 +148,15 @@ def p_declaracion_estruc(p):
                        | sino
                        | para
                        | mientras
-                       | funciones_internas
     """
     p[0] = ('declaracion_estructura', p[1])
+
+def p_declaracion_funcion_interna(p):
+    """
+    declaracion_funcion_interna :  funciones_internas
+    """
+    p[0] = ('declaracion_funcion_interna', p[1])
+
 
 def p_funciones_internas(p):
     """
@@ -160,11 +164,10 @@ def p_funciones_internas(p):
                 | activar_freno
                 | esperar
                 | ajustar_velocidad
-                | detener_motor
+                | instruccion
                 | sonar_alarma
                 | verificar_sensor_obstaculos
                 | calcular_distancia_restante
-                | motor_encendido
                 | velocidad
                 | cambiar_direccion
                 | verificar_freno
@@ -175,6 +178,20 @@ def p_funciones_internas(p):
                 | nueva_velocidad
                 | tiempo_transcurrido
     """
+    p[0] = p[1]
+
+def p_instruccion_llamada_funcion(p):
+    '''
+    instruccion : llamada_funcion
+    '''
+    p[0] = ('llamada_funcion_motor', p[1])
+    procesar_llamada_funcion(p[1], p.lineno(1), find_column(p.lexer.lexdata, p, 1))
+
+def p_llamada_funcion(p):
+    '''
+    llamada_funcion : motor_encendido
+                    | detener_motor
+    '''
     p[0] = p[1]
 
 # Tipos de datos
@@ -889,7 +906,6 @@ test_code = """COMENZAR{
     DECIMAL velocidad = 0.0; // Declarar velocidad
     DECIMAL tiempo_transcurrido = 1.0; // Asumir un tiempo transcurrido constante para la simulación
 
-    MOTOR_ENCENDIDO();  // Se enciende el motor al inicio
     AJUSTAR_VELOCIDAD(50);  // Se ajusta la velocidad inicial
     ACELERAR(); // Iniciar el avance del vehículo
 
