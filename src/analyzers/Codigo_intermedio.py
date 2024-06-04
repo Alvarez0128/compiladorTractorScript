@@ -1,5 +1,5 @@
 from Analizador_Lexico import reiniciar_analizador_lexico, construir_analizador_lexico
-from Analizador_Sintactico import construir_analizador_sintactico, obtener_errores_sintactico, reiniciar_analizador_sintactico
+from Analizador_Sintactico import construir_analizador_sintactico, reiniciar_analizador_sintactico
 from SymbolTable import SymbolTable, Symbol
 
 class GeneradorCodigoIntermedio:
@@ -50,20 +50,19 @@ class GeneradorCodigoIntermedio:
             elif nodo_tipo == 'declaracion':
                 self.recorrer_arbol(nodo[0])
             elif nodo_tipo == 'declaracion_variable':
-                identificador = nodo[1]
-                valor = self.recorrer_arbol(nodo[2])
-                self.generar_tripleta('=', valor, None, identificador)
-            elif nodo_tipo == 'asignacion':
-                identificador = nodo[1]
-                valor = self.recorrer_arbol(nodo[2])
-                self.generar_tripleta('=', valor, None, identificador)
-            elif nodo_tipo == 'instruccion':
+                if len(nodo) == 4:
+                    identificador = nodo[2]
+                    valor = self.recorrer_arbol(nodo[3])
+                    self.generar_tripleta('=', valor, None, identificador)
+                else:
+                    identificador = nodo[1]
+                    valor = self.recorrer_arbol(nodo[2])
+                    self.generar_tripleta('=', valor, None, identificador)
+            elif nodo_tipo == 'declaracion_estructura':
                 self.recorrer_arbol(nodo[1])
-            elif nodo_tipo == 'llamada_funcion':
-                nombre_funcion = nodo[1]
-                argumentos = [self.recorrer_arbol(arg) for arg in nodo[2]]
-                self.generar_tripleta(nombre_funcion, *argumentos)
-            elif nodo_tipo == 'if':
+            elif nodo_tipo == 'declaracion_funcion_interna':
+                self.recorrer_arbol(nodo[1])
+            elif nodo_tipo == 'si':
                 condicion = self.recorrer_arbol(nodo[1])
                 etiqueta_else = self.nueva_etiqueta()
                 etiqueta_fin = self.nueva_etiqueta()
@@ -71,10 +70,17 @@ class GeneradorCodigoIntermedio:
                 self.recorrer_arbol(nodo[2])
                 self.generar_tripleta('goto', None, None, etiqueta_fin)
                 self.generar_tripleta('label', None, None, etiqueta_else)
-                if len(nodo) > 3:
-                    self.recorrer_arbol(nodo[3])
                 self.generar_tripleta('label', None, None, etiqueta_fin)
-            elif nodo_tipo == 'while':
+            elif nodo_tipo == 'sino':
+                self.recorrer_arbol(nodo[1])
+                self.recorrer_arbol(nodo[2])
+            elif nodo_tipo == 'para':
+                self.recorrer_arbol(nodo[1])
+                self.recorrer_arbol(nodo[2])
+                self.recorrer_arbol(nodo[3])
+                self.recorrer_arbol(nodo[4])
+                self.recorrer_arbol(nodo[5])
+            elif nodo_tipo == 'mientras':
                 etiqueta_inicio = self.nueva_etiqueta()
                 etiqueta_fin = self.nueva_etiqueta()
                 self.generar_tripleta('label', None, None, etiqueta_inicio)
@@ -83,15 +89,61 @@ class GeneradorCodigoIntermedio:
                 self.recorrer_arbol(nodo[2])
                 self.generar_tripleta('goto', None, None, etiqueta_inicio)
                 self.generar_tripleta('label', None, None, etiqueta_fin)
-            elif nodo_tipo == 'binario':
+            elif nodo_tipo == 'mostrar_en_pantalla':
+                self.generar_tripleta('mostrar_en_pantalla', self.recorrer_arbol(nodo[1]))
+            elif nodo_tipo == 'detener_motor':
+                self.generar_tripleta('detener_motor')
+            elif nodo_tipo == 'motor_encendido':
+                self.generar_tripleta('motor_encendido')
+            elif nodo_tipo == 'velocidad':
+                self.generar_tripleta('velocidad')
+            elif nodo_tipo == 'cambiar_direccion':
+                self.generar_tripleta('cambiar_direccion')
+            elif nodo_tipo == 'verificar_freno':
+                self.generar_tripleta('verificar_freno')
+            elif nodo_tipo == 'distancia_recorrida':
+                self.generar_tripleta('distancia_recorrida')
+            elif nodo_tipo == 'frenos_activados':
+                self.generar_tripleta('frenos_activados')
+            elif nodo_tipo == 'calcular_distancia_restante':
+                self.generar_tripleta('calcular_distancia_restante', nodo[2])
+            elif nodo_tipo == 'distancia_restante':
+                self.generar_tripleta('distancia_restante')
+            elif nodo_tipo == 'acelerar':
+                self.generar_tripleta('acelerar')
+            elif nodo_tipo == 'ajustar_velocidad':
+                self.generar_tripleta('ajustar_velocidad', nodo[1])
+            elif nodo_tipo == 'nueva_velocidad':
+                self.generar_tripleta('nueva_velocidad', nodo[1])
+            elif nodo_tipo == 'sonar_alarma':
+                self.generar_tripleta('sonar_alarma')
+            elif nodo_tipo == 'esperar':
+                self.generar_tripleta('esperar', nodo[1])
+            elif nodo_tipo == 'verificar_sensor_obstaculos':
+                self.generar_tripleta('verificar_sensor_obstaculos')
+            elif nodo_tipo == 'tiempo_transcurrido':
+                self.generar_tripleta('tiempo_transcurrido')
+            elif nodo_tipo == 'activar_freno':
+                self.generar_tripleta('activar_freno')
+            elif nodo_tipo == 'expresion':
                 operador = nodo[1]
                 operando1 = self.recorrer_arbol(nodo[0])
                 operando2 = self.recorrer_arbol(nodo[2])
                 return self.generar_tripleta(operador, operando1, operando2)
-            elif nodo_tipo == 'numero':
-                return nodo[1]
+            elif nodo_tipo == 'grupo':
+                return self.recorrer_arbol(nodo[1])
             elif nodo_tipo == 'identificador':
                 return nodo[1]
+            elif nodo_tipo == 'numero':
+                return nodo[1]
+            elif nodo_tipo == 'bool':
+                return nodo[1]
+            elif nodo_tipo == 'cadena':
+                return nodo[1]
+            elif nodo_tipo == 'lista':
+                return self.recorrer_arbol(nodo[2])
+            elif nodo_tipo == 'llamada_funcion_motor':
+                self.recorrer_arbol(nodo[1])
             else:
                 print(f"Error: Nodo tipo {nodo_tipo} no reconocido")
 
