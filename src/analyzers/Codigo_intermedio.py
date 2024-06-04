@@ -29,12 +29,12 @@ class GeneradorCodigoIntermedio:
         for i, tripleta in enumerate(self.tripletas):
             print(f"({i+1}) {tripleta}")
 
-    def analizar(self, codigo):
-        lexer = construir_analizador_lexico()
-        parser = construir_analizador_sintactico()
-        reiniciar_analizador_lexico(lexer)
-        reiniciar_analizador_sintactico()
-        arbol = parser.parse(codigo, lexer=lexer)
+    def analizar(self, arbol):
+        # lexer = construir_analizador_lexico()
+        # parser = construir_analizador_sintactico()
+        # reiniciar_analizador_lexico(lexer)
+        # reiniciar_analizador_sintactico()
+        # arbol = parser.parse(codigo, lexer=lexer)
         self.recorrer_arbol(arbol)
 
     def recorrer_arbol(self, nodo):

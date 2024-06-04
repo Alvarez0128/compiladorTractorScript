@@ -48,7 +48,7 @@ def procesar_llamada_funcion(funcion, line, column):
         motor_encendido = True
     elif funcion[0] == 'detener_motor':
         if not motor_encendido:
-            agregar_error_sintactico(0, 'Semantico', 'DETENER_MOTOR() llamado antes de MOTOR_ENCENDIDO()', funcion[1], line, column)
+            agregar_error_sintactico(16, 'Semantico', 'DETENER_MOTOR() llamado antes de MOTOR_ENCENDIDO()', funcion[1], line, column)
         else:
             motor_encendido = False  # Se puede asumir que el motor se detiene después de esta llamada
 
@@ -133,7 +133,7 @@ def p_declaracion_variable(p):
         valor = p[4]
         
         if tabla_simbolos_global.exists(identificador, 'variable'):
-            agregar_error_sintactico(0, 'Semantico', f'Variable {identificador} ya declarada en este ámbito', identificador, p.lineno(2), find_column(p.lexer.lexdata, p, 2))
+            agregar_error_sintactico(17, 'Semantico', f'Variable {identificador} ya declarada en este ámbito', identificador, p.lineno(2), find_column(p.lexer.lexdata, p, 2))
         else:
             if not validar_tipo_asignacion(tipo, valor):
                 agregar_error_sintactico(15, 'Semantico', f'Tipo de asignación incompatible para la variable {identificador}', identificador, p.lineno(2), find_column(p.lexer.lexdata, p, 2))
@@ -148,7 +148,7 @@ def p_declaracion_variable(p):
         if p.slice[1].type == 'IDENTIFICADOR':
             identificador = p[1]
             if not tabla_simbolos_global.exists(identificador, 'variable'):
-                agregar_error_sintactico(0, 'Semantico', f'Variable {identificador} no declarada', identificador, p.lineno(1), find_column(p.lexer.lexdata, p,1))
+                agregar_error_sintactico(18, 'Semantico', f'Variable {identificador} no declarada', identificador, p.lineno(1), find_column(p.lexer.lexdata, p,1))
 
 def p_declaracion_estruc(p):
     """
@@ -236,7 +236,7 @@ def p_expresion(p):
         if p.slice[1].type == 'IDENTIFICADOR':
             identificador = p[1]
             if not tabla_simbolos_global.exists(identificador, 'variable'):
-                agregar_error_sintactico(0, 'Semantico', f'Variable {identificador} no declarada', identificador, p.lineno(1), find_column(p.lexer.lexdata, p,1))
+                agregar_error_sintactico(18, 'Semantico', f'Variable {identificador} no declarada', identificador, p.lineno(1), find_column(p.lexer.lexdata, p,1))
 
 # Operadores
 def p_operador(p):

@@ -43,10 +43,13 @@ def compile_code():
     errores_sintactico = obtener_errores_sintactico()
     errores = errores_lexico + errores_sintactico
     
-    # # Generar el código intermedio
-    # codigo_intermedio = generar_codigo_intermedio(arbol)
-    # # Exportar el código intermedio a una cadena de texto formateada
-    # codigo_intermedio_texto = exportar_codigo_a_texto(codigo_intermedio)
+    # Generar el código intermedio
+    generador = GeneradorCodigoIntermedio()
+    generador.analizar(arbol)
+    tripletas = generador.tripletas
+    
+    # Formatear las tripletas como texto
+    codigo_intermedio_texto = "\n".join([f"{i+1}. {tripleta}" for i, tripleta in enumerate(tripletas)])
     
     # # Optimizar el código intermedio
     # codigo_optimizado = generar_codigo_optimizado(codigo_intermedio)
@@ -62,7 +65,7 @@ def compile_code():
     #     codigo_arduino_texto = "Código Arduino no generado"
 
     # Devolver los resultados y errores
-    return jsonify({'tokens': tokens, 'errors': errores},arbolJSON,'codigo_intermedio_texto','codigo_optimizado_texto','codigo_arduino_texto') 
+    return jsonify({'tokens': tokens, 'errors': errores},arbolJSON,codigo_intermedio_texto,'codigo_optimizado_texto','codigo_arduino_texto') 
 
 
 if __name__ == '__main__':

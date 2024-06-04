@@ -61,7 +61,11 @@ function App() {
     11: '../public/ProgramaAF.png',
     12: '../public/IdentificadorError.png',
     13: '../public/SinoAF(Nuevo).png',
-    14: '../public/ESPERAR_AF.png'
+    14: '../public/ESPERAR_AF.png',
+    15: '../public/error_asignacion.png',
+    16: '../public/error_motor.png',
+    17: '../public/error_duplicatedvar.png',
+    18: '../public/error_inexistsvar.png'
   };
 
   let lexTable = <ConfigProvider theme={{
@@ -561,7 +565,7 @@ function App() {
 
 
               <Modal
-                title="Autómata de validación para el error"
+                title="Validación para el error"
                 open={modalVisible}
                 onCancel={handleCancel}
                 footer={null}
