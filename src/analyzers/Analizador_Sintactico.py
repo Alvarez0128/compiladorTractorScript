@@ -34,6 +34,9 @@ def find_column(input, token,n):
 def reiniciar_analizador_sintactico():
     global tabla_errores
     tabla_errores = []
+    global tabla_simbolos_global
+    tabla_simbolos_global = SymbolTable()
+    global motor_encendido
     motor_encendido = False
 
    
@@ -865,85 +868,85 @@ def tree_to_json(node):
 ######################################################ZONA PARA PRUEBAS
 # DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 
-parser = yacc.yacc()
-lexer = construir_analizador_lexico()
-tokens_analisis=[]
-#Función de prueba
-def test_parser(input_string):
+# parser = yacc.yacc()
+# lexer = construir_analizador_lexico()
+# tokens_analisis=[]
+# #Función de prueba
+# def test_parser(input_string):
     
-   lexer.input(input_string)
+#    lexer.input(input_string)
     
-   for token in lexer:
-       tokens_analisis.append(token)
+#    for token in lexer:
+#        tokens_analisis.append(token)
         
-   reiniciar_analizador_lexico(lexer)
+#    reiniciar_analizador_lexico(lexer)
 #    for t in tokens_analisis:
 #         print(t)
-   result = parser.parse(input_string)
-   print_tree(result)
+#    result = parser.parse(input_string)
+#    print_tree(result)
 
-#Función para imprimir el árbol sintáctico
-def print_tree(node, depth=0):
-   if isinstance(node, tuple):
-       print("  " * depth + node[0])
-       for child in node[1:]:
-           print_tree(child, depth + 1)
-   elif isinstance(node, NodoPara):
-       print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-       print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-   elif isinstance(node, list):
-       for item in node:
-           print_tree(item, depth)
-   else:
-       print("  " * depth + str(node))
-
-
-# Código de prueba
-test_code = """COMENZAR{
-    BOOL obstaculo_detectado = Falso;
-    DECIMAL distancia_objetivo = 500.0;
-    DECIMAL distancia_recorrida = 0.0; // Declarar distancia_recorrida
-    DECIMAL velocidad = 0.0; // Declarar velocidad
-    DECIMAL tiempo_transcurrido = 1.0; // Asumir un tiempo transcurrido constante para la simulación
-
-    AJUSTAR_VELOCIDAD(50);  // Se ajusta la velocidad inicial
-    ACELERAR(); // Iniciar el avance del vehículo
-
-    MIENTRAS(distancia_recorrida < distancia_objetivo){
-        SI(obstaculo_detectado){
-            SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
-                AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
-                DETENER_MOTOR(); // Detener el motor después de ajustar la velocidad a 0
-                SONAR_ALARMA();
-                ACTIVAR_FRENO(); // Activar freno inmediatamente después de detener el motor
-                ESPERAR(5); // Esperar 5 segundos con los frenos activados
-                obstaculo_detectado = Falso; // Reiniciar la detección de obstáculos
-                MOTOR_ENCENDIDO(); // Encender el motor de nuevo
-                AJUSTAR_VELOCIDAD(50); // Volver a la velocidad inicial
-                ACELERAR(); // Reanudar el avance del vehículo
-            } SINO {
-                AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
-            }
-        } SINO {
-            SI(VERIFICAR_SENSOR_OBSTACULOS()){
-                obstaculo_detectado = V; // Detectar obstáculo
-            } SINO {
-                AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
-            }
-        }
-        distancia_recorrida = distancia_recorrida + (velocidad * tiempo_transcurrido);
-    }
-
-    AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
-    DETENER_MOTOR(); // Detener el motor al final del recorrido
-}TERMINAR"""
-test_parser(test_code)
-# Obtener los errores sintácticos
-errores = obtener_errores_sintactico()
-# Imprimir los errores
-for error in errores:
-    print(error)
+# #Función para imprimir el árbol sintáctico
+# def print_tree(node, depth=0):
+#    if isinstance(node, tuple):
+#        print("  " * depth + node[0])
+#        for child in node[1:]:
+#            print_tree(child, depth + 1)
+#    elif isinstance(node, NodoPara):
+#        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+#        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+#    elif isinstance(node, list):
+#        for item in node:
+#            print_tree(item, depth)
+#    else:
+#        print("  " * depth + str(node))
 
 
-tabla_simbolos_global.print_table()
+# # Código de prueba
+# test_code = """COMENZAR{
+#     BOOL obstaculo_detectado = Falso;
+#     DECIMAL distancia_objetivo = 500.0;
+#     DECIMAL distancia_recorrida = 0.0; // Declarar distancia_recorrida
+#     DECIMAL velocidad = 0.0; // Declarar velocidad
+#     DECIMAL tiempo_transcurrido = 1.0; // Asumir un tiempo transcurrido constante para la simulación
+
+#     AJUSTAR_VELOCIDAD(50);  // Se ajusta la velocidad inicial
+#     ACELERAR(); // Iniciar el avance del vehículo
+
+#     MIENTRAS(distancia_recorrida < distancia_objetivo){
+#         SI(obstaculo_detectado){
+#             SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
+#                 AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
+#                 DETENER_MOTOR(); // Detener el motor después de ajustar la velocidad a 0
+#                 SONAR_ALARMA();
+#                 ACTIVAR_FRENO(); // Activar freno inmediatamente después de detener el motor
+#                 ESPERAR(5); // Esperar 5 segundos con los frenos activados
+#                 obstaculo_detectado = Falso; // Reiniciar la detección de obstáculos
+#                 MOTOR_ENCENDIDO(); // Encender el motor de nuevo
+#                 AJUSTAR_VELOCIDAD(50); // Volver a la velocidad inicial
+#                 ACELERAR(); // Reanudar el avance del vehículo
+#             } SINO {
+#                 AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
+#             }
+#         } SINO {
+#             SI(VERIFICAR_SENSOR_OBSTACULOS()){
+#                 obstaculo_detectado = V; // Detectar obstáculo
+#             } SINO {
+#                 AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
+#             }
+#         }
+#         distancia_recorrida = distancia_recorrida + (velocidad * tiempo_transcurrido);
+#     }
+
+#     AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
+#     DETENER_MOTOR(); // Detener el motor al final del recorrido
+# }TERMINAR"""
+# test_parser(test_code)
+# # Obtener los errores sintácticos
+# errores = obtener_errores_sintactico()
+# # Imprimir los errores
+# for error in errores:
+#     print(error)
+
+
+# #tabla_simbolos_global.print_table()
 

@@ -1,9 +1,3 @@
-import ply.yacc as yacc
-from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens
-from SymbolTable import Symbol, SymbolTable
-from Analizador_Sintactico import construir_analizador_sintactico, NodoPara
-from Codigo_optimizado import optimizar_codigo_intermedio, generar_codigo_intermedio, exportar_codigo_a_texto
-
 # Función para generar el código objeto (Arduino) a partir del código intermedio
 def generar_codigo_arduino(codigo_intermedio):
     codigo_arduino = []
@@ -29,31 +23,41 @@ def generar_codigo_arduino(codigo_intermedio):
 
     # Añadir el código de configuración inicial para Arduino
     codigo_arduino.append("#include <Arduino.h>")
-    codigo_arduino.append("int ENA = 29;")
-    codigo_arduino.append("int IN1 = 32;")
-    codigo_arduino.append("int IN2 = 33;")
-    codigo_arduino.append("int ENB = 31;")
-    codigo_arduino.append("int IN3 = 36;")
-    codigo_arduino.append("int IN4 = 37;")
-    codigo_arduino.append("int TERMISTOR = 40;")
+    codigo_arduino.append("#include <Servo.h>")
+    codigo_arduino.append("Servo myservo;")
+    codigo_arduino.append("Servo myservo2;")
+    codigo_arduino.append("int ENA = 5;")
+    codigo_arduino.append("int IN1 = 12;")
+    codigo_arduino.append("int IN2 = 13;")
+    codigo_arduino.append("int ENB = 6;")
+    codigo_arduino.append("int IN3 = 10;")
+    codigo_arduino.append("int IN4 = 11;")
+    codigo_arduino.append("int TERMISTOR = A0;")
+    codigo_arduino.append("int val;")
+    codigo_arduino.append("int temp;")
     codigo_arduino.append("int BUZZER_PIN = 7;")
     codigo_arduino.append("int echoPin = 8;")
     codigo_arduino.append("int trigPin = 9;")
-    codigo_arduino.append("int SERVO_PIN = 4;")
-    codigo_arduino.append("Servo servo;")
+    codigo_arduino.append("long duration;")
+    codigo_arduino.append("int distance;")
+    codigo_arduino.append("int delayVal;")
+    codigo_arduino.append("int servoPos = 0;")
+    codigo_arduino.append("int servoReadLeft = 0;")
+    codigo_arduino.append("int servoReadRight = 0;")
     codigo_arduino.append("void setup() {")
     codigo_arduino.append("  Serial.begin(9600);")
-    codigo_arduino.append("  pinMode(ENA, OUTPUT);")
+    codigo_arduino.append("  myservo.attach(4);")
+    codigo_arduino.append("  myservo2.attach(3);")
     codigo_arduino.append("  pinMode(IN1, OUTPUT);")
     codigo_arduino.append("  pinMode(IN2, OUTPUT);")
-    codigo_arduino.append("  pinMode(ENB, OUTPUT);")
     codigo_arduino.append("  pinMode(IN3, OUTPUT);")
     codigo_arduino.append("  pinMode(IN4, OUTPUT);")
-    codigo_arduino.append("  pinMode(BUZZER_PIN, OUTPUT);")
-    codigo_arduino.append("  pinMode(echoPin, INPUT);")
-    codigo_arduino.append("  pinMode(trigPin, OUTPUT);")
+    codigo_arduino.append("  pinMode(ENA, OUTPUT);")
+    codigo_arduino.append("  pinMode(ENB, OUTPUT);")
     codigo_arduino.append("  pinMode(TERMISTOR, INPUT);")
-    codigo_arduino.append("  servo.attach(SERVO_PIN);")
+    codigo_arduino.append("  pinMode(BUZZER_PIN, OUTPUT);")
+    codigo_arduino.append("  pinMode(trigPin, OUTPUT);")
+    codigo_arduino.append("  pinMode(echoPin, INPUT);")
     codigo_arduino.append("}")
     codigo_arduino.append("void loop() {")
 

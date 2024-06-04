@@ -2,35 +2,92 @@ import ply.yacc as yacc
 from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens
 from SymbolTable import Symbol, SymbolTable
 from Analizador_Sintactico import construir_analizador_sintactico, NodoPara
-from Codigo_intermedio import generar_codigo_intermedio, exportar_codigo_a_texto
 
-def optimizar_codigo_intermedio(codigo_intermedio):
-    codigo_optimizado = []
-    
-    def optimizar_linea(linea):
-        # Eliminación de instrucciones redundantes
-        if linea in codigo_optimizado:
-            return None
-        # Simplificación de expresiones constantes
-        if " = " in linea and ";" in linea:
-            partes = linea.split(" = ")
-            if len(partes) == 2:
-                izq = partes[0].strip()
-                der = partes[1].strip().rstrip(';')
-                try:
-                    valor = eval(der)
-                    linea = f"{izq} = {valor};"
-                except:
-                    pass
-        return linea
+def generar_codigo_optimizado(node):
+    triplos = []
+    temp_counter = 0
 
-    for linea in codigo_intermedio:
-        linea_optimizada = optimizar_linea(linea)
-        if linea_optimizada:
-            codigo_optimizado.append(linea_optimizada)
+    def nuevo_temporal():
+        nonlocal temp_counter
+        temp_name = f"t{temp_counter}"
+        temp_counter += 1
+        return temp_name
 
-    return codigo_optimizado
+    def recorrer_arbol(node):
+        if isinstance(node, tuple):
+            if node[0] == 'programa':
+                recorrer_arbol(node[1])
+            elif node[0] == 'bloque_codigo':
+                for decl in node[1]:
+                    recorrer_arbol(decl)
+            elif node[0] == 'declaracion':
+                if len(node) == 4:
+                    tipo, ident, valor = node[1], node[2], node[3]
+                    temp = generar_expresion(valor)
+                    triplos.append(('=', temp, ident))
+            elif node[0] == 'si':
+                condicion, bloque = node[1], node[2]
+                temp = generar_expresion(condicion)
+                etiqueta_si = nuevo_temporal()
+                triplos.append(('IF', temp, etiqueta_si))
+                recorrer_arbol(bloque)
+                triplos.append((etiqueta_si, 'GOTO', ''))
+            elif node[0] == 'sino':
+                etiqueta_sino = nuevo_temporal()
+                triplos.append(('ELSE', '', etiqueta_sino))
+                recorrer_arbol(node[1])
+                triplos.append((etiqueta_sino, 'GOTO', ''))
+            elif node[0] == 'si_no':
+                condicion, bloque = node[1], node[2]
+                temp = generar_expresion(condicion)
+                etiqueta_si_no = nuevo_temporal()
+                triplos.append(('IF', temp, etiqueta_si_no))
+                recorrer_arbol(bloque)
+                triplos.append((etiqueta_si_no, 'GOTO', ''))
+            elif node[0] == 'mientras':
+                condicion, bloque = node[1], node[2]
+                etiqueta_mientras = nuevo_temporal()
+                triplos.append((etiqueta_mientras, 'WHILE', ''))
+                temp = generar_expresion(condicion)
+                triplos.append(('IF', temp, etiqueta_mientras))
+                recorrer_arbol(bloque)
+                triplos.append((etiqueta_mientras, 'GOTO', ''))
+            elif node[0] == 'expresion':
+                izq, op, der = node[1], node[2], node[3]
+                temp1 = generar_expresion(izq)
+                temp2 = generar_expresion(der)
+                temp_result = nuevo_temporal()
+                triplos.append((op, temp1, temp2, temp_result))
+                return temp_result
+            elif node[0] == 'grupo':
+                return generar_expresion(node[1])
+        elif isinstance(node, NodoPara):
+            tipo, ident, inicio, condicion, incremento, bloque = node.tipo, node.identificador, node.inicio, node.condicion, node.incremento, node.bloque
+            temp_inicio = generar_expresion(inicio)
+            triplos.append(('=', temp_inicio, ident))
+            etiqueta_para = nuevo_temporal()
+            temp_cond = generar_expresion(condicion)
+            triplos.append(('IF', temp_cond, etiqueta_para))
+            recorrer_arbol(bloque)
+            temp_incr = generar_expresion(incremento)
+            triplos.append(('+', ident, temp_incr, ident))
+            triplos.append((etiqueta_para, 'GOTO', ''))
 
+    def generar_expresion(exp):
+        if isinstance(exp, tuple):
+            if exp[0] == 'expresion':
+                izq, op, der = exp[1], exp[2], exp[3]
+                temp1 = generar_expresion(izq)
+                temp2 = generar_expresion(der)
+                temp_result = nuevo_temporal()
+                triplos.append((op, temp1, temp2, temp_result))
+                return temp_result
+            elif exp[0] == 'grupo':
+                return generar_expresion(exp[1])
+        return str(exp)
+
+    recorrer_arbol(node)
+    return triplos
 ######################################################ZONA PARA PRUEBAS
 # DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 

@@ -474,7 +474,7 @@ function App() {
             width='100%'
             defaultLanguage="TractorScript"
             options={{
-              fontSize: 18,
+              fontSize: 15,
               fontFamily: 'Cascadia Mono' ?? 'Arial',
             }}
             value={`${codigo}` ?? ""}

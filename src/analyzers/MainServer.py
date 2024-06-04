@@ -3,7 +3,7 @@ from flask_cors import CORS
 from Analizador_Lexico import construir_analizador_lexico, reiniciar_analizador_lexico, obtener_errores_lexico
 from Analizador_Sintactico import construir_analizador_sintactico, obtener_errores_sintactico, reiniciar_analizador_sintactico, tree_to_json
 from Codigo_intermedio import generar_codigo_intermedio, exportar_codigo_a_texto
-from Codigo_optimizado import optimizar_codigo_intermedio
+from Codigo_optimizado import generar_codigo_optimizado
 from Codigo_objeto import generar_codigo_arduino
 
 
@@ -49,7 +49,7 @@ def compile_code():
     codigo_intermedio_texto = exportar_codigo_a_texto(codigo_intermedio)
     
     # Optimizar el código intermedio
-    codigo_optimizado = optimizar_codigo_intermedio(codigo_intermedio)
+    codigo_optimizado = generar_codigo_optimizado(codigo_intermedio)
     # Exportar el código optimizado a una cadena de texto formateada
     codigo_optimizado_texto = exportar_codigo_a_texto(codigo_optimizado)    
     
