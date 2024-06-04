@@ -1,130 +1,142 @@
-from SymbolTable import Symbol, SymbolTable
-from Analizador_Sintactico import construir_analizador_sintactico, NodoPara
-from tripletas import GeneradorTripletas
+from Analizador_Lexico import reiniciar_analizador_lexico, construir_analizador_lexico
+from Analizador_Sintactico import construir_analizador_sintactico, obtener_errores_sintactico, reiniciar_analizador_sintactico
+from SymbolTable import SymbolTable, Symbol
 
-generador_tripletas = GeneradorTripletas()
+class GeneradorCodigoIntermedio:
+    def __init__(self):
+        self.tripletas = []
+        self.temporales = 0
+        self.etiquetas = 0
 
-def generar_codigo_intermedio_triples(node):
-    def nuevo_temp():
-        return generador_tripletas.nueva_temporal()
+    def nueva_temporal(self):
+        temporal = f"t{self.temporales}"
+        self.temporales += 1
+        return temporal
 
-    def recorrer_arbol(node):
-        if isinstance(node, tuple):
-            if node[0] == 'programa':
-                recorrer_arbol(node[1])
-            elif node[0] == 'bloque_codigo':
-                for decl in node[1]:
-                    recorrer_arbol(decl)
-            elif node[0] == 'declaracion':
-                if len(node) == 4:
-                    tipo, ident, valor = node[1], node[2], node[3]
-                    generador_tripletas.agregar_tripleta('=', ident, valor)
-                else:
-                    recorrer_arbol(node[1])
-            elif node[0] == 'si':
-                condicion, bloque_si = node[1], node[2]
-                temp_cond = recorrer_arbol(condicion)
-                label_si = f"L{len(generador_tripletas.obtener_tripletas())+2}"
-                label_end = f"L{len(generador_tripletas.obtener_tripletas())+3}"
-                generador_tripletas.agregar_tripleta('IF', temp_cond, label_si)
-                generador_tripletas.agregar_tripleta('GOTO', label_end, '')
-                generador_tripletas.agregar_tripleta('LABEL', label_si, '')
-                recorrer_arbol(bloque_si)
-                generador_tripletas.agregar_tripleta('LABEL', label_end, '')
-            elif node[0] == 'si_no':
-                condicion, bloque_si, bloque_no = node[1], node[2], node[3]
-                temp_cond = recorrer_arbol(condicion)
-                label_si = f"L{len(generador_tripletas.obtener_tripletas())+2}"
-                label_no = f"L{len(generador_tripletas.obtener_tripletas())+3}"
-                label_end = f"L{len(generador_tripletas.obtener_tripletas())+4}"
-                generador_tripletas.agregar_tripleta('IF', temp_cond, label_si)
-                generador_tripletas.agregar_tripleta('GOTO', label_no, '')
-                generador_tripletas.agregar_tripleta('LABEL', label_si, '')
-                recorrer_arbol(bloque_si)
-                generador_tripletas.agregar_tripleta('GOTO', label_end, '')
-                generador_tripletas.agregar_tripleta('LABEL', label_no, '')
-                recorrer_arbol(bloque_no)
-                generador_tripletas.agregar_tripleta('LABEL', label_end, '')
-            elif node[0] == 'mientras':
-                condicion, bloque = node[1], node[2]
-                start_label = f"L{len(generador_tripletas.obtener_tripletas())}"
-                generador_tripletas.agregar_tripleta('LABEL', start_label, '')
-                temp_cond = recorrer_arbol(condicion)
-                end_label = f"L{len(generador_tripletas.obtener_tripletas())+2}"
-                generador_tripletas.agregar_tripleta('WHILE', temp_cond, end_label)
-                recorrer_arbol(bloque)
-                generador_tripletas.agregar_tripleta('GOTO', start_label, '')
-                generador_tripletas.agregar_tripleta('LABEL', end_label, '')
-            elif node[0] == 'expresion':
-                izq, op, der = node[1], node[2], node[3]
-                temp_izq = recorrer_arbol(izq)
-                temp_der = recorrer_arbol(der)
-                temp_res = nuevo_temp()
-                generador_tripletas.agregar_tripleta('=', temp_res, f"{temp_izq} {op} {temp_der}")
-                return temp_res
-            elif node[0] == 'condicion':
-                izq, op, der = node[1], node[2], node[3]
-                temp_izq = recorrer_arbol(izq)
-                temp_der = recorrer_arbol(der)
-                temp_res = nuevo_temp()
-                generador_tripletas.agregar_tripleta('=', temp_res, f"{temp_izq} {op} {temp_der}")
-                return temp_res
+    def nueva_etiqueta(self):
+        etiqueta = f"L{self.etiquetas}"
+        self.etiquetas += 1
+        return etiqueta
+
+    def generar_tripleta(self, operador, operando1=None, operando2=None, resultado=None):
+        if not resultado:
+            resultado = self.nueva_temporal()
+        tripleta = (operador, operando1, operando2, resultado)
+        self.tripletas.append(tripleta)
+        return resultado
+
+    def imprimir_tripletas(self):
+        for i, tripleta in enumerate(self.tripletas):
+            print(f"({i+1}) {tripleta}")
+
+    def analizar(self, codigo):
+        lexer = construir_analizador_lexico()
+        parser = construir_analizador_sintactico()
+        reiniciar_analizador_lexico(lexer)
+        reiniciar_analizador_sintactico()
+        arbol = parser.parse(codigo, lexer=lexer)
+        self.recorrer_arbol(arbol)
+
+    def recorrer_arbol(self, nodo):
+        if isinstance(nodo, list):
+            for subnodo in nodo:
+                self.recorrer_arbol(subnodo)
+        elif isinstance(nodo, tuple):
+            nodo_tipo = nodo[0]
+            if nodo_tipo == 'programa':
+                self.recorrer_arbol(nodo[1])
+            elif nodo_tipo == 'bloque_codigo':
+                self.recorrer_arbol(nodo[1])
+            elif nodo_tipo == 'declaracion':
+                self.recorrer_arbol(nodo[0])
+            elif nodo_tipo == 'declaracion_variable':
+                identificador = nodo[1]
+                valor = self.recorrer_arbol(nodo[2])
+                self.generar_tripleta('=', valor, None, identificador)
+            elif nodo_tipo == 'asignacion':
+                identificador = nodo[1]
+                valor = self.recorrer_arbol(nodo[2])
+                self.generar_tripleta('=', valor, None, identificador)
+            elif nodo_tipo == 'instruccion':
+                self.recorrer_arbol(nodo[1])
+            elif nodo_tipo == 'llamada_funcion':
+                nombre_funcion = nodo[1]
+                argumentos = [self.recorrer_arbol(arg) for arg in nodo[2]]
+                self.generar_tripleta(nombre_funcion, *argumentos)
+            elif nodo_tipo == 'if':
+                condicion = self.recorrer_arbol(nodo[1])
+                etiqueta_else = self.nueva_etiqueta()
+                etiqueta_fin = self.nueva_etiqueta()
+                self.generar_tripleta('if', condicion, None, etiqueta_else)
+                self.recorrer_arbol(nodo[2])
+                self.generar_tripleta('goto', None, None, etiqueta_fin)
+                self.generar_tripleta('label', None, None, etiqueta_else)
+                if len(nodo) > 3:
+                    self.recorrer_arbol(nodo[3])
+                self.generar_tripleta('label', None, None, etiqueta_fin)
+            elif nodo_tipo == 'while':
+                etiqueta_inicio = self.nueva_etiqueta()
+                etiqueta_fin = self.nueva_etiqueta()
+                self.generar_tripleta('label', None, None, etiqueta_inicio)
+                condicion = self.recorrer_arbol(nodo[1])
+                self.generar_tripleta('if', condicion, None, etiqueta_fin)
+                self.recorrer_arbol(nodo[2])
+                self.generar_tripleta('goto', None, None, etiqueta_inicio)
+                self.generar_tripleta('label', None, None, etiqueta_fin)
+            elif nodo_tipo == 'binario':
+                operador = nodo[1]
+                operando1 = self.recorrer_arbol(nodo[0])
+                operando2 = self.recorrer_arbol(nodo[2])
+                return self.generar_tripleta(operador, operando1, operando2)
+            elif nodo_tipo == 'numero':
+                return nodo[1]
+            elif nodo_tipo == 'identificador':
+                return nodo[1]
             else:
-                for child in node:
-                    recorrer_arbol(child)
-        elif isinstance(node, str):
-            return node
+                print(f"Error: Nodo tipo {nodo_tipo} no reconocido")
 
-    recorrer_arbol(node)
-    return generador_tripletas.obtener_tripletas()
+if __name__ == "__main__":
+    codigo_prueba = """
+    COMENZAR{
+        BOOL obstaculo_detectado = Falso;
+        DECIMAL distancia_objetivo = 500.0;
+        DECIMAL distancia_recorrida = 0.0;
+        DECIMAL velocidad = 0.0;
+        DECIMAL tiempo_transcurrido = 1.0;
 
-def exportar_triples_a_texto(triples):
-    return "\n".join(f"{i}: {triple}" for i, triple in enumerate(triples))
+        MOTOR_ENCENDIDO();
+        AJUSTAR_VELOCIDAD(50);
+        ACELERAR();
 
-# Probar el código de ejemplo
-test_code = """
-COMENZAR{
-
-BOOL obstaculo_detectado = falso;
-DECIMAL distancia_objetivo = 500.0;
-
-MIENTRAS(distancia_recorrida < distancia_objetivo){
-    SI(obstaculo_detectado){
-        SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
-            DETENER_MOTOR();
-            SONAR_ALARMA();
-            ESPERAR(5); // Espera 5 segundos antes de reanudar
-            ACTIVAR_FRENO();
-            ESPERAR(2); // Espera 2 segundos con los frenos activados
-            obstaculo_detectado = Falso; // Reinicia la detección de obstáculos
-        }SINO{
-            AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
+        MIENTRAS(distancia_recorrida < distancia_objetivo){
+            SI(obstaculo_detectado){
+                SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
+                    AJUSTAR_VELOCIDAD(0);
+                    DETENER_MOTOR();
+                    SONAR_ALARMA();
+                    ACTIVAR_FRENO();
+                    ESPERAR(5);
+                    obstaculo_detectado = Falso;
+                    MOTOR_ENCENDIDO();
+                    AJUSTAR_VELOCIDAD(50);
+                    ACELERAR();
+                } SINO {
+                    AJUSTAR_VELOCIDAD(20);
+                }
+            } SINO {
+                SI(VERIFICAR_SENSOR_OBSTACULOS()){
+                    obstaculo_detectado = verdadero;
+                } SINO {
+                    AJUSTAR_VELOCIDAD(50);
+                }
+            }
+            distancia_recorrida = distancia_recorrida + (velocidad * tiempo_transcurrido);
         }
-    }SINO{
-        SI(VERIFICAR_SENSOR_OBSTACULOS()){
-            obstaculo_detectado = Verdadero;
-        }SINO{
-            AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
-        }
-    }
-    // Simulación de movimiento del tractor
-    distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
-}
 
-}TERMINAR
-"""
-
-# Construir los analizadores
-parser = construir_analizador_sintactico()
-
-# Realizar el análisis léxico y sintáctico
-ast = parser.parse(test_code)
-
-# Generar el código intermedio con tripletas
-codigo_intermedio_triples = generar_codigo_intermedio_triples(ast)
-
-# Exportar los triples de código intermedio a una cadena de texto formateada
-codigo_intermedio_triples_texto = exportar_triples_a_texto(codigo_intermedio_triples)
-
-# Imprimir el código intermedio formateado
-print(codigo_intermedio_triples_texto)
+        AJUSTAR_VELOCIDAD(0);
+        DETENER_MOTOR();
+    }TERMINAR
+    """
+    generador = GeneradorCodigoIntermedio()
+    generador.analizar(codigo_prueba)
+    generador.imprimir_tripletas()

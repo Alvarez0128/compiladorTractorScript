@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Layout, Card, ConfigProvider, Button, Tooltip, Tabs, Table, message, Dropdown, Space, Tree, Modal, Image } from 'antd';
+import { Layout, Card, ConfigProvider, Button, Tooltip, Tabs, Table, message, Dropdown, Space, Tree, Modal, Image, Checkbox } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
 import { writeFile, readTextFile } from '@tauri-apps/api/fs';
@@ -43,7 +43,9 @@ function App() {
   const [codigoObjeto, setcodigoObjeto] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState('');
-
+  const [openMenuVer, setOpenMenuVer] = useState(false);
+  const [verPanDer, setverPanDer] = useState(true);
+  const [verSalida, setverSalida] = useState(true);
 
   const imageMap = {
     1: '../public/Bloque_CodigoAF.png',
@@ -62,7 +64,7 @@ function App() {
     14: '../public/ESPERAR_AF.png'
   };
 
-  let table = <ConfigProvider theme={{
+  let lexTable = <ConfigProvider theme={{
     components: {
       Table: {
         colorBgContainer: '#303030',
@@ -78,7 +80,7 @@ function App() {
     <Table pagination={false} columns={columns} dataSource={tokens} id='tabla' />
   </ConfigProvider>
 
-  let tree = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
+  let sintactTree = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
     <pre className='font-mono font-bold text-lg p-2'>
       Gramatica generada:<br />
       <ConfigProvider theme={{
@@ -105,13 +107,13 @@ function App() {
     </pre>
   </div>
 
-  let intermedio = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
+  let intermediateCode = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
     <pre className='font-mono font-bold text-base p-2'>{!codigoIntermedio ? "Código intermedio no generado" : codigoIntermedio}</pre>
   </div>
-  let optimizado = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
+  let optimizedCode = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
     <pre className='font-mono font-bold text-base p-2'>{!codigoOptimizado ? "Código optimizado no generado" : codigoOptimizado}</pre>
   </div>
-  let objeto = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
+  let objectCode = <div className='font-mono font-bold rounded-lg p-5 text-lg overflow-auto' id='baseInteriorTabs'>
     <pre className='font-mono font-bold text-base p-2'>{!codigoObjeto ? "Código Arduino no generado" : codigoObjeto}</pre>
   </div>
 
@@ -119,27 +121,27 @@ function App() {
     {
       key: '1',
       label: 'Componentes Léxicos',
-      children: table,
+      children: lexTable,
     },
     {
       key: '2',
       label: 'Análisis Sintáctico',
-      children: tree,
+      children: sintactTree,
     },
     {
       key: '4',
       label: 'Codigo Intermedio',
-      children: intermedio,
+      children: intermediateCode,
     },
     {
       key: '5',
       label: 'Codigo Optimizado',
-      children: optimizado,
+      children: optimizedCode,
     },
     {
       key: '6',
       label: 'Codigo Objeto',
-      children: objeto,
+      children: objectCode,
     },
   ];
 
@@ -205,7 +207,7 @@ function App() {
       inherit: true,
       rules: [
         { token: 'keyword', foreground: '44bd54', fontStyle: 'bold' },
-        { token: 'functions', foreground: '71b3ff'},
+        { token: 'functions', foreground: '71b3ff' },
         { token: 'datatypes', foreground: 'ff4dd8', fontStyle: 'bold' },
         { token: 'identifier', foreground: 'ffd374' },
         { token: 'identifier.error', foreground: 'FF0000', fontStyle: 'bold' },
@@ -343,7 +345,11 @@ function App() {
       message.error('Error al abrir el archivo');
     }
   };
-  const onClick = ({ key }) => { }
+  const handleMenuClick = (e) => {
+    if (e.key === 'pander' || e.key === 'salida') {
+      setOpenMenuVer(true);
+    }
+  };
 
   // Función para mostrar el modal
   function showModalInfoErrores(id) {
@@ -399,13 +405,20 @@ function App() {
     },
   ];
 
+  const onChangePD = (e) => {
+    setverPanDer(e.target.checked)
+  };
+  const onChangeS = (e) => {
+    setverSalida(e.target.checked)
+  };
+  const alturaSalida = verSalida ? {} : { height: '100vh' };
   const itemsVer = [
     {
-      label: 'Panel derecho',
+      label: (<Checkbox defaultChecked={verPanDer} onChange={onChangePD}>Panel derecho</Checkbox>),
       key: 'pander',
     },
     {
-      label: 'Salida',
+      label: (<Checkbox defaultChecked={verSalida} onChange={onChangeS}>Salida</Checkbox>),
       key: 'salida',
     },
   ];
@@ -421,9 +434,14 @@ function App() {
     },
   ];
 
+  const handleOpenChangeMenuVer = (nextOpen, info) => {
+    if (info.source === 'trigger' || nextOpen) {
+      setOpenMenuVer(nextOpen);
+    }
+  };
 
-  const MenuDropdown = ({ label, items }) => (
-    <Dropdown menu={{ items, onClick }} trigger={['click']}>
+  const MenuDropdown = ({ label, items, onClick, onOpenChange, open }) => (
+    <Dropdown menu={{ items, onClick }} trigger={['click']} onOpenChange={onOpenChange} open={open}>
       <a onClick={(e) => e.preventDefault()} className="cursor-default">
         <Space className=' text-white hover:bg-green-600 px-3 py-0.5 hover:text-white'>
           {label}
@@ -446,7 +464,7 @@ function App() {
         }}>
           <MenuDropdown label="Archivo" items={itemsArchivo} />
           <MenuDropdown label="Editar" items={itemsEditar} />
-          <MenuDropdown label="Ver" items={itemsVer} />
+          <MenuDropdown label="Ver" items={itemsVer} onClick={handleMenuClick} onOpenChange={handleOpenChangeMenuVer} open={openMenuVer} />
           <MenuDropdown label="Ayuda" items={itemsAyuda} />
         </ConfigProvider>
 
@@ -465,13 +483,13 @@ function App() {
         </ConfigProvider>
 
       </Header>
-
-      <Content id='content' className='border border-green-900 grid grid-cols-2'>
+      
+      <Content id='content' className='border border-green-900 grid grid-cols-2' style={alturaSalida}>
         <div>
           <Editor
             theme='vs-dark'
             height='100%'
-            width='100%'
+            width={verPanDer ? '100%' : '100vw'}
             defaultLanguage="TractorScript"
             options={{
               fontSize: 15,
@@ -483,26 +501,28 @@ function App() {
             className='border-e border-green-900 pt-3 relative'
           />
         </div>
-        <div className='px-6 '>
-          <ConfigProvider
-            theme={{
-              components: {
-                Tabs: {
-                  itemSelectedColor: '#43BC4C',
-                  algorithm: true,
-                  inkBarColor: '#43BC4C',
-                  itemColor: '#fff',
-                  itemHoverColor: '#47AB4E',
-                  colorText: '#fff',
-                  colorBorderSecondary: '#8b8b8b',
-                  colorBgContainer: '#282828'
+        {verPanDer &&
+          <div className='px-6 '>
+            <ConfigProvider
+              theme={{
+                components: {
+                  Tabs: {
+                    itemSelectedColor: '#43BC4C',
+                    algorithm: true,
+                    inkBarColor: '#43BC4C',
+                    itemColor: '#fff',
+                    itemHoverColor: '#47AB4E',
+                    colorText: '#fff',
+                    colorBorderSecondary: '#8b8b8b',
+                    colorBgContainer: '#282828'
+                  }
                 }
-              }
-            }}
-          >
-            <Tabs defaultActiveKey="1" items={itemsTabs} />
-          </ConfigProvider>
-        </div>
+              }}
+            >
+              <Tabs defaultActiveKey="1" items={itemsTabs} />
+            </ConfigProvider>
+          </div>
+        }
       </Content>
 
       <Footer className='bg-slate-800 h-60 m-0 p-0'>

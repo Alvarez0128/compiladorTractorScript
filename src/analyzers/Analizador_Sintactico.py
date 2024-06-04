@@ -1,6 +1,7 @@
 import ply.yacc as yacc
 from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens, find_column_lexico
 from SymbolTable import Symbol, SymbolTable
+# from Codigo_intermedio import GeneradorCodigoIntermedio
 
 tabla_errores=obtener_errores_lexico()
 tabla_simbolos_global = SymbolTable()
@@ -135,7 +136,7 @@ def p_declaracion_variable(p):
             agregar_error_sintactico(0, 'Semantico', f'Variable {identificador} ya declarada en este ámbito', identificador, p.lineno(2), find_column(p.lexer.lexdata, p, 2))
         else:
             if not validar_tipo_asignacion(tipo, valor):
-                agregar_error_sintactico(0, 'Semantico', f'Tipo de asignación incompatible para la variable {identificador}', identificador, p.lineno(2), find_column(p.lexer.lexdata, p, 2))
+                agregar_error_sintactico(15, 'Semantico', f'Tipo de asignación incompatible para la variable {identificador}', identificador, p.lineno(2), find_column(p.lexer.lexdata, p, 2))
             else:
                 symbol = Symbol(name=identificador, category='variable', symbol_type=tipo, attributes={'value': valor})
                 tabla_simbolos_global.add(symbol)
@@ -144,6 +145,10 @@ def p_declaracion_variable(p):
         identificador = p[1]
         valor = p[3]
         p[0] = ('declaracion', identificador, valor)
+        if p.slice[1].type == 'IDENTIFICADOR':
+            identificador = p[1]
+            if not tabla_simbolos_global.exists(identificador, 'variable'):
+                agregar_error_sintactico(0, 'Semantico', f'Variable {identificador} no declarada', identificador, p.lineno(1), find_column(p.lexer.lexdata, p,1))
 
 def p_declaracion_estruc(p):
     """
@@ -880,10 +885,13 @@ def tree_to_json(node):
 #        tokens_analisis.append(token)
         
 #    reiniciar_analizador_lexico(lexer)
-#    for t in tokens_analisis:
-#         print(t)
+# #    for t in tokens_analisis:
+# #         print(t)
 #    result = parser.parse(input_string)
 #    print_tree(result)
+# #    generador = GeneradorCodigoIntermedio()
+# #    generador.analizar(result)
+# #    generador.imprimir_tripletas()
 
 # #Función para imprimir el árbol sintáctico
 # def print_tree(node, depth=0):
@@ -911,7 +919,7 @@ def tree_to_json(node):
 
 #     AJUSTAR_VELOCIDAD(50);  // Se ajusta la velocidad inicial
 #     ACELERAR(); // Iniciar el avance del vehículo
-
+#     X=e;
 #     MIENTRAS(distancia_recorrida < distancia_objetivo){
 #         SI(obstaculo_detectado){
 #             SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
@@ -941,6 +949,7 @@ def tree_to_json(node):
 #     DETENER_MOTOR(); // Detener el motor al final del recorrido
 # }TERMINAR"""
 # test_parser(test_code)
+
 # # Obtener los errores sintácticos
 # errores = obtener_errores_sintactico()
 # # Imprimir los errores
@@ -948,5 +957,5 @@ def tree_to_json(node):
 #     print(error)
 
 
-# #tabla_simbolos_global.print_table()
+# # #tabla_simbolos_global.print_table()
 
