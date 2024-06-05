@@ -1,149 +1,138 @@
-import ply.yacc as yacc
-from Analizador_Lexico import construir_analizador_lexico, obtener_errores_lexico, reiniciar_analizador_lexico, tokens
+# optimizado_Codigo_Intermedio.py
+
 from SymbolTable import Symbol, SymbolTable
 from Analizador_Sintactico import construir_analizador_sintactico, NodoPara
+from Analizador_Lexico import construir_analizador_lexico
+from tripletas import GeneradorTripletas
 
-def generar_codigo_optimizado(node):
-    triplos = []
-    temp_counter = 0
+generador_tripletas = GeneradorTripletas()
 
-    def nuevo_temporal():
-        nonlocal temp_counter
-        temp_name = f"t{temp_counter}"
-        temp_counter += 1
-        return temp_name
+def nuevo_temp():
+    return generador_tripletas.nueva_temporal()
 
+def agregar_tripleta(*args):
+    generador_tripletas.agregar_tripleta(*args)
+
+def generar_codigo_intermedio_triples(node):
     def recorrer_arbol(node):
         if isinstance(node, tuple):
-            if node[0] == 'programa':
+            tipo_nodo = node[0]
+            if tipo_nodo == 'programa':
                 recorrer_arbol(node[1])
-            elif node[0] == 'bloque_codigo':
+            elif tipo_nodo == 'bloque_codigo':
                 for decl in node[1]:
                     recorrer_arbol(decl)
-            elif node[0] == 'declaracion':
+            elif tipo_nodo == 'declaracion':
                 if len(node) == 4:
-                    tipo, ident, valor = node[1], node[2], node[3]
-                    temp = generar_expresion(valor)
-                    triplos.append(('=', temp, ident))
-            elif node[0] == 'si':
-                condicion, bloque = node[1], node[2]
-                temp = generar_expresion(condicion)
-                etiqueta_si = nuevo_temporal()
-                triplos.append(('IF', temp, etiqueta_si))
-                recorrer_arbol(bloque)
-                triplos.append((etiqueta_si, 'GOTO', ''))
-            elif node[0] == 'sino':
-                etiqueta_sino = nuevo_temporal()
-                triplos.append(('ELSE', '', etiqueta_sino))
-                recorrer_arbol(node[1])
-                triplos.append((etiqueta_sino, 'GOTO', ''))
-            elif node[0] == 'si_no':
-                condicion, bloque = node[1], node[2]
-                temp = generar_expresion(condicion)
-                etiqueta_si_no = nuevo_temporal()
-                triplos.append(('IF', temp, etiqueta_si_no))
-                recorrer_arbol(bloque)
-                triplos.append((etiqueta_si_no, 'GOTO', ''))
-            elif node[0] == 'mientras':
-                condicion, bloque = node[1], node[2]
-                etiqueta_mientras = nuevo_temporal()
-                triplos.append((etiqueta_mientras, 'WHILE', ''))
-                temp = generar_expresion(condicion)
-                triplos.append(('IF', temp, etiqueta_mientras))
-                recorrer_arbol(bloque)
-                triplos.append((etiqueta_mientras, 'GOTO', ''))
-            elif node[0] == 'expresion':
-                izq, op, der = node[1], node[2], node[3]
-                temp1 = generar_expresion(izq)
-                temp2 = generar_expresion(der)
-                temp_result = nuevo_temporal()
-                triplos.append((op, temp1, temp2, temp_result))
-                return temp_result
-            elif node[0] == 'grupo':
-                return generar_expresion(node[1])
-        elif isinstance(node, NodoPara):
-            tipo, ident, inicio, condicion, incremento, bloque = node.tipo, node.identificador, node.inicio, node.condicion, node.incremento, node.bloque
-            temp_inicio = generar_expresion(inicio)
-            triplos.append(('=', temp_inicio, ident))
-            etiqueta_para = nuevo_temporal()
-            temp_cond = generar_expresion(condicion)
-            triplos.append(('IF', temp_cond, etiqueta_para))
-            recorrer_arbol(bloque)
-            temp_incr = generar_expresion(incremento)
-            triplos.append(('+', ident, temp_incr, ident))
-            triplos.append((etiqueta_para, 'GOTO', ''))
+                    _, ident, valor = node[1], node[2], node[3]
+                    agregar_tripleta('=', ident, valor)
+                else:
+                    recorrer_arbol(node[1])
+            elif tipo_nodo == 'si':
+                manejar_condicional(node[1], node[2])
+            elif tipo_nodo == 'si_no':
+                manejar_condicional_con_sino(node[1], node[2], node[3])
+            elif tipo_nodo == 'mientras':
+                manejar_bucle_mientras(node[1], node[2])
+            elif tipo_nodo == 'operacion':
+                return manejar_operacion(node[1], node[2], node[3])
+            else:
+                for child in node:
+                    recorrer_arbol(child)
+        elif isinstance(node, str):
+            return node
 
-    def generar_expresion(exp):
-        if isinstance(exp, tuple):
-            if exp[0] == 'expresion':
-                izq, op, der = exp[1], exp[2], exp[3]
-                temp1 = generar_expresion(izq)
-                temp2 = generar_expresion(der)
-                temp_result = nuevo_temporal()
-                triplos.append((op, temp1, temp2, temp_result))
-                return temp_result
-            elif exp[0] == 'grupo':
-                return generar_expresion(exp[1])
-        return str(exp)
+    def manejar_condicional(condicion, bloque_si):
+        temp_cond = recorrer_arbol(condicion)
+        label_si = f"L{len(generador_tripletas.obtener_tripletas())+2}"
+        label_end = f"L{len(generador_tripletas.obtener_tripletas())+3}"
+        agregar_tripleta('IF', temp_cond, label_si)
+        agregar_tripleta('GOTO', label_end, '')
+        agregar_tripleta('LABEL', label_si, '')
+        recorrer_arbol(bloque_si)
+        agregar_tripleta('LABEL', label_end, '')
+
+    def manejar_condicional_con_sino(condicion, bloque_si, bloque_no):
+        temp_cond = recorrer_arbol(condicion)
+        label_si = f"L{len(generador_tripletas.obtener_tripletas())+2}"
+        label_no = f"L{len(generador_tripletas.obtener_tripletas())+3}"
+        label_end = f"L{len(generador_tripletas.obtener_tripletas())+4}"
+        agregar_tripleta('IF', temp_cond, label_si)
+        agregar_tripleta('GOTO', label_no, '')
+        agregar_tripleta('LABEL', label_si, '')
+        recorrer_arbol(bloque_si)
+        agregar_tripleta('GOTO', label_end, '')
+        agregar_tripleta('LABEL', label_no, '')
+        recorrer_arbol(bloque_no)
+        agregar_tripleta('LABEL', label_end, '')
+
+    def manejar_bucle_mientras(condicion, bloque):
+        label_start = f"L{len(generador_tripletas.obtener_tripletas())+1}"
+        label_end = f"L{len(generador_tripletas.obtener_tripletas())+2}"
+        agregar_tripleta('LABEL', label_start, '')
+        temp_cond = recorrer_arbol(condicion)
+        agregar_tripleta('IF', temp_cond, label_end)
+        recorrer_arbol(bloque)
+        agregar_tripleta('GOTO', label_start, '')
+        agregar_tripleta('LABEL', label_end, '')
+
+    def manejar_operacion(izq, op, der):
+        temp_izq = recorrer_arbol(izq)
+        temp_der = recorrer_arbol(der)
+        temp_res = nuevo_temp()
+        agregar_tripleta('=', temp_res, f"{temp_izq} {op} {temp_der}")
+        return temp_res
 
     recorrer_arbol(node)
-    return triplos
-######################################################ZONA PARA PRUEBAS
-# DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
+    return generador_tripletas.obtener_tripletas()
 
-# # Probar el código de ejemplo
-# test_code = """
-# COMENZAR{
+def exportar_triples_a_texto(triples):
+    return "\n".join(f"{i}: {triple}" for i, triple in enumerate(triples))
 
-# BOOL obstaculo_detectado = falso;
-# DECIMAL distancia_objetivo = 500.0;
+# Probar el código de ejemplo
+test_code = """
+COMENZAR{
 
-# MIENTRAS(distancia_recorrida < distancia_objetivo){
-#     SI(obstaculo_detectado){
-#         SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
-#             DETENER_MOTOR();
-#             SONAR_ALARMA();
-#             ESPERAR(5); // Espera 5 segundos antes de reanudar
-#             ACTIVAR_FRENO();
-#             ESPERAR(2); // Espera 2 segundos con los frenos activados
-#             obstaculo_detectado = Falso; // Reinicia la detección de obstáculos
-#         }SINO{
-#             AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
-#         }
-#     }SINO{
-#         SI(VERIFICAR_SENSOR_OBSTACULOS()){
-#             obstaculo_detectado = Verdadero;
-#         }SINO{
-#             AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
-#         }
-#     }
-#     // Simulación de movimiento del tractor
-#     distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
-# }
+BOOL obstaculo_detectado = falso;
+DECIMAL distancia_objetivo = 500.0;
 
-# }TERMINAR
-# """
+MIENTRAS(distancia_recorrida < distancia_objetivo){
+    SI(obstaculo_detectado){
+        SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
+            DETENER_MOTOR();
+            SONAR_ALARMA();
+            ESPERAR(5); // Espera 5 segundos antes de reanudar
+            ACTIVAR_FRENO();
+            ESPERAR(2); // Espera 2 segundos con los frenos activados
+            obstaculo_detectado = Falso; // Reinicia la detección de obstáculos
+        }SINO{
+            AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
+        }
+    }SINO{
+        SI(VERIFICAR_SENSOR_OBSTACULOS()){
+            obstaculo_detectado = Verdadero;
+        }SINO{
+            AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
+        }
+    }
+    // Simulación de movimiento del tractor
+    distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
+}
 
-# # Construir los analizadores
-# lexer = construir_analizador_lexico()
-# parser = construir_analizador_sintactico()
+}TERMINAR
+"""
+lexer = construir_analizador_lexico()
+# Construir los analizadores
+parser = construir_analizador_sintactico()
 
-# # Realizar el análisis léxico y sintáctico
-# lexer.input(test_code)
-# tokens_analisis = [token for token in lexer]
-# reiniciar_analizador_lexico(lexer)
+# Realizar el análisis léxico y sintáctico
+ast = parser.parse(test_code)
 
-# # Obtener el AST
-# ast = parser.parse(test_code)
+# Generar el código intermedio con tripletas
+codigo_optimizado_triples = generar_codigo_intermedio_triples(ast)
 
-# # Generar el código intermedio
-# codigo_intermedio = generar_codigo_intermedio(ast)
+# Exportar los triples de código intermedio a una cadena de texto formateada
+codigo_optimizado_triples_texto = exportar_triples_a_texto(codigo_optimizado_triples)
 
-# # Optimizar el código intermedio
-# codigo_optimizado = optimizar_codigo_intermedio(codigo_intermedio)
-
-# # Exportar el código optimizado a una cadena de texto formateada
-# codigo_optimizado_texto = exportar_codigo_a_texto(codigo_optimizado)
-
-# # Imprimir el código optimizado formateado
-# print(codigo_optimizado_texto)
+# Imprimir el código intermedio formateado
+print(codigo_optimizado_triples_texto)

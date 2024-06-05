@@ -174,15 +174,18 @@ def p_funciones_internas(p):
                 | ajustar_velocidad
                 | instruccion
                 | sonar_alarma
-                | verificar_sensor_obstaculos
+                | obstaculo_detectado
                 | calcular_distancia_restante
                 | velocidad
                 | cambiar_direccion
-                | verificar_freno
+                | verificar_frenoW
                 | distancia_recorrida
                 | frenos_activados
                 | distancia_restante
                 | acelerar
+                | retroceder
+                | girar_derecha
+                | girar_izquierda
                 | nueva_velocidad
                 | tiempo_transcurrido
     """
@@ -418,6 +421,30 @@ def p_acelerar(p):
     """
     p[0] = ('acelerar',p[1])
 
+#ESTRUCTURA PARA EXPRESION RETROCEDER
+def p_retroceder(p):
+    """
+    retroceder : RETROCEDER PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+             | RETROCEDER PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('retroceder',p[1])
+
+#ESTRUCTURA PARA EXPRESION GIRAR_DERECHA
+def p_girar_derecha(p):
+    """
+    girar_derecha : GIRAR_DERECHA PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+             | GIRAR_DERECHA PARENTESIS_IZQ PARENTESIS_DER 
+    """
+    p[0] = ('girar_derecha',p[1])
+
+#ESTRUCTURA PARA EXPRESION GIRAR_IZQUIERDA
+def p_girar_izquierda(p):
+    """
+    girar_izquierda : GIRAR_IZQUIERDA PARENTESIS_IZQ EXPRESION PARENTESIS_DER PUNTO_COMA
+             | GIRAR_IZQUIERDA PARENTESIS_IZQ EXPRESION PARENTESIS_DER 
+    """
+    p[0] = ('girar_izquierda',p[3])
+
 # Estructura expresion AJUSTAR_VELOCIDAD
 def p_ajustar_velocidad(p):
     """
@@ -456,13 +483,13 @@ def p_esperar(p):
     """
     p[0] = ('esperar',p[1])
 
-# Estructura expresion VERIFICAR_SENSOR_OBSTACULO
-def p_verificar_sensor_obstaculos(p):
+# Estructura expresion OBSTACULO_DETECTADO
+def p_obstaculo_detectado(p):
     """
-    verificar_sensor_obstaculos : VERIFICAR_SENSOR_OBSTACULOS PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-                                | VERIFICAR_SENSOR_OBSTACULOS PARENTESIS_IZQ PARENTESIS_DER 
+    obstaculo_detectado : OBSTACULOS_DETECTADO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
+                                | OBSTACULOS_DETECTADO PARENTESIS_IZQ NUMENTRO PARENTESIS_DER 
     """
-    p[0] = ('verificar_sensor_obstaculos',p[1])
+    p[0] = ('obstaculo_detectado',p[1])
 
 # Estructura expresion TIEMPO_TRANSCURRIDO
 def p_tiempo_transcurrido(p):

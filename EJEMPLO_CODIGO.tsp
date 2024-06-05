@@ -37,3 +37,51 @@ COMENZAR{
     AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
     DETENER_MOTOR(); // Detener el motor al final del recorrido
 }TERMINAR
+
+//APARTIR DE AQUI ES EL BUENO
+/////////////////////////////////////////////////////////////////////////////
+
+COMENZAR{
+    temperatura = MEDIR_TEMPERATURA();
+
+    SI(temperatura<=75){
+        MOVER_IMPLEMENTO(160);
+        ESPERAR(600);
+        distancia = CALCULAR_DISTANCIA_RESTANTE();
+
+        SI(distancia <= 8 Y distancia !=0){
+            GIRAR_DERECHA();
+            ESPERAR(400);
+            distancia=15;
+        }
+        SI(distancia<= 20 Y distancia !=0){
+            DETENER_MOTOR();
+            OBSTACULO_DETECTADO(40);
+            ESPERAR(600);
+            obstaculo_derecha = CALCULAR_DISTANCIA_RESTANTE();
+
+            OBSTACULO_DETECTADO(140);
+            ESPERAR(600);
+            obstaculo_izquierda = CALCULAR_DISTANCIA_RESTANTE();
+
+            //miramos de frente
+            OBSTACULO_DETECTADO(90);
+            ESPERAR(600);
+            SI(obstaculo_izquierda > obstaculo_derecha){
+                MOSTRAR_EN_PANTALLA("Giro izquierda");
+                ACELERAR();
+            }
+            SI(obstaculo_derecha>= obstaculo_izquierda){
+                MOSTRAR_EN_PANTALLA("Giro derecha");
+                RETROCEDER();
+            }
+        }
+        SI(distancia > 20){
+            MOSTRAR_EN_PANTALLA("RECTO");
+            GIRAR_IZQUIERDA(80);
+        }
+        SINO{
+            SONAR_ALARMA();
+        }
+    }
+}TERMINAR

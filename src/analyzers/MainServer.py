@@ -51,6 +51,7 @@ def compile_code():
     # Formatear las tripletas como texto
     codigo_intermedio_texto = "\n".join([f"{i+1}. {tripleta}" for i, tripleta in enumerate(tripletas)])
     
+     
     # # Optimizar el código intermedio
     # codigo_optimizado = generar_codigo_optimizado(codigo_intermedio)
     # # Exportar el código optimizado a una cadena de texto formateada
