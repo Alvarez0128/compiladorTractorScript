@@ -178,7 +178,7 @@ def p_funciones_internas(p):
                 | calcular_distancia_restante
                 | velocidad
                 | cambiar_direccion
-                | verificar_frenoW
+                | verificar_freno
                 | distancia_recorrida
                 | frenos_activados
                 | distancia_restante
@@ -186,6 +186,8 @@ def p_funciones_internas(p):
                 | retroceder
                 | girar_derecha
                 | girar_izquierda
+                | mover_implemento
+                | medir_temperatura
                 | nueva_velocidad
                 | tiempo_transcurrido
     """
@@ -437,13 +439,29 @@ def p_girar_derecha(p):
     """
     p[0] = ('girar_derecha',p[1])
 
+#ESTRUCTURA PARA EXPRESION MEDIR_TEMPERATURA
+def p_medir_temperatura(p):
+    """
+    medir_temperatura : MEDIR_TEMPERATURA PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                    | MEDIR_TEMPERATURA PARENTESIS_IZQ PARENTESIS_DER
+    """
+    p[0] = ('medir_temperatura', p[1])
+
 #ESTRUCTURA PARA EXPRESION GIRAR_IZQUIERDA
 def p_girar_izquierda(p):
     """
-    girar_izquierda : GIRAR_IZQUIERDA PARENTESIS_IZQ EXPRESION PARENTESIS_DER PUNTO_COMA
-             | GIRAR_IZQUIERDA PARENTESIS_IZQ EXPRESION PARENTESIS_DER 
+    girar_izquierda : GIRAR_IZQUIERDA PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER PUNTO_COMA
+                    | GIRAR_IZQUIERDA PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER 
     """
-    p[0] = ('girar_izquierda',p[3])
+    p[0] = ('girar_izquierda',p[1])
+
+#ESTRUCTURA PARA EXPRESION MOVER_IMPLEMENTO
+def p_mover_implemento(p):
+    """
+    mover_implemento : MOVER_IMPLEMENTO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
+                     | MOVER_IMPLEMENTO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER 
+    """
+    p[0] = ('mover_implemento',p[1])
 
 # Estructura expresion AJUSTAR_VELOCIDAD
 def p_ajustar_velocidad(p):
@@ -486,8 +504,8 @@ def p_esperar(p):
 # Estructura expresion OBSTACULO_DETECTADO
 def p_obstaculo_detectado(p):
     """
-    obstaculo_detectado : OBSTACULOS_DETECTADO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
-                                | OBSTACULOS_DETECTADO PARENTESIS_IZQ NUMENTRO PARENTESIS_DER 
+    obstaculo_detectado : OBSTACULO_DETECTADO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
+                        | OBSTACULO_DETECTADO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER 
     """
     p[0] = ('obstaculo_detectado',p[1])
 
@@ -900,89 +918,99 @@ def tree_to_json(node):
 ######################################################ZONA PARA PRUEBAS
 # DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 
-# parser = yacc.yacc()
-# lexer = construir_analizador_lexico()
-# tokens_analisis=[]
-# #Función de prueba
-# def test_parser(input_string):
+parser = yacc.yacc()
+lexer = construir_analizador_lexico()
+tokens_analisis=[]
+#Función de prueba
+def test_parser(input_string):
     
-#    lexer.input(input_string)
+   lexer.input(input_string)
     
-#    for token in lexer:
-#        tokens_analisis.append(token)
+   for token in lexer:
+       tokens_analisis.append(token)
         
-#    reiniciar_analizador_lexico(lexer)
-# #    for t in tokens_analisis:
-# #         print(t)
-#    result = parser.parse(input_string)
-#    print_tree(result)
-# #    generador = GeneradorCodigoIntermedio()
-# #    generador.analizar(result)
-# #    generador.imprimir_tripletas()
+   reiniciar_analizador_lexico(lexer)
+#    for t in tokens_analisis:
+#         print(t)
+   result = parser.parse(input_string)
+   print_tree(result)
+#    generador = GeneradorCodigoIntermedio()
+#    generador.analizar(result)
+#    generador.imprimir_tripletas()
 
-# #Función para imprimir el árbol sintáctico
-# def print_tree(node, depth=0):
-#    if isinstance(node, tuple):
-#        print("  " * depth + node[0])
-#        for child in node[1:]:
-#            print_tree(child, depth + 1)
-#    elif isinstance(node, NodoPara):
-#        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-#        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-#    elif isinstance(node, list):
-#        for item in node:
-#            print_tree(item, depth)
-#    else:
-#        print("  " * depth + str(node))
-
-
-# # Código de prueba
-# test_code = """COMENZAR{
-#     BOOL obstaculo_detectado = Falso;
-#     DECIMAL distancia_objetivo = 500.0;
-#     DECIMAL distancia_recorrida = 0.0; // Declarar distancia_recorrida
-#     DECIMAL velocidad = 0.0; // Declarar velocidad
-#     DECIMAL tiempo_transcurrido = 1.0; // Asumir un tiempo transcurrido constante para la simulación
-
-#     AJUSTAR_VELOCIDAD(50);  // Se ajusta la velocidad inicial
-#     ACELERAR(); // Iniciar el avance del vehículo
-#     X=e;
-#     MIENTRAS(distancia_recorrida < distancia_objetivo){
-#         SI(obstaculo_detectado){
-#             SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
-#                 AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
-#                 DETENER_MOTOR(); // Detener el motor después de ajustar la velocidad a 0
-#                 SONAR_ALARMA();
-#                 ACTIVAR_FRENO(); // Activar freno inmediatamente después de detener el motor
-#                 ESPERAR(5); // Esperar 5 segundos con los frenos activados
-#                 obstaculo_detectado = Falso; // Reiniciar la detección de obstáculos
-#                 MOTOR_ENCENDIDO(); // Encender el motor de nuevo
-#                 AJUSTAR_VELOCIDAD(50); // Volver a la velocidad inicial
-#                 ACELERAR(); // Reanudar el avance del vehículo
-#             } SINO {
-#                 AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
-#             }
-#         } SINO {
-#             SI(VERIFICAR_SENSOR_OBSTACULOS()){
-#                 obstaculo_detectado = V; // Detectar obstáculo
-#             } SINO {
-#                 AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
-#             }
-#         }
-#         distancia_recorrida = distancia_recorrida + (velocidad * tiempo_transcurrido);
-#     }
-
-#     AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
-#     DETENER_MOTOR(); // Detener el motor al final del recorrido
-# }TERMINAR"""
-# test_parser(test_code)
-
-# # Obtener los errores sintácticos
-# errores = obtener_errores_sintactico()
-# # Imprimir los errores
-# for error in errores:
-#     print(error)
+#Función para imprimir el árbol sintáctico
+def print_tree(node, depth=0):
+   if isinstance(node, tuple):
+       print("  " * depth + node[0])
+       for child in node[1:]:
+           print_tree(child, depth + 1)
+   elif isinstance(node, NodoPara):
+       print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+       print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+   elif isinstance(node, list):
+       for item in node:
+           print_tree(item, depth)
+   else:
+       print("  " * depth + str(node))
 
 
-# # #tabla_simbolos_global.print_table()
+# Código de prueba
+test_code = """
+COMENZAR{
+    temperatura = MEDIR_TEMPERATURA();
+    
+    MOTOR_ENCENDIDO();
+    
+    SI(temperatura<=75){
+        MOVER_IMPLEMENTO(160);
+        ESPERAR(600);
+        distancia = CALCULAR_DISTANCIA_RESTANTE();
+
+        SI(distancia <= 8 Y distancia !=0){
+            GIRAR_DERECHA();
+            ESPERAR(400);
+            distancia=15;
+        }
+        SI(distancia<= 20 Y distancia !=0){
+            DETENER_MOTOR();
+            OBSTACULO_DETECTADO(40);
+            ESPERAR(600);
+            obstaculo_derecha = CALCULAR_DISTANCIA_RESTANTE();
+
+            OBSTACULO_DETECTADO(140);
+            ESPERAR(600);
+            obstaculo_izquierda = CALCULAR_DISTANCIA_RESTANTE();
+
+            //miramos de frente
+            OBSTACULO_DETECTADO(90);
+            ESPERAR(600);
+            SI(obstaculo_izquierda > obstaculo_derecha){
+                MOSTRAR_EN_PANTALLA("Giro izquierda");
+                ACELERAR();
+            }
+            SI(obstaculo_derecha>= obstaculo_izquierda){
+                MOSTRAR_EN_PANTALLA("Giro derecha");
+                RETROCEDER();
+            }
+        }
+        SI(distancia > 20){
+            MOSTRAR_EN_PANTALLA("RECTO");
+            GIRAR_IZQUIERDA(80);
+        }
+        SINO{
+            SONAR_ALARMA();
+        }
+    }
+}TERMINAR
+"""
+test_parser(test_code)
+
+# Obtener los errores sintácticos
+errores = obtener_errores_sintactico()
+# Imprimir los errores
+for error in errores:
+    print(error)
+
+
+#tabla_simbolos_global.print_table()
 
