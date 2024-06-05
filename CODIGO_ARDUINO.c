@@ -61,12 +61,6 @@ void setup() {
 }
 
 void loop() {
-  //Subir el servomotor de carga
-  //myservo2.write(160);
-  //delay(600);
-  //Bajar el servomotor de carga
-  //myservo2.write(100);
-  //delay(600);
 
   val=analogRead(TERMISTOR);
   temp=Thermister(val);
@@ -76,7 +70,6 @@ void loop() {
     myservo2.write(160);
     delay(600);
     distance = medirDistancia();
-    //Serial.println(distance);
     if (distance <= 8 && distance != 0){
       backward();
       delay(400);
@@ -119,7 +112,6 @@ void loop() {
   }
 }
 
-// Función para girar hacia adelante
 void left() {
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
@@ -130,7 +122,6 @@ void left() {
   delay(450);
 }
 
-// Función para girar hacia atrás
 void right() {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
@@ -141,7 +132,6 @@ void right() {
   delay(450);
 }
 
-// Función para girar a la izquierda
 int forward(int x) {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
@@ -151,7 +141,6 @@ int forward(int x) {
   analogWrite(ENB, x); 
 }
 
-// Función para girar a la derecha
 void backward() {
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
@@ -161,7 +150,6 @@ void backward() {
   analogWrite(ENB, 110); 
 }
 
-// Función para girar a la derecha
 void stop() {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);

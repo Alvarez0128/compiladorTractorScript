@@ -1,194 +1,153 @@
-from Analizador_Lexico import reiniciar_analizador_lexico, construir_analizador_lexico
-from Analizador_Sintactico import construir_analizador_sintactico, reiniciar_analizador_sintactico
-from SymbolTable import SymbolTable, Symbol
-
-class GeneradorCodigoIntermedio:
+class IntermediateCodeGenerator:
     def __init__(self):
-        self.tripletas = []
-        self.temporales = 0
-        self.etiquetas = 0
+        self.instructions = []
+        self.temp_counter = 0
+        self.label_counter = 0
+        self.labels = {}
 
-    def nueva_temporal(self):
-        temporal = f"t{self.temporales}"
-        self.temporales += 1
-        return temporal
+    def get_temp(self):
+        temp = f"t{self.temp_counter}"
+        self.temp_counter += 1
+        return temp
 
-    def nueva_etiqueta(self):
-        etiqueta = f"L{self.etiquetas}"
-        self.etiquetas += 1
-        return etiqueta
+    def get_label(self):
+        label = f"L{self.label_counter}"
+        self.label_counter += 1
+        return label
 
-    def generar_tripleta(self, operador, operando1=None, operando2=None, resultado=None):
-        if not resultado:
-            resultado = self.nueva_temporal()
-        tripleta = (operador, operando1, operando2, resultado)
-        self.tripletas.append(tripleta)
-        return resultado
+    def add_instruction(self, op, arg1=None, arg2=None, result=None):
+        self.instructions.append((op, arg1, arg2, result))
 
-    def imprimir_tripletas(self):
-        for i, tripleta in enumerate(self.tripletas):
-            print(f"({i+1}) {tripleta}")
+    def parse_line(self, line):
+        line = line.strip()
+        if line.startswith("ENTERO"):
+            parts = line.split()
+            if len(parts) == 2:
+                _, var = parts
+                self.add_instruction('=', 0, None, var)
+        elif line.startswith("temperatura = MEDIR_TEMPERATURA()"):
+            self.add_instruction('MEDIR_TEMPERATURA', None, None, 'temperatura')
+        elif line.startswith("MOTOR_ENCENDIDO()"):
+            self.add_instruction('MOTOR_ENCENDIDO', None, None, None)
+        elif line.startswith("SI"):
+            condition = line[3:-1]  # Extrae la condición entre paréntesis
+            self.handle_condition(condition)
+        elif line.startswith("SINO"):
+            self.add_instruction('GOTO', None, None, self.get_label())
+        elif line.startswith("ESPERAR"):
+            time = line[8:-1]  # Extrae el tiempo entre paréntesis
+            self.add_instruction('ESPERAR', time, None, None)
+        elif line.startswith("MOVER_IMPLEMENTO"):
+            angle = line[17:-1]  # Extrae el ángulo entre paréntesis
+            self.add_instruction('MOVER_IMPLEMENTO', angle, None, None)
+        elif line.startswith("RETROCEDER()"):
+            self.add_instruction('RETROCEDER', None, None, None)
+        elif line.startswith("DETENER_MOTOR()"):
+            self.add_instruction('DETENER_MOTOR', None, None, None)
+        elif line.startswith("OBSTACULO_DETECTADO"):
+            angle = line[19:-1]  # Extrae el ángulo entre paréntesis
+            self.add_instruction('OBSTACULO_DETECTADO', angle, None, None)
+        elif line.startswith("CALCULAR_DISTANCIA_RESTANTE()"):
+            var = line.split('=')[0].strip()
+            self.add_instruction('CALCULAR_DISTANCIA_RESTANTE', None, None, var)
+        elif line.startswith("MOSTRAR_EN_PANTALLA"):
+            message = line[19:-1]  # Extrae el mensaje entre paréntesis
+            self.add_instruction('MOSTRAR_EN_PANTALLA', message, None, None)
+        elif line.startswith("GIRAR_IZQUIERDA()"):
+            self.add_instruction('GIRAR_IZQUIERDA', None, None, None)
+        elif line.startswith("GIRAR_DERECHA()"):
+            self.add_instruction('GIRAR_DERECHA', None, None, None)
+        elif line.startswith("ACELERAR"):
+            speed = line[9:-1]  # Extrae la velocidad entre paréntesis
+            self.add_instruction('ACELERAR', speed, None, None)
+        elif line.startswith("SONAR_ALARMA()"):
+            self.add_instruction('SONAR_ALARMA', None, None, None)
 
-    def analizar(self, arbol):
-        # lexer = construir_analizador_lexico()
-        # parser = construir_analizador_sintactico()
-        # reiniciar_analizador_lexico(lexer)
-        # reiniciar_analizador_sintactico()
-        # arbol = parser.parse(codigo, lexer=lexer)
-        self.recorrer_arbol(arbol)
+    def handle_condition(self, condition):
+        parts = condition.split()
+        
+        if len(condition.split())==1:
+            op = parts[0]
+            label=self.get_label()
+            self.add_instruction(op, label)
+        elif len(condition.split())==2:
+            op = parts[0]
+            arg1 = parts[1]
+            label=self.get_label()
+            self.add_instruction(op,arg1, label)
+        else:
+            op = parts[0]
+            arg1 = parts[1]
+            arg2 = parts[2]
+            label=self.get_label()
+            self.add_instruction(op,arg1,arg2, label)
 
-    def recorrer_arbol(self, nodo):
-        if isinstance(nodo, list):
-            for subnodo in nodo:
-                self.recorrer_arbol(subnodo)
-        elif isinstance(nodo, tuple):
-            nodo_tipo = nodo[0]
-            if nodo_tipo == 'programa':
-                self.recorrer_arbol(nodo[1])
-            elif nodo_tipo == 'bloque_codigo':
-                self.recorrer_arbol(nodo[1])
-            elif nodo_tipo == 'declaracion':
-                self.recorrer_arbol(nodo[0])
-            elif nodo_tipo == 'declaracion_variable':
-                if len(nodo) == 4:
-                    identificador = nodo[2]
-                    valor = self.recorrer_arbol(nodo[3])
-                    self.generar_tripleta('=', valor, None, identificador)
-                else:
-                    identificador = nodo[1]
-                    valor = self.recorrer_arbol(nodo[2])
-                    self.generar_tripleta('=', valor, None, identificador)
-            elif nodo_tipo == 'declaracion_estructura':
-                self.recorrer_arbol(nodo[1])
-            elif nodo_tipo == 'declaracion_funcion_interna':
-                self.recorrer_arbol(nodo[1])
-            elif nodo_tipo == 'si':
-                condicion = self.recorrer_arbol(nodo[1])
-                etiqueta_else = self.nueva_etiqueta()
-                etiqueta_fin = self.nueva_etiqueta()
-                self.generar_tripleta('if', condicion, None, etiqueta_else)
-                self.recorrer_arbol(nodo[2])
-                self.generar_tripleta('goto', None, None, etiqueta_fin)
-                self.generar_tripleta('label', None, None, etiqueta_else)
-                self.generar_tripleta('label', None, None, etiqueta_fin)
-            elif nodo_tipo == 'sino':
-                self.recorrer_arbol(nodo[1])
-                self.recorrer_arbol(nodo[2])
-            elif nodo_tipo == 'para':
-                self.recorrer_arbol(nodo[1])
-                self.recorrer_arbol(nodo[2])
-                self.recorrer_arbol(nodo[3])
-                self.recorrer_arbol(nodo[4])
-                self.recorrer_arbol(nodo[5])
-            elif nodo_tipo == 'mientras':
-                etiqueta_inicio = self.nueva_etiqueta()
-                etiqueta_fin = self.nueva_etiqueta()
-                self.generar_tripleta('label', None, None, etiqueta_inicio)
-                condicion = self.recorrer_arbol(nodo[1])
-                self.generar_tripleta('if', condicion, None, etiqueta_fin)
-                self.recorrer_arbol(nodo[2])
-                self.generar_tripleta('goto', None, None, etiqueta_inicio)
-                self.generar_tripleta('label', None, None, etiqueta_fin)
-            elif nodo_tipo == 'mostrar_en_pantalla':
-                self.generar_tripleta('mostrar_en_pantalla', self.recorrer_arbol(nodo[1]))
-            elif nodo_tipo == 'detener_motor':
-                self.generar_tripleta('detener_motor')
-            elif nodo_tipo == 'motor_encendido':
-                self.generar_tripleta('motor_encendido')
-            elif nodo_tipo == 'velocidad':
-                self.generar_tripleta('velocidad')
-            elif nodo_tipo == 'cambiar_direccion':
-                self.generar_tripleta('cambiar_direccion')
-            elif nodo_tipo == 'verificar_freno':
-                self.generar_tripleta('verificar_freno')
-            elif nodo_tipo == 'distancia_recorrida':
-                self.generar_tripleta('distancia_recorrida')
-            elif nodo_tipo == 'frenos_activados':
-                self.generar_tripleta('frenos_activados')
-            elif nodo_tipo == 'calcular_distancia_restante':
-                self.generar_tripleta('calcular_distancia_restante', nodo[2])
-            elif nodo_tipo == 'distancia_restante':
-                self.generar_tripleta('distancia_restante')
-            elif nodo_tipo == 'acelerar':
-                self.generar_tripleta('acelerar')
-            elif nodo_tipo == 'ajustar_velocidad':
-                self.generar_tripleta('ajustar_velocidad', nodo[1])
-            elif nodo_tipo == 'nueva_velocidad':
-                self.generar_tripleta('nueva_velocidad', nodo[1])
-            elif nodo_tipo == 'sonar_alarma':
-                self.generar_tripleta('sonar_alarma')
-            elif nodo_tipo == 'esperar':
-                self.generar_tripleta('esperar', nodo[1])
-            elif nodo_tipo == 'verificar_sensor_obstaculos':
-                self.generar_tripleta('verificar_sensor_obstaculos')
-            elif nodo_tipo == 'tiempo_transcurrido':
-                self.generar_tripleta('tiempo_transcurrido')
-            elif nodo_tipo == 'activar_freno':
-                self.generar_tripleta('activar_freno')
-            elif nodo_tipo == 'expresion':
-                operador = nodo[1]
-                operando1 = self.recorrer_arbol(nodo[0])
-                operando2 = self.recorrer_arbol(nodo[2])
-                return self.generar_tripleta(operador, operando1, operando2)
-            elif nodo_tipo == 'grupo':
-                return self.recorrer_arbol(nodo[1])
-            elif nodo_tipo == 'identificador':
-                return nodo[1]
-            elif nodo_tipo == 'numero':
-                return nodo[1]
-            elif nodo_tipo == 'bool':
-                return nodo[1]
-            elif nodo_tipo == 'cadena':
-                return nodo[1]
-            elif nodo_tipo == 'lista':
-                return self.recorrer_arbol(nodo[2])
-            elif nodo_tipo == 'llamada_funcion_motor':
-                self.recorrer_arbol(nodo[1])
-            else:
-                print(f"Error: Nodo tipo {nodo_tipo} no reconocido")
+    def generate(self, code):
+        lines = code.split('\n')
+        for line in lines:
+            self.parse_line(line)
+        return self.instructions
 
-if __name__ == "__main__":
-    codigo_prueba = """
-    COMENZAR{
-        BOOL obstaculo_detectado = Falso;
-        DECIMAL distancia_objetivo = 500.0;
-        DECIMAL distancia_recorrida = 0.0;
-        DECIMAL velocidad = 0.0;
-        DECIMAL tiempo_transcurrido = 1.0;
+# Código de entrada TractorScript
+# tractor_code = """
+# COMENZAR{
+#         ENTERO obstaculo_izquierda = 0;
+#         ENTERO obstaculo_derecha = 0;
+#         ENTERO temperatura = 0;
+#         ENTERO distancia = 10;
 
-        MOTOR_ENCENDIDO();
-        AJUSTAR_VELOCIDAD(50);
-        ACELERAR();
+#         temperatura = MEDIR_TEMPERATURA();
+#         MOTOR_ENCENDIDO();
 
-        MIENTRAS(distancia_recorrida < distancia_objetivo){
-            SI(obstaculo_detectado){
-                SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
-                    AJUSTAR_VELOCIDAD(0);
-                    DETENER_MOTOR();
-                    SONAR_ALARMA();
-                    ACTIVAR_FRENO();
-                    ESPERAR(5);
-                    obstaculo_detectado = Falso;
-                    MOTOR_ENCENDIDO();
-                    AJUSTAR_VELOCIDAD(50);
-                    ACELERAR();
-                } SINO {
-                    AJUSTAR_VELOCIDAD(20);
-                }
-            } SINO {
-                SI(VERIFICAR_SENSOR_OBSTACULOS()){
-                    obstaculo_detectado = verdadero;
-                } SINO {
-                    AJUSTAR_VELOCIDAD(50);
-                }
-            }
-            distancia_recorrida = distancia_recorrida + (velocidad * tiempo_transcurrido);
-        }
+#         SI(temperatura<=75){
+#             MOVER_IMPLEMENTO(160);
+#             ESPERAR(600);
 
-        AJUSTAR_VELOCIDAD(0);
-        DETENER_MOTOR();
-    }TERMINAR
-    """
-    generador = GeneradorCodigoIntermedio()
-    generador.analizar(codigo_prueba)
-    generador.imprimir_tripletas()
+#             SI(distancia <= 8){
+#                 SI(distancia !=0){
+#                     RETROCEDER();
+#                     ESPERAR(400);
+#                     distancia=15;
+#                 }
+#             }
+#             SI(distancia<= 20){
+#                 SI(distancia !=0){
+#                     DETENER_MOTOR();
+#                     OBSTACULO_DETECTADO(40);
+#                     ESPERAR(600);
+#                     obstaculo_derecha = CALCULAR_DISTANCIA_RESTANTE();
+
+#                     OBSTACULO_DETECTADO(140);
+#                     ESPERAR(600);
+#                     obstaculo_izquierda = CALCULAR_DISTANCIA_RESTANTE();
+
+#                     //miramos de frente
+#                     OBSTACULO_DETECTADO(90);
+#                     ESPERAR(600);
+#                 }
+#                 SI(obstaculo_izquierda > obstaculo_derecha){
+#                     MOSTRAR_EN_PANTALLA("Giro izquierda");
+#                     GIRAR_IZQUIERDA();
+#                 }
+#                 SI(obstaculo_derecha >= obstaculo_izquierda){
+#                     MOSTRAR_EN_PANTALLA("Giro derecha");
+#                     GIRAR_DERECHA();
+#                 }
+#             }
+#             SI(distancia > 20){
+#                 MOSTRAR_EN_PANTALLA("RECTO");
+#                 ACELERAR(80);
+#             }
+#             SINO{
+#                 SONAR_ALARMA();
+#             }
+#         }
+#     }TERMINAR
+# """
+
+# generator = IntermediateCodeGenerator()
+# intermediate_code = generator.generate(tractor_code)
+
+# for index, instr in enumerate(intermediate_code, start=1):
+#     op, arg1, arg2, result = instr
+#     print(f"{index}. [{op}, {arg1}, {arg2}, {result}]")

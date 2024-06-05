@@ -126,6 +126,8 @@ def p_declaracion_variable(p):
     """
     declaracion_variable : tipo IDENTIFICADOR IGUAL expresion PUNTO_COMA
                          | IDENTIFICADOR IGUAL expresion PUNTO_COMA
+                         | IDENTIFICADOR IGUAL calcular_distancia_restante 
+                         | IDENTIFICADOR IGUAL medir_temperatura
     """
     if len(p) == 6:
         tipo = p[1]
@@ -178,7 +180,7 @@ def p_funciones_internas(p):
                 | calcular_distancia_restante
                 | velocidad
                 | cambiar_direccion
-                | verificar_frenoW
+                | verificar_freno
                 | distancia_recorrida
                 | frenos_activados
                 | distancia_restante
@@ -186,6 +188,8 @@ def p_funciones_internas(p):
                 | retroceder
                 | girar_derecha
                 | girar_izquierda
+                | mover_implemento
+                | medir_temperatura
                 | nueva_velocidad
                 | tiempo_transcurrido
     """
@@ -400,8 +404,8 @@ def p_frenos_activados(p):
 # Estructura expresion CALCULAR_DISTANCIA_RESTANTE
 def p_calcular_distancia_restante(p):
     """
-    calcular_distancia_restante : CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ IDENTIFICADOR PARENTESIS_DER PUNTO_COMA
-                                | CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ IDENTIFICADOR PARENTESIS_DER 
+    calcular_distancia_restante : CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                                | CALCULAR_DISTANCIA_RESTANTE PARENTESIS_IZQ PARENTESIS_DER 
     """
     p[0] = ('calcular_distancia_restante',p[1],p[3])
 
@@ -416,8 +420,10 @@ def p_distancia_restante(p):
 # Estructura expresion ACELERAR
 def p_acelerar(p):
     """
-    acelerar : ACELERAR PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
-             | ACELERAR PARENTESIS_IZQ PARENTESIS_DER 
+    acelerar : ACELERAR PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
+             | ACELERAR PARENTESIS_IZQ NUMENTERO PARENTESIS_DER
+             | ACELERAR PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER PUNTO_COMA
+             | ACELERAR PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER 
     """
     p[0] = ('acelerar',p[1])
 
@@ -437,13 +443,29 @@ def p_girar_derecha(p):
     """
     p[0] = ('girar_derecha',p[1])
 
+#ESTRUCTURA PARA EXPRESION MEDIR_TEMPERATURA
+def p_medir_temperatura(p):
+    """
+    medir_temperatura : MEDIR_TEMPERATURA PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                    | MEDIR_TEMPERATURA PARENTESIS_IZQ PARENTESIS_DER
+    """
+    p[0] = ('medir_temperatura', p[1])
+
 #ESTRUCTURA PARA EXPRESION GIRAR_IZQUIERDA
 def p_girar_izquierda(p):
     """
-    girar_izquierda : GIRAR_IZQUIERDA PARENTESIS_IZQ EXPRESION PARENTESIS_DER PUNTO_COMA
-             | GIRAR_IZQUIERDA PARENTESIS_IZQ EXPRESION PARENTESIS_DER 
+    girar_izquierda : GIRAR_IZQUIERDA PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
+                    | GIRAR_IZQUIERDA PARENTESIS_IZQ PARENTESIS_DER 
     """
-    p[0] = ('girar_izquierda',p[3])
+    p[0] = ('girar_izquierda',p[1])
+
+#ESTRUCTURA PARA EXPRESION MOVER_IMPLEMENTO
+def p_mover_implemento(p):
+    """
+    mover_implemento : MOVER_IMPLEMENTO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
+                     | MOVER_IMPLEMENTO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER 
+    """
+    p[0] = ('mover_implemento',p[1])
 
 # Estructura expresion AJUSTAR_VELOCIDAD
 def p_ajustar_velocidad(p):
@@ -486,8 +508,8 @@ def p_esperar(p):
 # Estructura expresion OBSTACULO_DETECTADO
 def p_obstaculo_detectado(p):
     """
-    obstaculo_detectado : OBSTACULOS_DETECTADO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
-                                | OBSTACULOS_DETECTADO PARENTESIS_IZQ NUMENTRO PARENTESIS_DER 
+    obstaculo_detectado : OBSTACULO_DETECTADO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER PUNTO_COMA
+                        | OBSTACULO_DETECTADO PARENTESIS_IZQ NUMENTERO PARENTESIS_DER 
     """
     p[0] = ('obstaculo_detectado',p[1])
 
@@ -937,44 +959,61 @@ def tree_to_json(node):
 
 
 # # Código de prueba
-# test_code = """COMENZAR{
-#     BOOL obstaculo_detectado = Falso;
-#     DECIMAL distancia_objetivo = 500.0;
-#     DECIMAL distancia_recorrida = 0.0; // Declarar distancia_recorrida
-#     DECIMAL velocidad = 0.0; // Declarar velocidad
-#     DECIMAL tiempo_transcurrido = 1.0; // Asumir un tiempo transcurrido constante para la simulación
+# test_code = """
+#     COMENZAR{
+#         ENTERO obstaculo_izquierda = 0;
+#         ENTERO obstaculo_derecha = 0;
+#         ENTERO temperatura = 0;
+#         ENTERO distancia = 10;
 
-#     AJUSTAR_VELOCIDAD(50);  // Se ajusta la velocidad inicial
-#     ACELERAR(); // Iniciar el avance del vehículo
-#     X=e;
-#     MIENTRAS(distancia_recorrida < distancia_objetivo){
-#         SI(obstaculo_detectado){
-#             SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
-#                 AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
-#                 DETENER_MOTOR(); // Detener el motor después de ajustar la velocidad a 0
-#                 SONAR_ALARMA();
-#                 ACTIVAR_FRENO(); // Activar freno inmediatamente después de detener el motor
-#                 ESPERAR(5); // Esperar 5 segundos con los frenos activados
-#                 obstaculo_detectado = Falso; // Reiniciar la detección de obstáculos
-#                 MOTOR_ENCENDIDO(); // Encender el motor de nuevo
-#                 AJUSTAR_VELOCIDAD(50); // Volver a la velocidad inicial
-#                 ACELERAR(); // Reanudar el avance del vehículo
-#             } SINO {
-#                 AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
+#         temperatura = MEDIR_TEMPERATURA();
+#         MOTOR_ENCENDIDO();
+
+#         SI(temperatura<=75){
+#             MOVER_IMPLEMENTO(160);
+#             ESPERAR(600);
+
+#             SI(distancia <= 8){
+#                 SI(distancia !=0){
+#                     RETROCEDER();
+#                     ESPERAR(400);
+#                     distancia=15;
+#                 }
 #             }
-#         } SINO {
-#             SI(VERIFICAR_SENSOR_OBSTACULOS()){
-#                 obstaculo_detectado = V; // Detectar obstáculo
-#             } SINO {
-#                 AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
+#             SI(distancia<= 20){
+#                 SI(distancia !=0){
+#                     DETENER_MOTOR();
+#                     OBSTACULO_DETECTADO(40);
+#                     ESPERAR(600);
+#                     obstaculo_derecha = CALCULAR_DISTANCIA_RESTANTE();
+
+#                     OBSTACULO_DETECTADO(140);
+#                     ESPERAR(600);
+#                     obstaculo_izquierda = CALCULAR_DISTANCIA_RESTANTE();
+
+#                     //miramos de frente
+#                     OBSTACULO_DETECTADO(90);
+#                     ESPERAR(600);
+#                 }
+#                 SI(obstaculo_izquierda > obstaculo_derecha){
+#                     MOSTRAR_EN_PANTALLA("Giro izquierda");
+#                     GIRAR_IZQUIERDA();
+#                 }
+#                 SI(obstaculo_derecha >= obstaculo_izquierda){
+#                     MOSTRAR_EN_PANTALLA("Giro derecha");
+#                     GIRAR_DERECHA();
+#                 }
+#             }
+#             SI(distancia > 20){
+#                 MOSTRAR_EN_PANTALLA("RECTO");
+#                 ACELERAR(80);
+#             }
+#             SINO{
+#                 SONAR_ALARMA();
 #             }
 #         }
-#         distancia_recorrida = distancia_recorrida + (velocidad * tiempo_transcurrido);
-#     }
-
-#     AJUSTAR_VELOCIDAD(0); // Reducir la velocidad a 0 antes de detener el motor
-#     DETENER_MOTOR(); // Detener el motor al final del recorrido
-# }TERMINAR"""
+#     }TERMINAR
+# """
 # test_parser(test_code)
 
 # # Obtener los errores sintácticos
@@ -984,5 +1023,5 @@ def tree_to_json(node):
 #     print(error)
 
 
-# # #tabla_simbolos_global.print_table()
+# #tabla_simbolos_global.print_table()
 

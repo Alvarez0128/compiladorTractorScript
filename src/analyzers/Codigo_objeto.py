@@ -1,138 +1,205 @@
-# Función para generar el código objeto (Arduino) a partir del código intermedio
-def generar_codigo_arduino(codigo_intermedio):
-    codigo_arduino = []
+class ArduinoCodeGenerator:
+    def __init__(self):
+        self.arduino_code = []
+        self.indent_level = 1
 
-    def traducir_linea(linea):
-        # Traducción de declaraciones de variables
-        if "BOOL" in linea:
-            return linea.replace("BOOL", "bool").replace("F", "false").replace("V", "true")
-        elif "DECIMAL" in linea:
-            return linea.replace("DECIMAL", "float")
-        elif "PRINT" in linea:
-            return linea.replace("PRINT", "Serial.println")
-        elif "IF" in linea:
-            return linea.replace("IF", "if")
-        elif "WHILE" in linea:
-            return linea.replace("WHILE", "while")
-        elif "OBSTACLE_DETECTED" in linea:
-            return "// Código para detectar obstáculo"
-        elif "FOR" in linea:
-            return linea.replace("FOR", "for")
+    def add_line(self, line):
+        indent = '  ' * self.indent_level
+        self.arduino_code.append(f"{indent}{line}")
 
-        return linea
+    def generate(self, node):
+        self.add_line("void loop() {")
+        self.indent_level += 1
+        self.traverse(node)
+        self.indent_level -= 1
+        self.add_line("}")
+        return '\n'.join(self.arduino_code)
 
-    # Añadir el código de configuración inicial para Arduino
-    codigo_arduino.append("#include <Arduino.h>")
-    codigo_arduino.append("#include <Servo.h>")
-    codigo_arduino.append("Servo myservo;")
-    codigo_arduino.append("Servo myservo2;")
-    codigo_arduino.append("int ENA = 5;")
-    codigo_arduino.append("int IN1 = 12;")
-    codigo_arduino.append("int IN2 = 13;")
-    codigo_arduino.append("int ENB = 6;")
-    codigo_arduino.append("int IN3 = 10;")
-    codigo_arduino.append("int IN4 = 11;")
-    codigo_arduino.append("int TERMISTOR = A0;")
-    codigo_arduino.append("int val;")
-    codigo_arduino.append("int temp;")
-    codigo_arduino.append("int BUZZER_PIN = 7;")
-    codigo_arduino.append("int echoPin = 8;")
-    codigo_arduino.append("int trigPin = 9;")
-    codigo_arduino.append("long duration;")
-    codigo_arduino.append("int distance;")
-    codigo_arduino.append("int delayVal;")
-    codigo_arduino.append("int servoPos = 0;")
-    codigo_arduino.append("int servoReadLeft = 0;")
-    codigo_arduino.append("int servoReadRight = 0;")
-    codigo_arduino.append("void setup() {")
-    codigo_arduino.append("  Serial.begin(9600);")
-    codigo_arduino.append("  myservo.attach(4);")
-    codigo_arduino.append("  myservo2.attach(3);")
-    codigo_arduino.append("  pinMode(IN1, OUTPUT);")
-    codigo_arduino.append("  pinMode(IN2, OUTPUT);")
-    codigo_arduino.append("  pinMode(IN3, OUTPUT);")
-    codigo_arduino.append("  pinMode(IN4, OUTPUT);")
-    codigo_arduino.append("  pinMode(ENA, OUTPUT);")
-    codigo_arduino.append("  pinMode(ENB, OUTPUT);")
-    codigo_arduino.append("  pinMode(TERMISTOR, INPUT);")
-    codigo_arduino.append("  pinMode(BUZZER_PIN, OUTPUT);")
-    codigo_arduino.append("  pinMode(trigPin, OUTPUT);")
-    codigo_arduino.append("  pinMode(echoPin, INPUT);")
-    codigo_arduino.append("}")
-    codigo_arduino.append("void loop() {")
+    def traverse(self, node):
+        
+        
+        if isinstance(node, tuple):
+            
+            node_type = node[0]
+            if node_type == 'programa':
+                self.traverse(node[1])
+                
+            if node_type == 'bloque_codigo':
+              self.traverse_list(node[1])
+                    
+            if node_type == 'lista_declaraciones':
+              self.traverse_list(node[1])
+            if node_type == 'declaracion':
+                self.handle_declaracion(node)
+            if node_type == 'declaracion_estructura':
+                self.traverse(node[1])
+            if node_type == 'declaracion_funcion_interna':
+                self.traverse(node[1])
+            if node_type == 'llamada_funcion_motor':
+                self.traverse(node[1])
+            if node_type == 'si':
+                self.handle_si(node)
+            if node_type == 'sino':
+                self.handle_sino(node)
+            if node_type == 'mientras':
+                self.handle_mientras(node)
+            if node_type == 'mostrar_en_pantalla':
+                self.add_line(f'Serial.println({node[1]});')
+            if node_type == 'detener_motor':
+                self.add_line('stop();')
+            if node_type == 'motor_encendido':
+                self.add_line('// MOTOR_ENCENDIDO() no tiene equivalente directo')
+            if node_type == 'acelerar':
+                print(node[0])
+                self.add_line(f'forward({node[1]});')
+            if node_type == 'retroceder':
+                self.add_line('backward();')
+            if node_type == 'girar_derecha':
+                self.add_line('right();')
+            if node_type == 'girar_izquierda':
+                self.add_line('left();')
+            if node_type == 'mover_implemento':
+                self.add_line(f'myservo2.write({node[1]});')
+            if node_type == 'esperar':
+                self.add_line(f'delay({node[1]});')
+            if node_type == 'obstaculo_detectado':
+                self.handle_obstaculo_detectado(node)
+            if node_type == 'sonar_alarma':
+                self.add_line('alarm();')
+            if node_type == 'calcular_distancia_restante':
+                print("si entra")
+                self.add_line('medirDistancia();')
 
-    for linea in codigo_intermedio:
-        linea_traducida = traducir_linea(linea)
-        if linea_traducida:
-            codigo_arduino.append("  " + linea_traducida)
+    def handle_declaracion(self, node):
+        if len(node) == 4:
+            tipo, identificador, valor = node[1], node[2], node[3]
+            if tipo == 'ENTERO':
+                self.add_line(f'int {identificador} = {valor};')
+            if tipo == 'DECIMAL':
+                self.add_line(f'float {identificador} = {valor};')
+            if tipo == 'BOOL':
+                self.add_line(f'bool {identificador} = {valor};')
+            if tipo == 'CADENA':
+                self.add_line(f'string {identificador} = {valor};')
+        else:
+            identificador, valor = node[1], node[2]
+            self.add_line(f'{identificador} = {valor};')
 
-    # Añadir el cierre del bucle loop
-    codigo_arduino.append("}")
+    def handle_si(self, node):
+        if len(node) == 3:
+            condicion, bloque = node[1], node[2]
+            self.add_line(f'if {self.translate_expr(condicion)} {{')
+            self.indent_level += 1
+            self.traverse(bloque)
+            self.indent_level -= 1
+            self.add_line('}')
 
-    return codigo_arduino
+    def traverse_list(self, node_list):
+        for child in node_list:
+            self.traverse(child)
 
-def exportar_codigo_a_texto(codigo):
-    return "\n".join(codigo)
+    def handle_sino(self, node):
+        self.handle_si(node[1])
+        self.add_line('else {')
+        self.indent_level += 1
+        self.traverse(node[2])
+        self.indent_level -= 1
+        self.add_line('}')
 
+    def handle_mientras(self, node):
+        condicion, bloque = node[1], node[2]
+        self.add_line(f'while ({self.translate_expr(condicion)}) {{')
+        self.indent_level += 1
+        self.traverse(bloque)
+        self.indent_level -= 1
+        self.add_line('}')
 
-######################################################ZONA PARA PRUEBAS
-# DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
-# # Probar el código de ejemplo
-# test_code = """
-# COMENZAR{
+    def handle_obstaculo_detectado(self, node):
+        if node[1] == '40':
+            self.add_line('myservo.write(40);')
+        if node[1] == '140':
+            self.add_line('myservo.write(140);')
+        if node[1] == '90':
+            self.add_line('myservo.write(90);')
+        self.add_line('delay(600);')
 
-# BOOL obstaculo_detectado = falso;
-# DECIMAL distancia_objetivo = 500.0;
+    def translate_expr(self, expr):
+        if isinstance(expr, tuple):
+            if expr[0] == 'expresion':
+                left = self.translate_expr(expr[1])
+                op = expr[2]
+                right = self.translate_expr(expr[3])
+                return f'({left} {op} {right})'
+            if expr[0] == 'grupo':
+                return f'({self.translate_expr(expr[1])})'
+        return str(expr)
 
-# MIENTRAS(distancia_recorrida < distancia_objetivo){
-#     SI(obstaculo_detectado){
-#         SI(CALCULAR_DISTANCIA_RESTANTE(distancia_objetivo) < 100){
-#             DETENER_MOTOR();
-#             SONAR_ALARMA();
-#             ESPERAR(5); // Espera 5 segundos antes de reanudar
-#             ACTIVAR_FRENO();
-#             ESPERAR(2); // Espera 2 segundos con los frenos activados
-#             obstaculo_detectado = Falso; // Reinicia la detección de obstáculos
-#         }SINO{
-#             AJUSTAR_VELOCIDAD(20); // Reducir la velocidad para evitar el obstáculo
-#         }
-#     }SINO{
-#         SI(VERIFICAR_SENSOR_OBSTACULOS()){
-#             obstaculo_detectado = Verdadero;
-#         }SINO{
-#             AJUSTAR_VELOCIDAD(50); // Mantener velocidad constante
-#         }
-#     }
-#     // Simulación de movimiento del tractor
-#     distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
-# }
+# # Ejemplo de uso
+# if __name__ == "__main__":
+#     from Analizador_Sintactico import construir_analizador_lexico, construir_analizador_sintactico, print_tree
 
-# }TERMINAR
-# """
+#     codigo_fuente = """
+    # COMENZAR {
+    #     ENTERO obstaculo_izquierda = 0;
+    #     ENTERO obstaculo_derecha = 0;
+    #     ENTERO temperatura = 0;
+    #     ENTERO distancia = 10;
 
-# # Construir los analizadores
-# lexer = construir_analizador_lexico()
-# parser = construir_analizador_sintactico()
+    #     temperatura = MEDIR_TEMPERATURA();
+    #     MOTOR_ENCENDIDO();
 
-# # Realizar el análisis léxico y sintáctico
-# lexer.input(test_code)
-# tokens_analisis = [token for token in lexer]
-# reiniciar_analizador_lexico(lexer)
+    #     SI(temperatura<=75){
+    #         MOVER_IMPLEMENTO(160);
+    #         ESPERAR(600);
 
-# # Obtener el AST
-# ast = parser.parse(test_code)
+    #         SI(distancia <= 8){
+    #             SI(distancia !=0){
+    #                 RETROCEDER();
+    #                 ESPERAR(400);
+    #                 distancia=15;
+    #             }
+    #         }
+    #         SI(distancia<= 20){
+    #             SI(distancia !=0){
+    #                 DETENER_MOTOR();
+    #                 OBSTACULO_DETECTADO(40);
+    #                 ESPERAR(600);
+    #                 obstaculo_derecha = CALCULAR_DISTANCIA_RESTANTE();
 
-# # Generar el código intermedio
-# codigo_intermedio = generar_codigo_intermedio(ast)
+    #                 OBSTACULO_DETECTADO(140);
+    #                 ESPERAR(600);
+    #                 obstaculo_izquierda = CALCULAR_DISTANCIA_RESTANTE();
 
-# # Optimizar el código intermedio
-# codigo_optimizado = optimizar_codigo_intermedio(codigo_intermedio)
+    #                 //miramos de frente
+    #                 OBSTACULO_DETECTADO(90);
+    #                 ESPERAR(600);
+    #             }
+    #             SI(obstaculo_izquierda > obstaculo_derecha){
+    #                 MOSTRAR_EN_PANTALLA("Giro izquierda");
+    #                 GIRAR_IZQUIERDA();
+    #             }
+    #             SI(obstaculo_derecha >= obstaculo_izquierda){
+    #                 MOSTRAR_EN_PANTALLA("Giro derecha");
+    #                 GIRAR_DERECHA();
+    #             }
+    #         }
+    #         SI(distancia > 20){
+    #             MOSTRAR_EN_PANTALLA("RECTO");
+    #             ACELERAR(80);
+    #         }
+    #         SINO{
+    #             SONAR_ALARMA();
+    #         }
+    #     }
+    # } TERMINAR
+#     """
 
-# # Generar el código Arduino
-# codigo_arduino = generar_codigo_arduino(codigo_optimizado)
+#     analizador_lexico = construir_analizador_lexico()
+#     analizador_sintactico = construir_analizador_sintactico()
 
-# # Exportar el código Arduino a una cadena de texto formateada
-# codigo_arduino_texto = exportar_codigo_a_texto(codigo_arduino)
-
-# # Imprimir el código Arduino formateado
-# print(codigo_arduino_texto)
+#     parse_result = analizador_sintactico.parse(codigo_fuente)
+#     #arduino_generator = ArduinoCodeGenerator()
+#     print_tree(parse_result)
+#     #arduino_code = arduino_generator.generate(parse_result)
+    
+#     #print(arduino_code)

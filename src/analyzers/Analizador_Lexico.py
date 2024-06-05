@@ -122,14 +122,16 @@ tokens = [
     'FRENOS_ACTIVADOS',
     'CALCULAR_DISTANCIA_RESTANTE',
     'DISTANCIA_RESTANTE',
+    'MOVER_IMPLEMENTO',
     'ACELERAR',
     'RETROCEDER',
     'GIRAR_DERECHA',
     'GIRAR_IZQUIERDA',
     'AJUSTAR_VELOCIDAD',
+    'MEDIR_TEMPERATURA',
     'NUEVA_VELOCIDAD',
-    #'OBSTACULO_DETECTADO',
-    #'DISTANCIA_OBJETIVO',
+    'OBSTACULO_DETECTADO',
+    'DISTANCIA_OBJETIVO',
     'SONAR_ALARMA',
     'ESPERAR',
     'VERIFICAR_SENSOR_OBSTACULOS',
@@ -219,15 +221,17 @@ def t_IDENTIFICADOR(t):
         'ACTIVAR_FRENO':'ACTIVAR_FRENO',
         'FRENOS_ACTIVADOS':'FRENOS_ACTIVADOS',
         'CALCULAR_DISTANCIA_RESTANTE':'CALCULAR_DISTANCIA_RESTANTE',
-        #'DISTANCIA_OBJETIVO':'DISTANCIA_OBJETIVO',
+        'DISTANCIA_OBJETIVO':'DISTANCIA_OBJETIVO',
         'DISTANCIA_RESTANTE':'DISTANCIA_RESTANTE',
         'ACELERAR':'ACELERAR',
         'RETROCEDER':'RETROCEDER',
         'GIRAR_DERECHA':'GIRAR_DERECHA',
         'GIRAR_IZQUIERDA':'GIRAR_IZQUIERDA',
+        'MOVER_IMPLEMENTO':'MOVER_IMPLEMENTO',
+        'MEDIR_TEMPERATURA':'MEDIR_TEMPERATURA',
         'AJUSTAR_VELOCIDAD':'AJUSTAR_VELOCIDAD',
         'NUEVA_VELOCIDAD':'NUEVA_VELOCIDAD',
-        #'OBSTACULO_DETECTADO':'OBSTACULO_DETECTADO',
+        'OBSTACULO_DETECTADO':'OBSTACULO_DETECTADO',
         'SONAR_ALARMA':'SONAR_ALARMA',
         'ESPERAR':'ESPERAR',
         'VERIFICAR_SENSOR_OBSTACULOS':'VERIFICAR_SENSOR_OBSTACULOS',
@@ -268,33 +272,48 @@ def construir_analizador_lexico():
 
 # code = """
 # COMENZAR{
+#     temperatura = MEDIR_TEMPERATURA();
 
-# BOOL obstaculo_detectado = Falso;
-# DECIMAL distancia_objetivo = 500.0;
+#     SI(temperatura<=75){
+#         MOVER_IMPLEMENTO(160);
+#         ESPERAR(600);
+#         distancia = CALCULAR_DISTANCIA_RESTANTE();
 
-# MIENTRAS(distancia_recorrida < distancia_objetivo){
-#     SI(obstaculo_detectado){
-#         SI(calcular_distancia_restante(distancia_objetivo) < 100){
-#             DETENER_MOTOR();
-#             SONAR_ALARMA();
-#             ESPERAR(5); // Espera 5 segundos antes de reanudar
-#             activar_freno();
-#             ESPERAR(2); // Espera 2 segundos con los frenos activados
-#             obstaculo_detectado = F; // Reinicia la detección de obstáculos
-#         }SINO{
-#             ajustar_velocidad(20); // Reducir la velocidad para evitar el obstáculo
+#         SI(distancia <= 8 Y distancia !=0){
+#             GIRAR_DERECHA();
+#             ESPERAR(400);
+#             distancia=15;
 #         }
-#     }SINO{
-#         SI(verificar_sensor_obstaculos()){
-#             obstaculo_detectado = V;
-#         }SINO{
-#             ajustar_velocidad(50); // Mantener velocidad constante
+#         SI(distancia<= 20 Y distancia !=0){
+#             DETENER_MOTOR();
+#             OBSTACULO_DETECTADO(40);
+#             ESPERAR(600);
+#             obstaculo_derecha = CALCULAR_DISTANCIA_RESTANTE();
+
+#             OBSTACULO_DETECTADO(140);
+#             ESPERAR(600);
+#             obstaculo_izquierda = CALCULAR_DISTANCIA_RESTANTE();
+
+#             //miramos de frente
+#             OBSTACULO_DETECTADO(90);
+#             ESPERAR(600);
+#             SI(obstaculo_izquierda > obstaculo_derecha){
+#                 MOSTRAR_EN_PANTALLA("Giro izquierda");
+#                 ACELERAR();
+#             }
+#             SI(obstaculo_derecha>= obstaculo_izquierda){
+#                 MOSTRAR_EN_PANTALLA("Giro derecha");
+#                 RETROCEDER();
+#             }
+#         }
+#         SI(distancia > 20){
+#             MOSTRAR_EN_PANTALLA("RECTO");
+#             GIRAR_IZQUIERDA(80);
+#         }
+#         SINO{
+#             SONAR_ALARMA();
 #         }
 #     }
-#     // Simulación de movimiento del tractor
-#     distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
-# }
-
 # }TERMINAR
 # """
 # lexer = construir_analizador_lexico()
