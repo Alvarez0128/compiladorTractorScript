@@ -303,9 +303,9 @@ def construir_analizador_lexico():
 # """
 # lexer = construir_analizador_lexico()
 
-lexer.input(code)
+# lexer.input(code)
 
-for token in lexer:
-   print(token)
-for error in tabla_errores:
-   print(error)
+# for token in lexer:
+#    print(token)
+# for error in tabla_errores:
+#    print(error)
