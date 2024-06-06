@@ -454,8 +454,13 @@ def p_medir_temperatura(p):
 #ESTRUCTURA PARA EXPRESION GIRAR_IZQUIERDA
 def p_girar_izquierda(p):
     """
+<<<<<<< HEAD
     girar_izquierda : GIRAR_IZQUIERDA PARENTESIS_IZQ PARENTESIS_DER PUNTO_COMA
                     | GIRAR_IZQUIERDA PARENTESIS_IZQ PARENTESIS_DER 
+=======
+    girar_izquierda : GIRAR_IZQUIERDA PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER PUNTO_COMA
+                    | GIRAR_IZQUIERDA PARENTESIS_IZQ NUMDECIMAL PARENTESIS_DER 
+>>>>>>> ebddd9c718497f87e114544c93d68d7d7c539432
     """
     p[0] = ('girar_izquierda',p[1])
 
@@ -922,40 +927,40 @@ def tree_to_json(node):
 ######################################################ZONA PARA PRUEBAS
 # DESCOMENTA CON Ctrl+k+u TODAS LAS LINEAS DE ABAJO PARA PROBAR ESTE ARCHIVO DE MANERA AISLADA
 
-# parser = yacc.yacc()
-# lexer = construir_analizador_lexico()
-# tokens_analisis=[]
-# #Función de prueba
-# def test_parser(input_string):
+parser = yacc.yacc()
+lexer = construir_analizador_lexico()
+tokens_analisis=[]
+#Función de prueba
+def test_parser(input_string):
     
-#    lexer.input(input_string)
+   lexer.input(input_string)
     
-#    for token in lexer:
-#        tokens_analisis.append(token)
+   for token in lexer:
+       tokens_analisis.append(token)
         
-#    reiniciar_analizador_lexico(lexer)
-# #    for t in tokens_analisis:
-# #         print(t)
-#    result = parser.parse(input_string)
-#    print_tree(result)
-# #    generador = GeneradorCodigoIntermedio()
-# #    generador.analizar(result)
-# #    generador.imprimir_tripletas()
+   reiniciar_analizador_lexico(lexer)
+#    for t in tokens_analisis:
+#         print(t)
+   result = parser.parse(input_string)
+   print_tree(result)
+#    generador = GeneradorCodigoIntermedio()
+#    generador.analizar(result)
+#    generador.imprimir_tripletas()
 
-# #Función para imprimir el árbol sintáctico
-# def print_tree(node, depth=0):
-#    if isinstance(node, tuple):
-#        print("  " * depth + node[0])
-#        for child in node[1:]:
-#            print_tree(child, depth + 1)
-#    elif isinstance(node, NodoPara):
-#        print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
-#        print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
-#    elif isinstance(node, list):
-#        for item in node:
-#            print_tree(item, depth)
-#    else:
-#        print("  " * depth + str(node))
+#Función para imprimir el árbol sintáctico
+def print_tree(node, depth=0):
+   if isinstance(node, tuple):
+       print("  " * depth + node[0])
+       for child in node[1:]:
+           print_tree(child, depth + 1)
+   elif isinstance(node, NodoPara):
+       print("  " * depth + f"PARA {node.tipo} {node.identificador} = {node.inicio}; {node.condicion}; {node.incremento}")
+       print_tree(node.bloque, depth + 1)  # Imprimir el bloque de código del nodo
+   elif isinstance(node, list):
+       for item in node:
+           print_tree(item, depth)
+   else:
+       print("  " * depth + str(node))
 
 
 # # Código de prueba
@@ -1015,12 +1020,62 @@ def tree_to_json(node):
 #     }TERMINAR
 # """
 # test_parser(test_code)
+# Código de prueba
+test_code = """
+COMENZAR{
+    temperatura = MEDIR_TEMPERATURA();
+    
+    MOTOR_ENCENDIDO();
+    
+    SI(temperatura<=75){
+        MOVER_IMPLEMENTO(160);
+        ESPERAR(600);
+        distancia = CALCULAR_DISTANCIA_RESTANTE();
 
-# # Obtener los errores sintácticos
-# errores = obtener_errores_sintactico()
-# # Imprimir los errores
-# for error in errores:
-#     print(error)
+        SI(distancia <= 8 Y distancia !=0){
+            GIRAR_DERECHA();
+            ESPERAR(400);
+            distancia=15;
+        }
+        SI(distancia<= 20 Y distancia !=0){
+            DETENER_MOTOR();
+            OBSTACULO_DETECTADO(40);
+            ESPERAR(600);
+            obstaculo_derecha = CALCULAR_DISTANCIA_RESTANTE();
+
+            OBSTACULO_DETECTADO(140);
+            ESPERAR(600);
+            obstaculo_izquierda = CALCULAR_DISTANCIA_RESTANTE();
+
+            //miramos de frente
+            OBSTACULO_DETECTADO(90);
+            ESPERAR(600);
+            SI(obstaculo_izquierda > obstaculo_derecha){
+                MOSTRAR_EN_PANTALLA("Giro izquierda");
+                ACELERAR();
+            }
+            SI(obstaculo_derecha>= obstaculo_izquierda){
+                MOSTRAR_EN_PANTALLA("Giro derecha");
+                RETROCEDER();
+            }
+        }
+        SI(distancia > 20){
+            MOSTRAR_EN_PANTALLA("RECTO");
+            GIRAR_IZQUIERDA(80);
+        }
+        SINO{
+            SONAR_ALARMA();
+        }
+    }
+}TERMINAR
+"""
+test_parser(test_code)
+
+# Obtener los errores sintácticos
+errores = obtener_errores_sintactico()
+# Imprimir los errores
+for error in errores:
+    print(error)
 
 
 # #tabla_simbolos_global.print_table()

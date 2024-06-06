@@ -272,55 +272,40 @@ def construir_analizador_lexico():
 
 # code = """
 # COMENZAR{
-#     temperatura = MEDIR_TEMPERATURA();
 
-#     SI(temperatura<=75){
-#         MOVER_IMPLEMENTO(160);
-#         ESPERAR(600);
-#         distancia = CALCULAR_DISTANCIA_RESTANTE();
+# BOOL obstaculo_detectado = Falso;
+# DECIMAL distancia_objetivo = 500.0;
 
-#         SI(distancia <= 8 Y distancia !=0){
-#             GIRAR_DERECHA();
-#             ESPERAR(400);
-#             distancia=15;
-#         }
-#         SI(distancia<= 20 Y distancia !=0){
+# MIENTRAS(distancia_recorrida < distancia_objetivo){
+#     SI(obstaculo_detectado){
+#         SI(calcular_distancia_restante(distancia_objetivo) < 100){
 #             DETENER_MOTOR();
-#             OBSTACULO_DETECTADO(40);
-#             ESPERAR(600);
-#             obstaculo_derecha = CALCULAR_DISTANCIA_RESTANTE();
-
-#             OBSTACULO_DETECTADO(140);
-#             ESPERAR(600);
-#             obstaculo_izquierda = CALCULAR_DISTANCIA_RESTANTE();
-
-#             //miramos de frente
-#             OBSTACULO_DETECTADO(90);
-#             ESPERAR(600);
-#             SI(obstaculo_izquierda > obstaculo_derecha){
-#                 MOSTRAR_EN_PANTALLA("Giro izquierda");
-#                 ACELERAR();
-#             }
-#             SI(obstaculo_derecha>= obstaculo_izquierda){
-#                 MOSTRAR_EN_PANTALLA("Giro derecha");
-#                 RETROCEDER();
-#             }
-#         }
-#         SI(distancia > 20){
-#             MOSTRAR_EN_PANTALLA("RECTO");
-#             GIRAR_IZQUIERDA(80);
-#         }
-#         SINO{
 #             SONAR_ALARMA();
+#             ESPERAR(5); // Espera 5 segundos antes de reanudar
+#             activar_freno();
+#             ESPERAR(2); // Espera 2 segundos con los frenos activados
+#             obstaculo_detectado = F; // Reinicia la detección de obstáculos
+#         }SINO{
+#             ajustar_velocidad(20); // Reducir la velocidad para evitar el obstáculo
+#         }
+#     }SINO{
+#         SI(verificar_sensor_obstaculos()){
+#             obstaculo_detectado = V;
+#         }SINO{
+#             ajustar_velocidad(50); // Mantener velocidad constante
 #         }
 #     }
+#     // Simulación de movimiento del tractor
+#     distancia_recorrida = distancia_recorrida + velocidad * tiempo_transcurrido;
+# }
+
 # }TERMINAR
 # """
 # lexer = construir_analizador_lexico()
 
-# lexer.input(code)
+lexer.input(code)
 
-# for token in lexer:
-#    print(token)
-# for error in tabla_errores:
-#    print(error)
+for token in lexer:
+   print(token)
+for error in tabla_errores:
+   print(error)
