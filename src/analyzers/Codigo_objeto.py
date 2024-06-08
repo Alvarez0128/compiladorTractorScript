@@ -50,8 +50,7 @@ class ArduinoCodeGenerator:
             if node_type == 'motor_encendido':
                 self.add_line('// MOTOR_ENCENDIDO() no tiene equivalente directo')
             if node_type == 'acelerar':
-                print(node[0])
-                self.add_line(f'forward({node[1]});')
+                self.add_line(f'forward({node[2]});')
             if node_type == 'retroceder':
                 self.add_line('backward();')
             if node_type == 'girar_derecha':
@@ -59,11 +58,11 @@ class ArduinoCodeGenerator:
             if node_type == 'girar_izquierda':
                 self.add_line('left();')
             if node_type == 'mover_implemento':
-                self.add_line(f'myservo2.write({node[1]});')
+                self.add_line(f'myservo2.write({node[2]});')
             if node_type == 'esperar':
-                self.add_line(f'delay({node[1]});')
+                self.add_line(f'delay({node[2]});')
             if node_type == 'obstaculo_detectado':
-                self.handle_obstaculo_detectado(node)
+                self.add_line(f'myservo.write({node[2]});')
             if node_type == 'sonar_alarma':
                 self.add_line('alarm();')
             if node_type == 'calcular_distancia_restante':
@@ -83,7 +82,14 @@ class ArduinoCodeGenerator:
                 self.add_line(f'string {identificador} = {valor};')
         else:
             identificador, valor = node[1], node[2]
+            if isinstance(node[2],tuple):
+                valor = self.handle_asig_func(node[2])
             self.add_line(f'{identificador} = {valor};')
+
+    def handle_asig_func(self,node):
+        if(node[0]=='calcular_distancia_restante'):
+            return ('medirDistancia()')
+        return ('Thermister(analogRead(TERMISTOR))')
 
     def handle_si(self, node):
         if len(node) == 3:
@@ -113,15 +119,6 @@ class ArduinoCodeGenerator:
         self.traverse(bloque)
         self.indent_level -= 1
         self.add_line('}')
-
-    def handle_obstaculo_detectado(self, node):
-        if node[1] == '40':
-            self.add_line('myservo.write(40);')
-        if node[1] == '140':
-            self.add_line('myservo.write(140);')
-        if node[1] == '90':
-            self.add_line('myservo.write(90);')
-        self.add_line('delay(600);')
 
     def translate_expr(self, expr):
         if isinstance(expr, tuple):
